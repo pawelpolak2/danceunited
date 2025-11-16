@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "module": "preserve",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "target": "esnext",
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "strict": true
+  },
+  "include": ["index.ts", "types"]
+}

@@ -1,0 +1,13 @@
+FROM node:20-slim
+
+# Install pnpm
+RUN npm install -g pnpm
+
+# Set working directory
+WORKDIR /app
+
+# Expose port for React Router dev server
+EXPOSE 5173
+
+# Start command will be provided by docker-compose
+CMD ["sh"]
