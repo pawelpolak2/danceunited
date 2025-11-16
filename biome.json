@@ -1,0 +1,87 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "files": {
+    "ignore": ["build/**", "entry.client.tsx", "entry.server.tsx", "localstack/**", "generated/**"]
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "correctness": {
+        "useExhaustiveDependencies": "off",
+        "noUnusedVariables": "error",
+        "useJsxKeyInIterable": "off",
+        "noUnusedImports": "error"
+      },
+      "complexity": {
+        "useLiteralKeys": "off",
+        "useArrowFunction": "off",
+        "noForEach": "off",
+        "useOptionalChain": "off",
+        "noUselessSwitchCase": "off",
+        "noUselessEmptyExport": "error",
+        "noUselessFragments": "error"
+      },
+      "style": {
+        "noParameterAssign": "error",
+        "noUselessElse": "off",
+        "noNonNullAssertion": "off",
+        "useDefaultParameterLast": "off",
+        "useNumberNamespace": "off",
+        "useNodejsImportProtocol": "off"
+      },
+      "suspicious": {
+        "noConsoleLog": "error",
+        "noExplicitAny": "off",
+        "noArrayIndexKey": "off",
+        "useDefaultSwitchClauseLast": "off",
+        "noAssignInExpressions": "off",
+        "noDuplicateAtImportRules": "error",
+        "useAwait": "error"
+      },
+      "nursery": {
+        "useSortedClasses": {
+          "level": "error",
+          "fix": "safe",
+          "options": {
+            "attributes": ["classList"],
+            "functions": ["cn", "cva"]
+          }
+        }
+      },
+      "a11y": {
+        "noSvgWithoutTitle": "off",
+        "useKeyWithClickEvents": "off",
+        "useSemanticElements": "off",
+        "useFocusableInteractive": "off",
+        "noLabelWithoutControl": "off"
+      }
+    }
+  },
+  "formatter": {
+    "indentStyle": "space",
+    "lineWidth": 120
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "semicolons": "asNeeded",
+      "trailingCommas": "es5"
+    }
+  },
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "css": {
+    "formatter": {
+      "enabled": true
+    }
+  },
+  "json": {
+    "formatter": {
+      "enabled": true
+    }
+  }
+}
