@@ -2,7 +2,9 @@
 	"packageManager": "pnpm@10.18.2",
 	"scripts": {
 		"dev": "docker compose -f docker-compose.dev.yml up --build",
-		"lint": "turbo lint"
+		"build": "turbo build",
+		"lint": "turbo lint",
+		"typegen": "turbo typegen"
 	},
 	"dependencies": {
 		"@biomejs/biome": "^2.3.5"
