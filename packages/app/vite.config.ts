@@ -11,5 +11,16 @@ export default defineConfig({
   },
   ssr: {
     external: ['bcryptjs', '@prisma/client'],
+    noExternal: [],
+    resolve: {
+      externalConditions: ['node'],
+    },
+  },
+  build: {
+    rollupOptions: {
+      external: (id) => {
+        return id === '@prisma/client' || id.startsWith('@prisma/client/')
+      },
+    },
   },
 })
