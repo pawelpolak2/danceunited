@@ -1,6 +1,17 @@
-import { Links, Meta, Outlet, Scripts, ScrollRestoration, isRouteErrorResponse } from 'react-router'
+import {
+  Form,
+  Link,
+  Links,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+  isRouteErrorResponse,
+  useLoaderData,
+} from 'react-router'
 
 import type { Route } from './+types/root'
+import { getCurrentUser } from './lib/auth.server'
 import './app.css'
 
 export const links: Route.LinksFunction = () => [
@@ -34,8 +45,65 @@ export function Layout({ children }: { children: React.ReactNode }) {
   )
 }
 
+export async function loader({ request }: Route.LoaderArgs) {
+  const user = await getCurrentUser(request)
+  return { user }
+}
+
 export default function App() {
-  return <Outlet />
+  const { user } = useLoaderData<typeof loader>()
+
+  return (
+    <div className="flex min-h-screen flex-col">
+      <header className="border-gray-200 border-b bg-white dark:border-gray-800 dark:bg-gray-900">
+        <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+          <Link to="/" className="font-bold text-2xl text-gray-900 dark:text-white">
+            Dance United
+          </Link>
+          <div className="flex items-center gap-4">
+            {user ? (
+              <>
+                <span className="text-gray-700 text-sm dark:text-gray-300">
+                  {user.firstName} {user.lastName}
+                </span>
+                <Form method="post" action="/api/auth/logout">
+                  <button
+                    type="submit"
+                    className="rounded-md px-4 py-2 font-medium text-gray-700 text-sm transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+                  >
+                    Logout
+                  </button>
+                </Form>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="rounded-md px-4 py-2 font-medium text-gray-700 text-sm transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  className="rounded-md bg-blue-600 px-4 py-2 font-semibold text-sm text-white transition-colors hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+                >
+                  Register
+                </Link>
+              </>
+            )}
+          </div>
+        </nav>
+      </header>
+      <main className="flex-1">
+        <Outlet />
+      </main>
+      <footer className="border-gray-200 border-t bg-gray-50 py-8 dark:border-gray-800 dark:bg-gray-900">
+        <div className="mx-auto max-w-7xl px-4 text-center text-gray-600 text-sm dark:text-gray-400">
+          <p>&copy; {new Date().getFullYear()} Dance United. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
+  )
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
