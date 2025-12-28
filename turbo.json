@@ -1,6 +1,9 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "tasks": {
+    "generate": {
+      "outputs": ["generated/**"]
+    },
     "typegen": {
       "outputs": [".react-router/**"]
     },
@@ -8,7 +11,7 @@
       "dependsOn": ["typegen", "^lint"]
     },
     "build": {
-      "dependsOn": ["typegen", "^build"],
+      "dependsOn": ["generate", "typegen", "^build"],
       "outputs": ["build/**", "dist/**"]
     },
     "dev": {
