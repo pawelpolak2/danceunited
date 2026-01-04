@@ -32,7 +32,7 @@ export function FormField({
         </ShinyText>
       </label>
       {children || (
-        <div className="relative inline-block w-full">
+        <div className="mt-1 relative inline-block w-full">
           <input
             id={name}
             name={name}

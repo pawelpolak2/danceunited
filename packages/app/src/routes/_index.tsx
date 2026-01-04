@@ -1,8 +1,8 @@
-import { MetallicLink, ShinyText } from '../components/ui'
+import { Carousel, MetallicLink, ShinyText } from '../components/ui'
 import type { Route } from './+types/_index'
 
 // biome-ignore lint/correctness/noEmptyPattern: this is boilerplate code!
-export function meta({}: Route.MetaArgs) {
+export function meta({ }: Route.MetaArgs) {
   return [
     { title: 'Dance United - Home' },
     { name: 'description', content: 'Welcome to Dance United - Your dance community platform' },
@@ -13,8 +13,9 @@ export default function HomePage() {
   return (
     <main className="flex min-h-screen flex-col bg-gray-950">
       {/* Hero Section */}
-      <section className="flex flex-1 flex-col items-center justify-center px-4 py-16">
-        <div className="w-full max-w-4xl text-center">
+      {/* Hero Section */}
+      <section className="flex flex-col items-center justify-center pt-16 pb-8">
+        <div className="w-full max-w-4xl px-4 text-center">
           <ShinyText
             as="h1"
             variant="title"
@@ -25,8 +26,18 @@ export default function HomePage() {
           <ShinyText as="p" variant="body" className="mb-12 text-xl">
             Your premier platform for dance classes, community, and connection
           </ShinyText>
+        </div>
 
-          {/* CTA Buttons */}
+        {/* Full Width Carousel */}
+        <div className="mb-12 w-full">
+          <Carousel
+            images={['/img/hero-1.png', '/img/hero-2.png', '/img/hero-3.png']}
+            className="w-full rounded-none border-y border-amber-900/40"
+          />
+        </div>
+
+        {/* CTA Buttons */}
+        <div className="w-full max-w-4xl px-4 text-center">
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <MetallicLink
               to="/login"

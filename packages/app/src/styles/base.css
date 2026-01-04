@@ -1,0 +1,6 @@
+html,
+body {
+    @apply bg-gray-950;
+    color-scheme: dark;
+    font-family: "EB Garamond", Georgia, serif;
+}
