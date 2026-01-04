@@ -1,355 +1,376 @@
 /* Amazing metallic gold effect for titles - each letter polished */
 .shiny-text {
-    position: relative;
-    display: inline-block;
-    letter-spacing: 0.01em;
-    font-family: "Cinzel", serif;
-    font-weight: 400;
-    text-transform: none;
-    font-variant: normal;
-    font-feature-settings: normal;
+  position: relative;
+  display: inline-block;
+  letter-spacing: 0.01em;
+  font-family: "Cinzel", serif;
+  font-weight: 400;
+  text-transform: none;
+  font-variant: normal;
+  font-feature-settings: normal;
 
-    /* Base metallic gold gradient - highly polished with strong contrast */
-    background: linear-gradient(135deg,
-            #ffffff 0%,
-            #fff9e6 3%,
-            #ffed4e 8%,
-            #ffd700 15%,
-            #ffc125 22%,
-            #daa520 28%,
-            #b8860b 35%,
-            #daa520 42%,
-            #ffc125 50%,
-            #ffd700 58%,
-            #ffc125 65%,
-            #daa520 72%,
-            #ffd700 78%,
-            #ffed4e 85%,
-            #fff9e6 92%,
-            #ffffff 97%,
-            #ffd700 100%);
-    background-size: 500% 500%;
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: metallic-shine 15s ease-in-out infinite;
+  /* Base metallic gold gradient - highly polished with strong contrast */
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #fff9e6 3%,
+    #ffed4e 8%,
+    #ffd700 15%,
+    #ffc125 22%,
+    #daa520 28%,
+    #b8860b 35%,
+    #daa520 42%,
+    #ffc125 50%,
+    #ffd700 58%,
+    #ffc125 65%,
+    #daa520 72%,
+    #ffd700 78%,
+    #ffed4e 85%,
+    #fff9e6 92%,
+    #ffffff 97%,
+    #ffd700 100%
+  );
+  background-size: 500% 500%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: metallic-shine 15s ease-in-out infinite;
 
-    /* Strong metallic depth with multiple shadow layers */
-    text-shadow:
-        0 1px 3px rgba(0, 0, 0, 0.5),
-        0 2px 6px rgba(0, 0, 0, 0.3),
-        0 3px 9px rgba(0, 0, 0, 0.2),
-        0 -1px 2px rgba(255, 255, 255, 0.4),
-        0 -2px 4px rgba(255, 255, 255, 0.2);
+  /* Strong metallic depth with multiple shadow layers */
+  text-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.5),
+    0 2px 6px rgba(0, 0, 0, 0.3),
+    0 3px 9px rgba(0, 0, 0, 0.2),
+    0 -1px 2px rgba(255, 255, 255, 0.4),
+    0 -2px 4px rgba(255, 255, 255, 0.2);
 }
 
 /* Brushed metal highlight sweep - per letter effect */
 .shiny-text::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(90deg,
-            transparent 0%,
-            transparent 25%,
-            rgba(255, 255, 255, 0.3) 35%,
-            rgba(255, 255, 255, 0.8) 45%,
-            rgba(255, 255, 255, 1) 50%,
-            rgba(255, 255, 255, 0.8) 55%,
-            rgba(255, 255, 255, 0.3) 65%,
-            transparent 75%,
-            transparent 100%);
-    background-size: 500% 100%;
-    background-clip: text;
-    -webkit-background-clip: text;
-    animation: highlight-sweep 12s ease-in-out infinite;
-    pointer-events: none;
-    mix-blend-mode: overlay;
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 25%,
+    rgba(255, 255, 255, 0.3) 35%,
+    rgba(255, 255, 255, 0.8) 45%,
+    rgba(255, 255, 255, 1) 50%,
+    rgba(255, 255, 255, 0.8) 55%,
+    rgba(255, 255, 255, 0.3) 65%,
+    transparent 75%,
+    transparent 100%
+  );
+  background-size: 500% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  animation: highlight-sweep 12s ease-in-out infinite;
+  pointer-events: none;
+  mix-blend-mode: overlay;
 }
 
 /* Per-letter metallic reflection - creates individual letter shine */
 .shiny-text::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: repeating-linear-gradient(0deg,
-            transparent,
-            transparent 1px,
-            rgba(255, 255, 255, 0.15) 1px,
-            rgba(255, 255, 255, 0.15) 2px,
-            transparent 2px,
-            transparent 3px),
-        repeating-linear-gradient(45deg,
-            transparent,
-            transparent 2px,
-            rgba(255, 255, 255, 0.1) 2px,
-            rgba(255, 255, 255, 0.1) 3px);
-    background-size: 100% 6px, 200% 200%;
-    background-clip: text;
-    -webkit-background-clip: text;
-    opacity: 0.4;
-    pointer-events: none;
-    mix-blend-mode: soft-light;
-    animation: texture-shift 20s linear infinite;
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 1px,
+      rgba(255, 255, 255, 0.15) 1px,
+      rgba(255, 255, 255, 0.15) 2px,
+      transparent 2px,
+      transparent 3px
+    ),
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 2px,
+      rgba(255, 255, 255, 0.1) 2px,
+      rgba(255, 255, 255, 0.1) 3px
+    );
+  background-size: 100% 6px, 200% 200%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  opacity: 0.4;
+  pointer-events: none;
+  mix-blend-mode: soft-light;
+  animation: texture-shift 20s linear infinite;
 }
 
 @keyframes metallic-shine {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
 
-    0%,
-    100% {
-        background-position: 0% 50%;
-    }
+  25% {
+    background-position: 50% 0%;
+  }
 
-    25% {
-        background-position: 50% 0%;
-    }
+  50% {
+    background-position: 100% 50%;
+  }
 
-    50% {
-        background-position: 100% 50%;
-    }
-
-    75% {
-        background-position: 50% 100%;
-    }
+  75% {
+    background-position: 50% 100%;
+  }
 }
 
 @keyframes highlight-sweep {
-    0% {
-        background-position: -500% 0;
-        opacity: 0;
-    }
+  0% {
+    background-position: -500% 0;
+    opacity: 0;
+  }
 
-    15% {
-        opacity: 0.6;
-    }
+  15% {
+    opacity: 0.6;
+  }
 
-    50% {
-        opacity: 1;
-    }
+  50% {
+    opacity: 1;
+  }
 
-    85% {
-        opacity: 0.6;
-    }
+  85% {
+    opacity: 0.6;
+  }
 
-    100% {
-        background-position: 500% 0;
-        opacity: 0;
-    }
+  100% {
+    background-position: 500% 0;
+    opacity: 0;
+  }
 }
 
 @keyframes texture-shift {
-    0% {
-        background-position: 0 0, 0 0;
-    }
+  0% {
+    background-position: 0 0, 0 0;
+  }
 
-    100% {
-        background-position: 0 0, 100% 100%;
-    }
+  100% {
+    background-position: 0 0, 100% 100%;
+  }
 }
 
 /* Metallic gold effect for buttons */
 .metallic-button {
-    position: relative;
-    display: inline-block;
-    letter-spacing: 0.01em;
-    font-family: "EB Garamond", Georgia, serif;
-    font-weight: 600;
-    overflow: hidden;
+  position: relative;
+  display: inline-block;
+  letter-spacing: 0.01em;
+  font-family: "EB Garamond", Georgia, serif;
+  font-weight: 600;
+  overflow: hidden;
 
-    /* Base metallic gold gradient for background */
-    background: linear-gradient(135deg,
-            #ffffff 0%,
-            #fff9e6 3%,
-            #ffed4e 8%,
-            #ffd700 15%,
-            #ffc125 22%,
-            #daa520 28%,
-            #b8860b 35%,
-            #daa520 42%,
-            #ffc125 50%,
-            #ffd700 58%,
-            #ffc125 65%,
-            #daa520 72%,
-            #ffd700 78%,
-            #ffed4e 85%,
-            #fff9e6 92%,
-            #ffffff 97%,
-            #ffd700 100%);
-    background-size: 500% 500%;
-    animation: metallic-shine 15s ease-in-out infinite;
+  /* Base metallic gold gradient for background */
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #fff9e6 3%,
+    #ffed4e 8%,
+    #ffd700 15%,
+    #ffc125 22%,
+    #daa520 28%,
+    #b8860b 35%,
+    #daa520 42%,
+    #ffc125 50%,
+    #ffd700 58%,
+    #ffc125 65%,
+    #daa520 72%,
+    #ffd700 78%,
+    #ffed4e 85%,
+    #fff9e6 92%,
+    #ffffff 97%,
+    #ffd700 100%
+  );
+  background-size: 500% 500%;
+  animation: metallic-shine 15s ease-in-out infinite;
 
-    /* Metallic depth with shadows */
-    box-shadow:
-        0 1px 3px rgba(0, 0, 0, 0.5),
-        0 2px 6px rgba(0, 0, 0, 0.3),
-        0 3px 9px rgba(0, 0, 0, 0.2),
-        inset 0 -1px 2px rgba(255, 255, 255, 0.3),
-        inset 0 1px 2px rgba(0, 0, 0, 0.2);
+  /* Metallic depth with shadows */
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.5),
+    0 2px 6px rgba(0, 0, 0, 0.3),
+    0 3px 9px rgba(0, 0, 0, 0.2),
+    inset 0 -1px 2px rgba(255, 255, 255, 0.3),
+    inset 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 /* Metallic gold border effect for buttons with borders */
 .metallic-button[class*="border"],
 .metallic-button.border {
-    border: 2px solid transparent;
-    background-clip: padding-box;
-    position: relative;
-    /* Override gold gradient background with black fill */
-    background-color: rgb(3, 7, 18) !important;
-    /* gray-950 */
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  position: relative;
+  /* Override gold gradient background with black fill */
+  background-color: rgb(3, 7, 18) !important;
+  /* gray-950 */
 }
 
 /* Create metallic border using pseudo-element */
 .metallic-button[class*="border"]::after,
 .metallic-button.border::after {
-    content: "";
-    position: absolute;
-    inset: -2px;
-    border-radius: inherit;
-    padding: 2px;
-    background: linear-gradient(135deg,
-            #ffffff 0%,
-            #fff9e6 3%,
-            #ffed4e 8%,
-            #ffd700 15%,
-            #ffc125 22%,
-            #daa520 28%,
-            #b8860b 35%,
-            #daa520 42%,
-            #ffc125 50%,
-            #ffd700 58%,
-            #ffc125 65%,
-            #daa520 72%,
-            #ffd700 78%,
-            #ffed4e 85%,
-            #fff9e6 92%,
-            #ffffff 97%,
-            #ffd700 100%);
-    background-size: 500% 500%;
-    animation: metallic-shine 15s ease-in-out infinite;
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    mask-composite: exclude;
-    z-index: -1;
-    pointer-events: none;
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  padding: 2px;
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #fff9e6 3%,
+    #ffed4e 8%,
+    #ffd700 15%,
+    #ffc125 22%,
+    #daa520 28%,
+    #b8860b 35%,
+    #daa520 42%,
+    #ffc125 50%,
+    #ffd700 58%,
+    #ffc125 65%,
+    #daa520 72%,
+    #ffd700 78%,
+    #ffed4e 85%,
+    #fff9e6 92%,
+    #ffffff 97%,
+    #ffd700 100%
+  );
+  background-size: 500% 500%;
+  animation: metallic-shine 15s ease-in-out infinite;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  z-index: -1;
+  pointer-events: none;
 }
 
 /* Metallic text effect for button text - use span wrapper */
 .metallic-button span,
 .metallic-button {
-    position: relative;
-    z-index: 2;
-    color: transparent;
-    background: linear-gradient(135deg,
-            #ffffff 0%,
-            #fff9e6 3%,
-            #ffed4e 8%,
-            #ffd700 15%,
-            #ffc125 22%,
-            #daa520 28%,
-            #b8860b 35%,
-            #daa520 42%,
-            #ffc125 50%,
-            #ffd700 58%,
-            #ffc125 65%,
-            #daa520 72%,
-            #ffd700 78%,
-            #ffed4e 85%,
-            #fff9e6 92%,
-            #ffffff 97%,
-            #ffd700 100%);
-    background-size: 500% 500%;
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: metallic-shine 15s ease-in-out infinite;
+  position: relative;
+  z-index: 2;
+  color: transparent;
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #fff9e6 3%,
+    #ffed4e 8%,
+    #ffd700 15%,
+    #ffc125 22%,
+    #daa520 28%,
+    #b8860b 35%,
+    #daa520 42%,
+    #ffc125 50%,
+    #ffd700 58%,
+    #ffc125 65%,
+    #daa520 72%,
+    #ffd700 78%,
+    #ffed4e 85%,
+    #fff9e6 92%,
+    #ffffff 97%,
+    #ffd700 100%
+  );
+  background-size: 500% 500%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: metallic-shine 15s ease-in-out infinite;
 
-    /* Metallic depth with shadows for text - SHARPER VERSION */
-    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6), 0 -1px 0px rgba(255, 255, 255, 0.2);
+  /* Metallic depth with shadows for text - SHARPER VERSION */
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6), 0 -1px 0px rgba(255, 255, 255, 0.2);
 }
 
 /* Brushed metal highlight sweep for buttons - background layer */
 .metallic-button::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(90deg,
-            transparent 0%,
-            transparent 25%,
-            rgba(255, 255, 255, 0.3) 35%,
-            rgba(255, 255, 255, 0.8) 45%,
-            rgba(255, 255, 255, 1) 50%,
-            rgba(255, 255, 255, 0.8) 55%,
-            rgba(255, 255, 255, 0.3) 65%,
-            transparent 75%,
-            transparent 100%);
-    background-size: 500% 100%;
-    animation: highlight-sweep 30s ease-in-out infinite;
-    pointer-events: none;
-    mix-blend-mode: overlay;
-    border-radius: inherit;
-    z-index: 1;
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 25%,
+    rgba(255, 255, 255, 0.3) 35%,
+    rgba(255, 255, 255, 0.8) 45%,
+    rgba(255, 255, 255, 1) 50%,
+    rgba(255, 255, 255, 0.8) 55%,
+    rgba(255, 255, 255, 0.3) 65%,
+    transparent 75%,
+    transparent 100%
+  );
+  background-size: 500% 100%;
+  animation: highlight-sweep 30s ease-in-out infinite;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  border-radius: inherit;
+  z-index: 1;
 }
 
 /* Metallic text highlight sweep */
 .metallic-button span::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(90deg,
-            transparent 0%,
-            transparent 25%,
-            rgba(255, 255, 255, 0.3) 35%,
-            rgba(255, 255, 255, 0.8) 45%,
-            rgba(255, 255, 255, 1) 50%,
-            rgba(255, 255, 255, 0.8) 55%,
-            rgba(255, 255, 255, 0.3) 65%,
-            transparent 75%,
-            transparent 100%);
-    background-size: 500% 100%;
-    background-clip: text;
-    -webkit-background-clip: text;
-    animation: highlight-sweep 30s ease-in-out infinite;
-    pointer-events: none;
-    mix-blend-mode: overlay;
-    z-index: 3;
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 25%,
+    rgba(255, 255, 255, 0.3) 35%,
+    rgba(255, 255, 255, 0.8) 45%,
+    rgba(255, 255, 255, 1) 50%,
+    rgba(255, 255, 255, 0.8) 55%,
+    rgba(255, 255, 255, 0.3) 65%,
+    transparent 75%,
+    transparent 100%
+  );
+  background-size: 500% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  animation: highlight-sweep 30s ease-in-out infinite;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  z-index: 3;
 }
 
 /* Per-button metallic reflection */
 .metallic-button::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: repeating-linear-gradient(0deg,
-            transparent,
-            transparent 1px,
-            rgba(255, 255, 255, 0.15) 1px,
-            rgba(255, 255, 255, 0.15) 2px,
-            transparent 2px,
-            transparent 3px),
-        repeating-linear-gradient(45deg,
-            transparent,
-            transparent 2px,
-            rgba(255, 255, 255, 0.1) 2px,
-            rgba(255, 255, 255, 0.1) 3px);
-    background-size: 100% 6px, 200% 200%;
-    opacity: 0.4;
-    pointer-events: none;
-    mix-blend-mode: soft-light;
-    animation: texture-shift 20s linear infinite;
-    border-radius: inherit;
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 1px,
+      rgba(255, 255, 255, 0.15) 1px,
+      rgba(255, 255, 255, 0.15) 2px,
+      transparent 2px,
+      transparent 3px
+    ),
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 2px,
+      rgba(255, 255, 255, 0.1) 2px,
+      rgba(255, 255, 255, 0.1) 3px
+    );
+  background-size: 100% 6px, 200% 200%;
+  opacity: 0.4;
+  pointer-events: none;
+  mix-blend-mode: soft-light;
+  animation: texture-shift 20s linear infinite;
+  border-radius: inherit;
 }

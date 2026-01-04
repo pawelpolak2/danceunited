@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { MetallicButton } from './MetallicButton'
+
 
 interface CarouselProps {
     images: string[]
@@ -64,7 +64,7 @@ export function Carousel({ images, className = '', autoPlayInterval = 5000 }: Ca
             <button
                 type="button"
                 onClick={goToPrevious}
-                className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-black/40 p-2 text-gold backdrop-blur-sm transition-all hover:bg-black/60 hover:text-white"
+                className="-translate-y-1/2 absolute top-1/2 left-4 rounded-full bg-black/40 p-2 text-gold backdrop-blur-sm transition-all hover:bg-black/60 hover:text-white"
                 aria-label="Previous slide"
             >
                 <svg
@@ -81,7 +81,7 @@ export function Carousel({ images, className = '', autoPlayInterval = 5000 }: Ca
             <button
                 type="button"
                 onClick={goToNext}
-                className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-black/40 p-2 text-gold backdrop-blur-sm transition-all hover:bg-black/60 hover:text-white"
+                className="-translate-y-1/2 absolute top-1/2 right-4 rounded-full bg-black/40 p-2 text-gold backdrop-blur-sm transition-all hover:bg-black/60 hover:text-white"
                 aria-label="Next slide"
             >
                 <svg
@@ -97,7 +97,7 @@ export function Carousel({ images, className = '', autoPlayInterval = 5000 }: Ca
             </button>
 
             {/* Dots Navigation */}
-            <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2">
+            <div className="-translate-x-1/2 absolute bottom-4 left-1/2 flex gap-2">
                 {images.map((_, index) => (
                     <button
                         key={index}
