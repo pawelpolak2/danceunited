@@ -1,15 +1,1075 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+  --font-serif: "Cinzel", "EB Garamond", Georgia, serif;
+  --font-sans: "EB Garamond", Georgia, serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
     "Noto Color Emoji";
+
+  /* Custom gold colors - more yellow, less orange */
+  --color-gold-50: #fffbeb;
+  --color-gold-100: #fef3c7;
+  --color-gold-200: #fde68a;
+  --color-gold-300: #fcd34d;
+  --color-gold-400: #fbbf24;
+  --color-gold-500: #f59e0b;
+  --color-gold-600: #d97706;
+  --color-gold-700: #b45309;
+  --color-gold-800: #92400e;
+  --color-gold-900: #78350f;
 }
 
 html,
 body {
-  @apply bg-white dark:bg-gray-950;
+  @apply bg-gray-950;
+  color-scheme: dark;
+  font-family: "EB Garamond", Georgia, serif;
+}
 
-  @media (prefers-color-scheme: dark) {
-    color-scheme: dark;
+/* Gold color utility class */
+.text-gold {
+  color: #ffd700;
+}
+
+.text-gold\/80 {
+  color: rgba(255, 215, 0, 0.8);
+}
+
+.text-gold\/70 {
+  color: rgba(255, 215, 0, 0.7);
+}
+
+.text-gold\/60 {
+  color: rgba(255, 215, 0, 0.6);
+}
+
+.text-gold\/50 {
+  color: rgba(255, 215, 0, 0.5);
+}
+
+.bg-gold {
+  background-color: #ffd700;
+}
+
+.border-gold {
+  border-color: #ffd700;
+}
+
+.border-gold\/50 {
+  border-color: rgba(255, 215, 0, 0.5);
+}
+
+.border-gold\/70 {
+  border-color: rgba(255, 215, 0, 0.7);
+}
+
+.hover\:bg-gold:hover {
+  background-color: #ffd700;
+}
+
+.hover\:text-gold:hover {
+  color: #ffd700;
+}
+
+.hover\:border-gold:hover {
+  border-color: #ffd700;
+}
+
+.hover\:border-gold\/70:hover {
+  border-color: rgba(255, 215, 0, 0.7);
+}
+
+/* Font utility classes */
+.font-title {
+  font-family: "Cinzel", serif;
+}
+
+.font-body {
+  font-family: "EB Garamond", Georgia, serif;
+}
+
+.shiny-text.font-title {
+  font-family: "Cinzel", serif;
+}
+
+.shiny-text.font-body {
+  font-family: "EB Garamond", Georgia, serif;
+}
+
+/* Form styling utilities */
+.form-container {
+  width: 100%;
+  max-width: 28rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(180, 83, 9, 0.2);
+  background-color: rgba(17, 24, 39, 0.3);
+  padding: 2rem;
+  box-shadow: 0 10px 15px -3px rgba(180, 83, 9, 0.05);
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-label {
+  display: block;
+  font-weight: 500;
+  color: rgba(255, 215, 0, 0.8);
+  font-size: 0.875rem;
+}
+
+.form-input {
+  position: relative;
+  margin-top: 0.25rem;
+  display: block;
+  width: 100%;
+  border-radius: 0.375rem;
+  border: 1px solid transparent;
+  background-color: rgb(17, 24, 39);
+  padding: 0.5rem 0.75rem;
+  color: rgba(255, 215, 0, 0.9);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.form-input::placeholder {
+  color: rgba(255, 215, 0, 0.4);
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: transparent;
+}
+
+.form-input:focus + .form-input-focus-border {
+  opacity: 1;
+}
+
+.form-input-focus-border {
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  bottom: -1px;
+  border-radius: 0.375rem;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #fff9e6 3%,
+    #ffed4e 8%,
+    #ffd700 15%,
+    #ffc125 22%,
+    #daa520 28%,
+    #b8860b 35%,
+    #daa520 42%,
+    #ffc125 50%,
+    #ffd700 58%,
+    #ffc125 65%,
+    #daa520 72%,
+    #ffd700 78%,
+    #ffed4e 85%,
+    #fff9e6 92%,
+    #ffffff 97%,
+    #ffd700 100%
+  );
+  background-size: 500% 500%;
+  animation: metallic-shine 15s ease-in-out infinite;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 1;
+}
+
+/* FullCalendar custom styling to match gold-on-black theme */
+.dashboard-calendar {
+  background-color: rgb(3, 7, 18);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  width: 100%;
+  max-width: 100%;
+}
+
+.dashboard-calendar .fc {
+  color: #ffd700;
+  font-family: "EB Garamond", Georgia, serif;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Make all calendar text shiny */
+.dashboard-calendar .fc-button,
+.dashboard-calendar .fc-button-group > .fc-button {
+  position: relative;
+}
+
+.dashboard-calendar .fc-button .fc-button-primary {
+  background: transparent;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  color: #ffd700 !important;
+  background-clip: unset;
+  -webkit-background-clip: unset;
+  -webkit-text-fill-color: #ffd700 !important;
+}
+
+.dashboard-calendar .fc-button-text,
+.dashboard-calendar .fc-button .fc-button-text {
+  position: relative;
+  z-index: 1;
+  color: #ffd700 !important;
+  -webkit-text-fill-color: #ffd700 !important;
+  background: none !important;
+  background-clip: unset !important;
+  -webkit-background-clip: unset !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Keep text gold on all button states */
+.dashboard-calendar .fc-button:focus .fc-button-text,
+.dashboard-calendar .fc-button:active .fc-button-text,
+.dashboard-calendar .fc-button:hover .fc-button-text,
+.dashboard-calendar .fc-button-active .fc-button-text,
+.dashboard-calendar .fc-button-active .fc-button-text,
+.dashboard-calendar .fc-button-primary:not(:disabled):active .fc-button-text,
+.dashboard-calendar .fc-button-primary:not(:disabled).fc-button-active .fc-button-text,
+.dashboard-calendar .fc-button-primary:not(:disabled):focus .fc-button-text,
+.dashboard-calendar .fc-button-primary:not(:disabled):hover .fc-button-text {
+  color: #ffd700 !important;
+  -webkit-text-fill-color: #ffd700 !important;
+  background: none !important;
+  background-clip: unset !important;
+  -webkit-background-clip: unset !important;
+}
+
+.dashboard-calendar .fc-view-harness {
+  width: 100% !important;
+}
+
+.dashboard-calendar .fc-scroller {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.dashboard-calendar .fc-header-toolbar {
+  margin-bottom: 1.5rem;
+}
+
+.dashboard-calendar .fc-button {
+  background-color: rgb(3, 7, 18) !important;
+  border: 1px solid rgba(255, 215, 0, 0.3) !important;
+  color: #ffd700 !important;
+  font-family: "EB Garamond", Georgia, serif;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  transition: all 0.2s;
+  position: relative;
+  overflow: visible;
+}
+
+.dashboard-calendar .fc-button:hover {
+  background-color: rgba(255, 215, 0, 0.08);
+  border-color: rgba(255, 215, 0, 0.5);
+  color: #ffd700 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(255, 215, 0, 0.15);
+}
+
+.dashboard-calendar .fc-button:focus,
+.dashboard-calendar .fc-button:focus-visible {
+  color: #ffd700 !important;
+  outline: none;
+  border-color: rgba(255, 215, 0, 0.6);
+  box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.2);
+}
+
+.dashboard-calendar .fc-button-active,
+.dashboard-calendar .fc-button-primary:not(:disabled).fc-button-active {
+  background-color: rgba(255, 215, 0, 0.15) !important;
+  border-color: #ffd700 !important;
+  color: #ffd700 !important;
+  box-shadow: 0 2px 4px rgba(255, 215, 0, 0.2), inset 0 1px 2px rgba(255, 215, 0, 0.1);
+}
+
+.dashboard-calendar .fc-button-primary:not(:disabled):active {
+  background-color: rgba(255, 215, 0, 0.12) !important;
+  border-color: #ffd700 !important;
+  color: #ffd700 !important;
+  transform: translateY(0);
+}
+
+/* Style the icon buttons (prev/next arrows) */
+.dashboard-calendar .fc-button .fc-icon {
+  color: transparent;
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #fff9e6 3%,
+    #ffed4e 8%,
+    #ffd700 15%,
+    #ffc125 22%,
+    #daa520 28%,
+    #b8860b 35%,
+    #daa520 42%,
+    #ffc125 50%,
+    #ffd700 58%,
+    #ffc125 65%,
+    #daa520 72%,
+    #ffd700 78%,
+    #ffed4e 85%,
+    #fff9e6 92%,
+    #ffffff 97%,
+    #ffd700 100%
+  );
+  background-size: 500% 500%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: metallic-shine 15s ease-in-out infinite;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
+}
+
+/* SVG icons in buttons */
+.dashboard-calendar .fc-button svg {
+  fill: #ffd700;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
+}
+
+.dashboard-calendar .fc-daygrid-day {
+  background-color: rgba(17, 24, 39, 0.5);
+  border: 1px solid rgba(255, 215, 0, 0.2) !important;
+  border-right: 1px solid rgba(255, 215, 0, 0.3) !important;
+  border-bottom: 1px solid rgba(255, 215, 0, 0.3) !important;
+}
+
+.dashboard-calendar .fc-day-today {
+  background-color: rgba(255, 215, 0, 0.1) !important;
+  border: 2px solid rgba(255, 215, 0, 0.5) !important;
+}
+
+.dashboard-calendar .fc-col-header-cell {
+  background-color: rgba(17, 24, 39, 0.7);
+  border: 1px solid rgba(255, 215, 0, 0.3) !important;
+  border-right: 1px solid rgba(255, 215, 0, 0.4) !important;
+  color: transparent;
+  font-weight: 500;
+  padding: 0.75rem;
+  position: relative;
+}
+
+.dashboard-calendar .fc-col-header-cell-cushion {
+  position: relative;
+  z-index: 1;
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #fff9e6 3%,
+    #ffed4e 8%,
+    #ffd700 15%,
+    #ffc125 22%,
+    #daa520 28%,
+    #b8860b 35%,
+    #daa520 42%,
+    #ffc125 50%,
+    #ffd700 58%,
+    #ffc125 65%,
+    #daa520 72%,
+    #ffd700 78%,
+    #ffed4e 85%,
+    #fff9e6 92%,
+    #ffffff 97%,
+    #ffd700 100%
+  );
+  background-size: 500% 500%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: metallic-shine 15s ease-in-out infinite;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.2), 0 -1px 1px rgba(255, 255, 255, 0.3);
+}
+
+.dashboard-calendar .fc-col-header-cell-cushion::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 25%,
+    rgba(255, 255, 255, 0.3) 35%,
+    rgba(255, 255, 255, 0.8) 45%,
+    rgba(255, 255, 255, 1) 50%,
+    rgba(255, 255, 255, 0.8) 55%,
+    rgba(255, 255, 255, 0.3) 65%,
+    transparent 75%,
+    transparent 100%
+  );
+  background-size: 500% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  animation: highlight-sweep 30s ease-in-out infinite;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  z-index: 2;
+}
+
+.dashboard-calendar .fc-daygrid-day-number {
+  color: transparent;
+  padding: 0.5rem;
+  font-weight: 500;
+  position: relative;
+  z-index: 1;
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #fff9e6 3%,
+    #ffed4e 8%,
+    #ffd700 15%,
+    #ffc125 22%,
+    #daa520 28%,
+    #b8860b 35%,
+    #daa520 42%,
+    #ffc125 50%,
+    #ffd700 58%,
+    #ffc125 65%,
+    #daa520 72%,
+    #ffd700 78%,
+    #ffed4e 85%,
+    #fff9e6 92%,
+    #ffffff 97%,
+    #ffd700 100%
+  );
+  background-size: 500% 500%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: metallic-shine 15s ease-in-out infinite;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.2), 0 -1px 1px rgba(255, 255, 255, 0.3);
+}
+
+.dashboard-calendar .fc-daygrid-day-number::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 25%,
+    rgba(255, 255, 255, 0.3) 35%,
+    rgba(255, 255, 255, 0.8) 45%,
+    rgba(255, 255, 255, 1) 50%,
+    rgba(255, 255, 255, 0.8) 55%,
+    rgba(255, 255, 255, 0.3) 65%,
+    transparent 75%,
+    transparent 100%
+  );
+  background-size: 500% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  animation: highlight-sweep 30s ease-in-out infinite;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  z-index: 2;
+}
+
+.dashboard-calendar .fc-daygrid-day-top {
+  flex-direction: row;
+}
+
+.dashboard-calendar .calendar-event {
+  background-color: #ffd700;
+  border-color: #ffd700;
+  color: rgb(3, 7, 18);
+  font-weight: 500;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dashboard-calendar .calendar-event:hover {
+  background-color: #ffed4e;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
+}
+
+.dashboard-calendar .fc-timegrid-slot {
+  border-color: rgba(180, 83, 9, 0.1);
+}
+
+.dashboard-calendar .fc-timegrid-axis {
+  color: transparent;
+}
+
+.dashboard-calendar .fc-timegrid-axis-cushion {
+  position: relative;
+  z-index: 1;
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #fff9e6 3%,
+    #ffed4e 8%,
+    #ffd700 15%,
+    #ffc125 22%,
+    #daa520 28%,
+    #b8860b 35%,
+    #daa520 42%,
+    #ffc125 50%,
+    #ffd700 58%,
+    #ffc125 65%,
+    #daa520 72%,
+    #ffd700 78%,
+    #ffed4e 85%,
+    #fff9e6 92%,
+    #ffffff 97%,
+    #ffd700 100%
+  );
+  background-size: 500% 500%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: metallic-shine 15s ease-in-out infinite;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.2), 0 -1px 1px rgba(255, 255, 255, 0.3);
+}
+
+.dashboard-calendar .fc-timegrid-axis-cushion::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 25%,
+    rgba(255, 255, 255, 0.3) 35%,
+    rgba(255, 255, 255, 0.8) 45%,
+    rgba(255, 255, 255, 1) 50%,
+    rgba(255, 255, 255, 0.8) 55%,
+    rgba(255, 255, 255, 0.3) 65%,
+    transparent 75%,
+    transparent 100%
+  );
+  background-size: 500% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  animation: highlight-sweep 30s ease-in-out infinite;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  z-index: 2;
+}
+
+.dashboard-calendar .fc-toolbar-title {
+  position: relative;
+  z-index: 1;
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #fff9e6 3%,
+    #ffed4e 8%,
+    #ffd700 15%,
+    #ffc125 22%,
+    #daa520 28%,
+    #b8860b 35%,
+    #daa520 42%,
+    #ffc125 50%,
+    #ffd700 58%,
+    #ffc125 65%,
+    #daa520 72%,
+    #ffd700 78%,
+    #ffed4e 85%,
+    #fff9e6 92%,
+    #ffffff 97%,
+    #ffd700 100%
+  );
+  background-size: 500% 500%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: metallic-shine 15s ease-in-out infinite;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.2), 0 -1px 1px rgba(255, 255, 255, 0.3);
+  font-family: "Cinzel", serif;
+}
+
+.dashboard-calendar .fc-toolbar-title::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 25%,
+    rgba(255, 255, 255, 0.3) 35%,
+    rgba(255, 255, 255, 0.8) 45%,
+    rgba(255, 255, 255, 1) 50%,
+    rgba(255, 255, 255, 0.8) 55%,
+    rgba(255, 255, 255, 0.3) 65%,
+    transparent 75%,
+    transparent 100%
+  );
+  background-size: 500% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  animation: highlight-sweep 30s ease-in-out infinite;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  z-index: 2;
+}
+
+.dashboard-calendar .fc-timegrid-col {
+  border-color: rgba(180, 83, 9, 0.2);
+}
+
+.dashboard-calendar .fc-scrollgrid {
+  border: 2px solid rgba(255, 215, 0, 0.4) !important;
+}
+
+.dashboard-calendar .fc-scrollgrid-section-header > td {
+  border: 1px solid rgba(255, 215, 0, 0.3) !important;
+  border-right: 1px solid rgba(255, 215, 0, 0.4) !important;
+}
+
+.dashboard-calendar .fc-scrollgrid td,
+.dashboard-calendar .fc-scrollgrid th {
+  border-color: rgba(255, 215, 0, 0.2) !important;
+}
+
+.dashboard-calendar .fc-daygrid-body {
+  border: 1px solid rgba(255, 215, 0, 0.3) !important;
+}
+
+.dashboard-calendar .fc-timegrid-col {
+  border-left: 1px solid rgba(255, 215, 0, 0.3) !important;
+  border-right: 1px solid rgba(255, 215, 0, 0.3) !important;
+}
+
+.dashboard-calendar .fc-timegrid-slot {
+  border-top: 1px solid rgba(255, 215, 0, 0.15) !important;
+}
+
+.dashboard-calendar .fc-timegrid-slot-minor {
+  border-top: 1px solid rgba(255, 215, 0, 0.08) !important;
+}
+
+.form-input-error {
+  border-color: rgb(220, 38, 38);
+}
+
+.form-input-normal {
+  border-color: transparent;
+}
+
+.form-error {
+  margin-top: 0.25rem;
+  color: rgb(248, 113, 113);
+  font-size: 0.875rem;
+}
+
+.form-error-container {
+  border-radius: 0.375rem;
+  border: 1px solid rgba(127, 29, 29, 0.5);
+  background-color: rgba(127, 29, 29, 0.3);
+  padding: 1rem;
+}
+
+/* Card styling */
+.feature-card {
+  border-radius: 0.5rem;
+  border: 1px solid rgba(180, 83, 9, 0.2);
+  background-color: rgba(17, 24, 39, 0.3);
+  padding: 1.5rem;
+  box-shadow: 0 10px 15px -3px rgba(180, 83, 9, 0.05);
+}
+
+/* Section styling */
+.section-container {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 72rem;
+}
+
+.section-title {
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+/* Amazing metallic gold effect for titles - each letter polished */
+.shiny-text {
+  position: relative;
+  display: inline-block;
+  letter-spacing: 0.01em;
+  font-family: "Cinzel", serif;
+  font-weight: 400;
+  text-transform: none;
+  font-variant: normal;
+  font-feature-settings: normal;
+
+  /* Base metallic gold gradient - highly polished with strong contrast */
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #fff9e6 3%,
+    #ffed4e 8%,
+    #ffd700 15%,
+    #ffc125 22%,
+    #daa520 28%,
+    #b8860b 35%,
+    #daa520 42%,
+    #ffc125 50%,
+    #ffd700 58%,
+    #ffc125 65%,
+    #daa520 72%,
+    #ffd700 78%,
+    #ffed4e 85%,
+    #fff9e6 92%,
+    #ffffff 97%,
+    #ffd700 100%
+  );
+  background-size: 500% 500%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: metallic-shine 15s ease-in-out infinite;
+
+  /* Strong metallic depth with multiple shadow layers */
+  text-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.5),
+    0 2px 6px rgba(0, 0, 0, 0.3),
+    0 3px 9px rgba(0, 0, 0, 0.2),
+    0 -1px 2px rgba(255, 255, 255, 0.4),
+    0 -2px 4px rgba(255, 255, 255, 0.2);
+}
+
+/* Brushed metal highlight sweep - per letter effect */
+.shiny-text::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 25%,
+    rgba(255, 255, 255, 0.3) 35%,
+    rgba(255, 255, 255, 0.8) 45%,
+    rgba(255, 255, 255, 1) 50%,
+    rgba(255, 255, 255, 0.8) 55%,
+    rgba(255, 255, 255, 0.3) 65%,
+    transparent 75%,
+    transparent 100%
+  );
+  background-size: 500% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  animation: highlight-sweep 12s ease-in-out infinite;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+/* Per-letter metallic reflection - creates individual letter shine */
+.shiny-text::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 1px,
+      rgba(255, 255, 255, 0.15) 1px,
+      rgba(255, 255, 255, 0.15) 2px,
+      transparent 2px,
+      transparent 3px
+    ),
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 2px,
+      rgba(255, 255, 255, 0.1) 2px,
+      rgba(255, 255, 255, 0.1) 3px
+    );
+  background-size: 100% 6px, 200% 200%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  opacity: 0.4;
+  pointer-events: none;
+  mix-blend-mode: soft-light;
+  animation: texture-shift 20s linear infinite;
+}
+
+@keyframes metallic-shine {
+  0%,
+  100% {
+    background-position: 0% 50%;
   }
+  25% {
+    background-position: 50% 0%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  75% {
+    background-position: 50% 100%;
+  }
+}
+
+@keyframes highlight-sweep {
+  0% {
+    background-position: -500% 0;
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 0.6;
+  }
+  100% {
+    background-position: 500% 0;
+    opacity: 0;
+  }
+}
+
+@keyframes texture-shift {
+  0% {
+    background-position: 0 0, 0 0;
+  }
+  100% {
+    background-position: 0 0, 100% 100%;
+  }
+}
+
+/* Metallic gold effect for buttons */
+.metallic-button {
+  position: relative;
+  display: inline-block;
+  letter-spacing: 0.01em;
+  font-family: "EB Garamond", Georgia, serif;
+  font-weight: 500;
+  overflow: hidden;
+
+  /* Base metallic gold gradient for background */
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #fff9e6 3%,
+    #ffed4e 8%,
+    #ffd700 15%,
+    #ffc125 22%,
+    #daa520 28%,
+    #b8860b 35%,
+    #daa520 42%,
+    #ffc125 50%,
+    #ffd700 58%,
+    #ffc125 65%,
+    #daa520 72%,
+    #ffd700 78%,
+    #ffed4e 85%,
+    #fff9e6 92%,
+    #ffffff 97%,
+    #ffd700 100%
+  );
+  background-size: 500% 500%;
+  animation: metallic-shine 15s ease-in-out infinite;
+
+  /* Metallic depth with shadows */
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.5),
+    0 2px 6px rgba(0, 0, 0, 0.3),
+    0 3px 9px rgba(0, 0, 0, 0.2),
+    inset 0 -1px 2px rgba(255, 255, 255, 0.3),
+    inset 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Metallic gold border effect for buttons with borders */
+.metallic-button[class*="border"],
+.metallic-button.border {
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  position: relative;
+  /* Override gold gradient background with black fill */
+  background-color: rgb(3, 7, 18) !important; /* gray-950 */
+}
+
+/* Create metallic border using pseudo-element */
+.metallic-button[class*="border"]::after,
+.metallic-button.border::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  padding: 2px;
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #fff9e6 3%,
+    #ffed4e 8%,
+    #ffd700 15%,
+    #ffc125 22%,
+    #daa520 28%,
+    #b8860b 35%,
+    #daa520 42%,
+    #ffc125 50%,
+    #ffd700 58%,
+    #ffc125 65%,
+    #daa520 72%,
+    #ffd700 78%,
+    #ffed4e 85%,
+    #fff9e6 92%,
+    #ffffff 97%,
+    #ffd700 100%
+  );
+  background-size: 500% 500%;
+  animation: metallic-shine 15s ease-in-out infinite;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Metallic text effect for button text - use span wrapper */
+.metallic-button span,
+.metallic-button {
+  position: relative;
+  z-index: 2;
+  color: transparent;
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #fff9e6 3%,
+    #ffed4e 8%,
+    #ffd700 15%,
+    #ffc125 22%,
+    #daa520 28%,
+    #b8860b 35%,
+    #daa520 42%,
+    #ffc125 50%,
+    #ffd700 58%,
+    #ffc125 65%,
+    #daa520 72%,
+    #ffd700 78%,
+    #ffed4e 85%,
+    #fff9e6 92%,
+    #ffffff 97%,
+    #ffd700 100%
+  );
+  background-size: 500% 500%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: metallic-shine 15s ease-in-out infinite;
+
+  /* Metallic depth with shadows for text */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.2), 0 -1px 1px rgba(255, 255, 255, 0.3);
+}
+
+/* Brushed metal highlight sweep for buttons - background layer */
+.metallic-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 25%,
+    rgba(255, 255, 255, 0.3) 35%,
+    rgba(255, 255, 255, 0.8) 45%,
+    rgba(255, 255, 255, 1) 50%,
+    rgba(255, 255, 255, 0.8) 55%,
+    rgba(255, 255, 255, 0.3) 65%,
+    transparent 75%,
+    transparent 100%
+  );
+  background-size: 500% 100%;
+  animation: highlight-sweep 30s ease-in-out infinite;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  border-radius: inherit;
+  z-index: 1;
+}
+
+/* Metallic text highlight sweep */
+.metallic-button span::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 25%,
+    rgba(255, 255, 255, 0.3) 35%,
+    rgba(255, 255, 255, 0.8) 45%,
+    rgba(255, 255, 255, 1) 50%,
+    rgba(255, 255, 255, 0.8) 55%,
+    rgba(255, 255, 255, 0.3) 65%,
+    transparent 75%,
+    transparent 100%
+  );
+  background-size: 500% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  animation: highlight-sweep 30s ease-in-out infinite;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  z-index: 3;
+}
+
+/* Per-button metallic reflection */
+.metallic-button::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 1px,
+      rgba(255, 255, 255, 0.15) 1px,
+      rgba(255, 255, 255, 0.15) 2px,
+      transparent 2px,
+      transparent 3px
+    ),
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 2px,
+      rgba(255, 255, 255, 0.1) 2px,
+      rgba(255, 255, 255, 0.1) 3px
+    );
+  background-size: 100% 6px, 200% 200%;
+  opacity: 0.4;
+  pointer-events: none;
+  mix-blend-mode: soft-light;
+  animation: texture-shift 20s linear infinite;
+  border-radius: inherit;
 }

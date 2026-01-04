@@ -1,0 +1,121 @@
+import type { DateSelectArg, EventClickArg, EventInput } from '@fullcalendar/core'
+import dayGridPlugin from '@fullcalendar/daygrid'
+import interactionPlugin from '@fullcalendar/interaction'
+import FullCalendar from '@fullcalendar/react'
+import timeGridPlugin from '@fullcalendar/timegrid'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { ShinyText } from '../ui'
+
+// Note: FullCalendar v6 CSS should be imported, but paths may vary
+// If you see styling issues, you may need to add CSS imports manually
+// or use a CDN link in the root.tsx links function
+
+interface DashboardCalendarProps {
+  events?: EventInput[]
+  onDateSelect?: (selectInfo: DateSelectArg) => void
+  onEventClick?: (clickInfo: EventClickArg) => void
+}
+
+// Move static config outside component to prevent re-creation
+const headerToolbarConfig = {
+  left: 'prev,next today',
+  center: 'title',
+  right: 'dayGridMonth,timeGridWeek,timeGridDay',
+} as const
+
+const buttonTextConfig = {
+  today: 'today',
+  month: 'month',
+  week: 'week',
+  day: 'day',
+} as const
+
+export function DashboardCalendar({ events = [], onDateSelect, onEventClick }: DashboardCalendarProps) {
+  const [isClient, setIsClient] = useState(false)
+  const calendarRef = useRef<FullCalendar>(null)
+
+  // Only render on client to avoid SSR hydration issues
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  // Memoize default events to prevent recreation on every render
+  const defaultEvents = useMemo<EventInput[]>(() => {
+    const today = new Date()
+    const todayStr = today.toISOString().split('T')[0]
+    return [
+      {
+        id: '1',
+        title: 'Ballet Basics',
+        start: `${todayStr}T10:00:00`,
+        end: `${todayStr}T11:00:00`,
+        backgroundColor: '#ffd700',
+        borderColor: '#ffd700',
+      },
+    ]
+  }, [])
+
+  // Memoize handlers to prevent recreation
+  const handleDateSelect = useCallback(
+    (selectInfo: DateSelectArg) => {
+      if (onDateSelect) {
+        onDateSelect(selectInfo)
+      } else {
+        // Default: show alert (will be replaced with booking modal)
+        alert(`Selected: ${selectInfo.startStr} to ${selectInfo.endStr}`)
+      }
+    },
+    [onDateSelect]
+  )
+
+  const handleEventClick = useCallback(
+    (clickInfo: EventClickArg) => {
+      if (onEventClick) {
+        onEventClick(clickInfo)
+      } else {
+        // Default: show event details
+        alert(`Event: ${clickInfo.event.title}`)
+      }
+    },
+    [onEventClick]
+  )
+
+  // Memoize events array
+  const calendarEvents = useMemo(() => {
+    return events.length > 0 ? events : defaultEvents
+  }, [events, defaultEvents])
+
+  // Show placeholder during SSR
+  if (!isClient) {
+    return (
+      <div className="dashboard-calendar" style={{ minHeight: '600px' }}>
+        <div className="flex h-full items-center justify-center">
+          <ShinyText variant="body">Loading calendar...</ShinyText>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="dashboard-calendar">
+      <FullCalendar
+        ref={calendarRef}
+        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+        initialView="dayGridMonth"
+        headerToolbar={headerToolbarConfig}
+        events={calendarEvents}
+        selectable={true}
+        selectMirror={true}
+        dayMaxEvents={true}
+        weekends={true}
+        select={handleDateSelect}
+        eventClick={handleEventClick}
+        height={600}
+        aspectRatio={1.8}
+        eventClassNames="calendar-event"
+        dayHeaderClassNames="calendar-day-header"
+        buttonText={buttonTextConfig}
+      />
+    </div>
+  )
+}

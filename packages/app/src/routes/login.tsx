@@ -1,5 +1,6 @@
 import { prisma } from 'db'
 import { Form, redirect, useActionData, useNavigation } from 'react-router'
+import { FormError, FormField, MetallicButton, ShinyText } from '../components/ui'
 import { createSessionCookie, verifyPassword } from '../lib/auth.server'
 import { validateLogin } from '../lib/validation'
 import type { Route } from './+types/login'
@@ -87,87 +88,51 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-[calc(100vh-200px)] items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md space-y-8 rounded-lg bg-white p-8 shadow-lg dark:bg-gray-800">
+      <div className="form-container">
         <div>
-          <h2 className="text-center font-bold text-3xl text-gray-900 dark:text-white">Sign in to your account</h2>
-          <p className="mt-2 text-center text-gray-600 text-sm dark:text-gray-400">
-            Or{' '}
-            <a href="/register" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400">
-              create a new account
-            </a>
+          <ShinyText as="h2" variant="title" className="text-center text-3xl">
+            sign in to your account
+          </ShinyText>
+          <p className="mt-2 text-center text-sm">
+            <ShinyText variant="body" className="text-sm">
+              Or{' '}
+              <a href="/register" className="shiny-text font-medium hover:opacity-80">
+                create a new account
+              </a>
+            </ShinyText>
           </p>
         </div>
         <Form method="post" className="mt-8 space-y-6">
-          {actionData && !actionData.success && (
-            <div className="rounded-md bg-red-50 p-4 dark:bg-red-900/20">
-              {actionData.message && (
-                <p className="mb-2 text-red-800 text-sm dark:text-red-200">{actionData.message}</p>
-              )}
-              {actionData.errors && Object.keys(actionData.errors).length > 0 && (
-                <ul className="list-inside list-disc space-y-1 text-red-800 text-sm dark:text-red-200">
-                  {Object.values(actionData.errors).map((error, index) => (
-                    <li key={index}>{error}</li>
-                  ))}
-                </ul>
-              )}
-              {!actionData.message && (!actionData.errors || Object.keys(actionData.errors).length === 0) && (
-                <p className="text-red-800 text-sm dark:text-red-200">Invalid email or password</p>
-              )}
-            </div>
-          )}
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block font-medium text-gray-700 text-sm dark:text-gray-300">
-                Email address
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                className={`mt-1 block w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white ${
-                  actionData?.errors?.email
-                    ? 'border-red-300 dark:border-red-700'
-                    : 'border-gray-300 dark:border-gray-600'
-                }`}
-                placeholder="you@example.com"
-              />
-              {actionData?.errors?.email && (
-                <p className="mt-1 text-red-600 text-sm dark:text-red-400">{actionData.errors.email}</p>
-              )}
-            </div>
-            <div>
-              <label htmlFor="password" className="block font-medium text-gray-700 text-sm dark:text-gray-300">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                className={`mt-1 block w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white ${
-                  actionData?.errors?.password
-                    ? 'border-red-300 dark:border-red-700'
-                    : 'border-gray-300 dark:border-gray-600'
-                }`}
-                placeholder="••••••••"
-              />
-              {actionData?.errors?.password && (
-                <p className="mt-1 text-red-600 text-sm dark:text-red-400">{actionData.errors.password}</p>
-              )}
-            </div>
+          {actionData && !actionData.success && <FormError message={actionData.message} errors={actionData.errors} />}
+          <div className="form-field">
+            <FormField
+              label="Email address"
+              name="email"
+              type="email"
+              autoComplete="email"
+              required
+              placeholder="you@example.com"
+              error={actionData?.errors?.email}
+            />
+            <FormField
+              label="Password"
+              name="password"
+              type="password"
+              autoComplete="current-password"
+              required
+              placeholder="••••••••"
+              error={actionData?.errors?.password}
+            />
           </div>
 
           <div>
-            <button
+            <MetallicButton
               type="submit"
               disabled={isSubmitting}
-              className="w-full rounded-md bg-blue-600 px-4 py-2 font-semibold text-sm text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 dark:bg-blue-500 dark:hover:bg-blue-600"
+              className="w-full rounded-md border-2 px-4 py-2 text-sm"
             >
               {isSubmitting ? 'Signing in...' : 'Sign in'}
-            </button>
+            </MetallicButton>
           </div>
         </Form>
       </div>
