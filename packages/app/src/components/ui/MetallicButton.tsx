@@ -1,22 +1,12 @@
-import type { ReactNode } from 'react'
+import type { ButtonHTMLAttributes, ReactNode } from 'react'
 
-interface MetallicButtonProps {
+interface MetallicButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode
-  type?: 'button' | 'submit' | 'reset'
-  disabled?: boolean
-  className?: string
-  onClick?: () => void
 }
 
-export function MetallicButton({
-  children,
-  type = 'button',
-  disabled = false,
-  className = '',
-  onClick,
-}: MetallicButtonProps) {
+export function MetallicButton({ children, className = '', ...props }: MetallicButtonProps) {
   return (
-    <button type={type} disabled={disabled} onClick={onClick} className={`metallic-button ${className}`}>
+    <button className={`metallic-button ${className}`} {...props}>
       <span>{children}</span>
     </button>
   )

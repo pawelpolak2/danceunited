@@ -5,9 +5,9 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
+  provider   = "prisma-client"
   engineType = "client"
-  output   = "../generated/prisma"
+  output     = "../generated/prisma"
 }
 
 datasource db {
@@ -61,15 +61,15 @@ enum PaymentStatus {
 
 // Models
 model User {
-  id            String    @id @default(uuid()) @db.Uuid
-  firstName     String    @map("first_name") @db.VarChar(100)
-  lastName      String    @map("last_name") @db.VarChar(100)
-  email         String    @unique @db.VarChar(255)
-  passwordHash  String    @map("password_hash") @db.VarChar(255)
-  role          UserRole  @default(DANCER)
-  phoneNumber   String?   @map("phone_number") @db.VarChar(20)
-  isActive      Boolean   @default(true) @map("is_active")
-  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  firstName    String   @map("first_name") @db.VarChar(100)
+  lastName     String   @map("last_name") @db.VarChar(100)
+  email        String   @unique @db.VarChar(255)
+  passwordHash String   @map("password_hash") @db.VarChar(255)
+  role         UserRole @default(DANCER)
+  phoneNumber  String?  @map("phone_number") @db.VarChar(20)
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
   // Relations
   classTemplatesAsTrainer ClassTemplate[] @relation("TemplateTrainer")
@@ -82,9 +82,9 @@ model User {
 }
 
 model DanceStyle {
-  id          String   @id @default(uuid()) @db.Uuid
-  name        String   @unique @db.VarChar(100)
-  description String?  @db.Text
+  id          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String  @unique @db.VarChar(100)
+  description String? @db.Text
 
   // Relations
   classTemplates ClassTemplate[]
@@ -93,38 +93,40 @@ model DanceStyle {
 }
 
 model ClassTemplate {
-  id          String      @id @default(uuid()) @db.Uuid
-  name        String      @db.VarChar(150)
-  description String?     @db.Text
-  level       ClassLevel  @default(OPEN)
-  duration    String      @default("1 hour") // Stored as string for PostgreSQL INTERVAL
-  styleId     String      @map("style_id") @db.Uuid
-  hallId      DanceHall   @default(HALL1) @map("hall_id")
-  trainerId  String      @map("trainer_id") @db.Uuid
-  isActive    Boolean     @default(true) @map("is_active")
-  createdAt   DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt   DateTime    @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name         String     @db.VarChar(150)
+  description  String?    @db.Text
+  level        ClassLevel @default(OPEN)
+  duration     Int        @default(3600) // Stored as seconds
+  styleId      String     @map("style_id") @db.Uuid
+  hallId       DanceHall  @default(HALL1) @map("hall_id")
+  trainerId    String     @map("trainer_id") @db.Uuid
+  isActive     Boolean    @default(true) @map("is_active")
+  isRestricted Boolean    @default(false) @map("is_restricted")
+  createdAt    DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime   @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   // Relations
-  style           DanceStyle    @relation(fields: [styleId], references: [id])
-  trainer         User          @relation("TemplateTrainer", fields: [trainerId], references: [id])
-  classInstances  ClassInstance[]
-  packages        Package[]
+  style          DanceStyle      @relation(fields: [styleId], references: [id])
+  trainer        User            @relation("TemplateTrainer", fields: [trainerId], references: [id])
+  classInstances ClassInstance[]
+  packages       Package[]
 
   @@map("class_template")
 }
 
 model ClassInstance {
-  id              String      @id @default(uuid()) @db.Uuid
-  classTemplateId String      @map("class_template_id") @db.Uuid
-  startTime       DateTime    @map("start_time") @db.Timestamptz(6)
-  endTime         DateTime    @map("end_time") @db.Timestamptz(6)
-  actualHall      DanceHall   @map("actual_hall")
-  actualTrainerId String      @map("actual_trainer_id") @db.Uuid
-  status          ClassStatus @default(SCHEDULED)
-  notes           String?     @db.Text
-  createdAt       DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt       DateTime    @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  id                String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  classTemplateId   String      @map("class_template_id") @db.Uuid
+  startTime         DateTime    @map("start_time") @db.Timestamptz(6)
+  endTime           DateTime    @map("end_time") @db.Timestamptz(6)
+  actualHall        DanceHall   @map("actual_hall")
+  actualTrainerId   String      @map("actual_trainer_id") @db.Uuid
+  status            ClassStatus @default(SCHEDULED)
+  notes             String?     @db.Text
+  recurrenceGroupId String?     @map("recurrence_group_id") @db.Uuid
+  createdAt         DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime    @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   // Relations
   classTemplate ClassTemplate @relation(fields: [classTemplateId], references: [id])
@@ -147,14 +149,14 @@ model Attendance {
 }
 
 model Package {
-  id              String   @id @default(uuid()) @db.Uuid
-  name            String   @db.VarChar(150)
-  description     String?  @db.Text
-  classCount      Int      @map("class_count")
-  price           Decimal  @db.Decimal(10, 2)
-  validityDays    Int      @default(30) @map("validity_days")
-  classTemplateId String?  @map("class_template_id") @db.Uuid
-  isActive        Boolean  @default(true) @map("is_active")
+  id              String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name            String  @db.VarChar(150)
+  description     String? @db.Text
+  classCount      Int     @map("class_count")
+  price           Decimal @db.Decimal(10, 2)
+  validityDays    Int     @default(30) @map("validity_days")
+  classTemplateId String? @map("class_template_id") @db.Uuid
+  isActive        Boolean @default(true) @map("is_active")
 
   // Relations
   classTemplate ClassTemplate? @relation(fields: [classTemplateId], references: [id])
@@ -164,15 +166,15 @@ model Package {
 }
 
 model UserPurchase {
-  id              String         @id @default(uuid()) @db.Uuid
-  userId          String         @map("user_id") @db.Uuid
-  packageId       String         @map("package_id") @db.Uuid
-  purchaseDate    DateTime       @default(now()) @map("purchase_date") @db.Timestamptz(6)
-  expiryDate      DateTime?      @map("expiry_date") @db.Timestamptz(6)
-  classesRemaining Int           @map("classes_remaining")
-  classesUsed     Int            @default(0) @map("classes_used")
-  paymentId       String?        @map("payment_id") @db.Uuid
-  status          PurchaseStatus
+  id               String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId           String         @map("user_id") @db.Uuid
+  packageId        String         @map("package_id") @db.Uuid
+  purchaseDate     DateTime       @default(now()) @map("purchase_date") @db.Timestamptz(6)
+  expiryDate       DateTime?      @map("expiry_date") @db.Timestamptz(6)
+  classesRemaining Int            @map("classes_remaining")
+  classesUsed      Int            @default(0) @map("classes_used")
+  paymentId        String?        @map("payment_id") @db.Uuid
+  status           PurchaseStatus
 
   // Relations
   user    User     @relation(fields: [userId], references: [id])
@@ -183,7 +185,7 @@ model UserPurchase {
 }
 
 model Payment {
-  id            String        @id @default(uuid()) @db.Uuid
+  id            String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId        String        @map("user_id") @db.Uuid
   amount        Decimal       @db.Decimal(10, 2)
   paymentMethod PaymentMethod @default(CARD) @map("payment_method")
@@ -193,7 +195,7 @@ model Payment {
   updatedAt     DateTime      @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   // Relations
-  user         User           @relation(fields: [userId], references: [id])
+  user          User           @relation(fields: [userId], references: [id])
   userPurchases UserPurchase[]
 
   @@map("payment")

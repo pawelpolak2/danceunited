@@ -7,6 +7,7 @@ interface FormFieldProps {
   type?: string
   autoComplete?: string
   placeholder?: string
+  defaultValue?: string
   required?: boolean
   error?: string
   hint?: string
@@ -19,6 +20,7 @@ export function FormField({
   type = 'text',
   autoComplete,
   placeholder,
+  defaultValue,
   required = false,
   error,
   hint,
@@ -39,6 +41,7 @@ export function FormField({
             type={type}
             autoComplete={autoComplete}
             required={required}
+            defaultValue={defaultValue}
             className={`form-input ${error ? 'form-input-error' : 'form-input-normal'}`}
             placeholder={placeholder}
           />
