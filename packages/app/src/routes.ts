@@ -4,6 +4,8 @@ export default [
   index('routes/_index.tsx'),
   route('login', 'routes/login.tsx'),
   route('register', 'routes/register.tsx'),
+  route('dashboard', 'routes/dashboard.tsx'),
+  route('trainer-dashboard', 'routes/trainer-dashboard.tsx'),
   route('api/health', 'routes/api.health.tsx'),
   route('api/auth/login', 'routes/api.auth.login.tsx'),
   route('api/auth/register', 'routes/api.auth.register.tsx'),

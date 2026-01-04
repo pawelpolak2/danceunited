@@ -11,6 +11,11 @@
     "lint:fix": "biome check . --write"
   },
   "dependencies": {
+    "@fullcalendar/core": "^6.1.15",
+    "@fullcalendar/daygrid": "^6.1.15",
+    "@fullcalendar/interaction": "^6.1.15",
+    "@fullcalendar/react": "^6.1.15",
+    "@fullcalendar/timegrid": "^6.1.15",
     "@react-router/node": "^7.9.2",
     "@react-router/serve": "^7.9.2",
     "bcryptjs": "^2.4.3",

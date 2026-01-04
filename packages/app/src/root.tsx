@@ -11,6 +11,7 @@ import {
 } from 'react-router'
 
 import type { Route } from './+types/root'
+import { MetallicButton, MetallicLink, ShinyText } from './components/ui'
 import { getCurrentUser } from './lib/auth.server'
 import './app.css'
 
@@ -23,7 +24,19 @@ export const links: Route.LinksFunction = () => [
   },
   {
     rel: 'stylesheet',
-    href: 'https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap',
+    href: 'https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&display=swap',
+  },
+  {
+    rel: 'stylesheet',
+    href: 'https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.15/index.global.min.css',
+  },
+  {
+    rel: 'stylesheet',
+    href: 'https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.15/index.global.min.css',
+  },
+  {
+    rel: 'stylesheet',
+    href: 'https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@6.1.15/index.global.min.css',
   },
 ]
 
@@ -54,52 +67,56 @@ export default function App() {
   const { user } = useLoaderData<typeof loader>()
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <header className="border-gray-200 border-b bg-white dark:border-gray-800 dark:bg-gray-900">
+    <div className="flex min-h-screen flex-col bg-gray-950">
+      <header className="border-amber-900/20 border-b bg-gray-950">
         <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-          <Link to="/" className="font-bold text-2xl text-gray-900 dark:text-white">
-            Dance United
+          <Link to="/" className="flex items-center gap-3">
+            <img src="/logos/logo-transparent.png" alt="Dance United" className="h-10 w-auto" />
+            <ShinyText as="span" variant="title" className="text-2xl">
+              dance united
+            </ShinyText>
           </Link>
           <div className="flex items-center gap-4">
             {user ? (
               <>
-                <span className="text-gray-700 text-sm dark:text-gray-300">
+                {user.role === 'DANCER' && (
+                  <MetallicLink to="/dashboard" className="rounded-md border-2 px-4 py-2 text-sm">
+                    Dashboard
+                  </MetallicLink>
+                )}
+                {user.role === 'TRAINER' && (
+                  <MetallicLink to="/trainer-dashboard" className="rounded-md border-2 px-4 py-2 text-sm">
+                    Dashboard
+                  </MetallicLink>
+                )}
+                <ShinyText variant="body" className="text-sm">
                   {user.firstName} {user.lastName}
-                </span>
+                </ShinyText>
                 <Form method="post" action="/api/auth/logout">
-                  <button
-                    type="submit"
-                    className="rounded-md px-4 py-2 font-medium text-gray-700 text-sm transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
-                  >
+                  <MetallicButton type="submit" className="rounded-md border-2 px-4 py-2 text-sm">
                     Logout
-                  </button>
+                  </MetallicButton>
                 </Form>
               </>
             ) : (
               <>
-                <Link
-                  to="/login"
-                  className="rounded-md px-4 py-2 font-medium text-gray-700 text-sm transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
-                >
+                <MetallicLink to="/login" className="rounded-md border-2 px-4 py-2 text-sm">
                   Login
-                </Link>
-                <Link
-                  to="/register"
-                  className="rounded-md bg-blue-600 px-4 py-2 font-semibold text-sm text-white transition-colors hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-                >
+                </MetallicLink>
+                <MetallicLink to="/register" className="rounded-md border-2 px-4 py-2 text-sm">
                   Register
-                </Link>
+                </MetallicLink>
               </>
             )}
           </div>
         </nav>
       </header>
-      <main className="flex-1">
+      <main className="flex-1 bg-gray-950">
         <Outlet />
       </main>
-      <footer className="border-gray-200 border-t bg-gray-50 py-8 dark:border-gray-800 dark:bg-gray-900">
-        <div className="mx-auto max-w-7xl px-4 text-center text-gray-600 text-sm dark:text-gray-400">
-          <p>&copy; {new Date().getFullYear()} Dance United. All rights reserved.</p>
+      <footer className="border-amber-900/20 border-t bg-gray-950 py-8">
+        <div className="mx-auto max-w-7xl px-4 text-center text-sm">
+          <ShinyText variant="body">&copy; {new Date().getFullYear()} dance united. All rights reserved.</ShinyText>
         </div>
       </footer>
     </div>
@@ -120,11 +137,15 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   }
 
   return (
-    <main className="container mx-auto p-4 pt-16">
-      <h1>{message}</h1>
-      <p>{details}</p>
+    <main className="container mx-auto bg-gray-950 p-4 pt-16">
+      <ShinyText as="h1" variant="title" className="mb-4 text-4xl">
+        {message}
+      </ShinyText>
+      <ShinyText as="p" variant="body" className="mb-4 text-lg">
+        {details}
+      </ShinyText>
       {stack && (
-        <pre className="w-full overflow-x-auto p-4">
+        <pre className="w-full overflow-x-auto rounded-lg border border-amber-900/20 bg-gray-900/30 p-4 text-gold text-sm">
           <code>{stack}</code>
         </pre>
       )}
