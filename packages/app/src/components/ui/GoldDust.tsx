@@ -91,7 +91,7 @@ export function GoldDust() {
         // Target Pale Gold: 255, 245, 150 (Previous was 255, 255, 255)
         const r = 255
         // Green: 215 -> 245 (Add 30)
-        const g = Math.floor(215 + (30 * sparkle))
+        const g = Math.floor(215 + 30 * sparkle)
         // Blue: 0 -> 150 (Add 150) - Keeps it warm/yellowish
         const b = Math.floor(150 * sparkle)
 

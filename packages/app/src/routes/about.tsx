@@ -1,4 +1,4 @@
-import { ShinyText, MetallicButton } from '../components/ui'
+import { ShinyText } from '../components/ui'
 
 export default function About() {
   return (
@@ -11,14 +11,16 @@ export default function About() {
 
         <div className="mx-auto max-w-4xl space-y-8 text-lg">
           <ShinyText as="p" variant="body" className="text-gray-300">
-            The story of <span className="text-gold font-semibold">Dance United</span> begins with a passion that started at the age of three.
-            Our founder, <span className="text-gold font-semibold">Wiktoria</span>, took her first dance steps at Caro Dance, representing Poland on international stages
-            and earning titles such as Polish Champion and European Vice-Champion.
+            The story of <span className="font-semibold text-gold">Dance United</span> begins with a passion that
+            started at the age of three. Our founder, <span className="font-semibold text-gold">Wiktoria</span>, took
+            her first dance steps at Caro Dance, representing Poland on international stages and earning titles such as
+            Polish Champion and European Vice-Champion.
           </ShinyText>
           <ShinyText as="p" variant="body" className="text-gray-300">
-            Years of training, discipline, and love for movement evolved into a dream: to create a place where dance is not just a sport,
-            but a lifestyle. Dance United was born from this vision—a space where professionals and amateurs alike, regardless of age,
-            can discover and nurture their passion in a supportive, energetic environment.
+            Years of training, discipline, and love for movement evolved into a dream: to create a place where dance is
+            not just a sport, but a lifestyle. Dance United was born from this vision—a space where professionals and
+            amateurs alike, regardless of age, can discover and nurture their passion in a supportive, energetic
+            environment.
           </ShinyText>
         </div>
       </section>
@@ -29,7 +31,7 @@ export default function About() {
           <ShinyText as="h2" variant="title" className="mb-8 text-3xl">
             Our Mission
           </ShinyText>
-          <ShinyText as="p" variant="body" className="text-xl text-gray-300 italic">
+          <ShinyText as="p" variant="body" className="text-gray-300 text-xl italic">
             "We believe that dance connects people. Our mission is to build a community where quality instruction meets
             a friendly atmosphere, empowering everyone to express themselves through movement."
           </ShinyText>
@@ -41,15 +43,15 @@ export default function About() {
         <div className="mx-auto flex max-w-5xl flex-col items-center gap-12 md:flex-row">
           <div className="w-full md:w-1/2">
             <div className="relative mx-auto aspect-[3/4] w-full max-w-sm overflow-hidden rounded-xl border border-amber-900/30 shadow-2xl">
-              <img
-                src="/img/founder.png"
-                alt="Wiktoria - Founder"
-                className="h-full w-full object-cover"
-              />
+              <img src="/img/founder.png" alt="Wiktoria - Founder" className="h-full w-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-gray-950/80 to-transparent" />
               <div className="absolute bottom-6 left-6 text-left">
-                <ShinyText as="h3" variant="title" className="text-3xl">Wiktoria</ShinyText>
-                <ShinyText as="p" variant="body" className="text-gold font-cinzel text-sm uppercase tracking-widest">Founder & Head Coach</ShinyText>
+                <ShinyText as="h3" variant="title" className="text-3xl">
+                  Wiktoria
+                </ShinyText>
+                <ShinyText as="p" variant="body" className="font-cinzel text-gold text-sm uppercase tracking-widest">
+                  Founder & Head Coach
+                </ShinyText>
               </div>
             </div>
           </div>
@@ -58,12 +60,12 @@ export default function About() {
               Meet the Founder
             </ShinyText>
             <ShinyText as="p" variant="body" className="mb-6 text-gray-300 text-lg leading-relaxed">
-              With a lifetime dedicated to dance, Wiktoria brings world-class experience to Gdańsk.
-              Her journey from a young champion to a mentor has shaped the philosophy of Dance United.
-              She manages the studio with a heart full of passion, ensuring that every student feels seen, heard, and inspired.
+              With a lifetime dedicated to dance, Wiktoria brings world-class experience to Gdańsk. Her journey from a
+              young champion to a mentor has shaped the philosophy of Dance United. She manages the studio with a heart
+              full of passion, ensuring that every student feels seen, heard, and inspired.
             </ShinyText>
             <div className="flex justify-center gap-4 md:justify-start">
-              <div className="h-1 w-24 rounded-full bg-gradient-to-r from-amber-500 to-transparent"></div>
+              <div className="h-1 w-24 rounded-full bg-gradient-to-r from-amber-500 to-transparent" />
             </div>
           </div>
         </div>
@@ -89,31 +91,43 @@ export default function About() {
                 src="https://maps.google.com/maps?q=aleja+Grunwaldzka+225,+80-266+Gdańsk&t=&z=15&ie=UTF8&iwloc=&output=embed"
                 title="Dance United Location"
                 className="transition-opacity duration-500 hover:opacity-90"
-              ></iframe>
+              />
             </div>
 
             {/* Address & Socials Box */}
             <div className="flex h-[400px] flex-col justify-center space-y-6 rounded-xl border border-amber-900/20 bg-gray-900/40 p-10 text-left backdrop-blur-sm">
               <div>
-                <ShinyText as="h3" variant="title" className="mb-4 font-cinzel font-semibold text-3xl text-gold">Address</ShinyText>
+                <ShinyText as="h3" variant="title" className="mb-4 font-cinzel font-semibold text-3xl text-gold">
+                  Address
+                </ShinyText>
                 <div className="space-y-2">
-                  <ShinyText as="p" variant="body" className="text-gray-200 text-xl font-medium">aleja Grunwaldzka 225</ShinyText><br />
-                  <ShinyText as="p" variant="body" className="text-gray-400 text-lg">80-266 Gdańsk</ShinyText><br />
-                  <ShinyText as="p" variant="body" className="text-gray-400 text-lg">Poland</ShinyText>
+                  <ShinyText as="p" variant="body" className="font-medium text-gray-200 text-xl">
+                    aleja Grunwaldzka 225
+                  </ShinyText>
+                  <br />
+                  <ShinyText as="p" variant="body" className="text-gray-400 text-lg">
+                    80-266 Gdańsk
+                  </ShinyText>
+                  <br />
+                  <ShinyText as="p" variant="body" className="text-gray-400 text-lg">
+                    Poland
+                  </ShinyText>
                 </div>
               </div>
 
               {/* Divider */}
-              <div className="h-px w-full bg-gradient-to-r from-amber-900/50 via-amber-500/50 to-amber-900/50 my-2"></div>
+              <div className="my-2 h-px w-full bg-gradient-to-r from-amber-900/50 via-amber-500/50 to-amber-900/50" />
 
               <div>
-                <ShinyText as="h3" variant="title" className="mb-4 font-cinzel font-semibold text-3xl text-gold">Follow Us</ShinyText>
+                <ShinyText as="h3" variant="title" className="mb-4 font-cinzel font-semibold text-3xl text-gold">
+                  Follow Us
+                </ShinyText>
                 <div className="flex gap-6">
                   <a
                     href="https://www.facebook.com/danceunitedgdansk"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group transition-all duration-300 hover:scale-110 text-[#1877F2]"
+                    className="group text-[#1877F2] transition-all duration-300 hover:scale-110"
                     aria-label="Facebook"
                   >
                     <svg
@@ -127,7 +141,7 @@ export default function About() {
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     >
-                      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
                     </svg>
                   </a>
 

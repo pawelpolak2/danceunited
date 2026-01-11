@@ -5,7 +5,7 @@ export default function Pricing() {
     <div className="min-h-screen bg-gray-950 text-white">
       <section className="container mx-auto px-4 py-16 text-center">
         <div className="mb-12">
-          <ShinyText as="h1" variant="title" className="text-5xl inline-block">
+          <ShinyText as="h1" variant="title" className="inline-block text-5xl">
             Pricing
           </ShinyText>
         </div>
@@ -14,7 +14,7 @@ export default function Pricing() {
           {/* Group Classes Table */}
           <div>
             <div className="mb-6 text-center">
-              <ShinyText as="h2" variant="title" className="text-3xl text-gold inline-block">
+              <ShinyText as="h2" variant="title" className="inline-block text-3xl text-gold">
                 Group Classes
               </ShinyText>
             </div>
@@ -22,7 +22,7 @@ export default function Pricing() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left">
                   <thead>
-                    <tr className="border-b border-amber-900/30 bg-gray-900/60 text-gold">
+                    <tr className="border-amber-900/30 border-b bg-gray-900/60 text-gold">
                       <th className="px-6 py-4 font-cinzel font-semibold">Group</th>
                       <th className="px-6 py-4 font-cinzel font-semibold">Age</th>
                       <th className="px-6 py-4 font-cinzel font-semibold">Duration</th>
@@ -89,7 +89,7 @@ export default function Pricing() {
           {/* Individual Lessons Table */}
           <div>
             <div className="mb-6 text-center">
-              <ShinyText as="h2" variant="title" className="text-3xl text-gold inline-block">
+              <ShinyText as="h2" variant="title" className="inline-block text-3xl text-gold">
                 Individual Lessons
               </ShinyText>
             </div>
@@ -97,7 +97,7 @@ export default function Pricing() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left">
                   <thead>
-                    <tr className="border-b border-amber-900/30 bg-gray-900/60 text-gold">
+                    <tr className="border-amber-900/30 border-b bg-gray-900/60 text-gold">
                       <th className="px-6 py-4 font-cinzel font-semibold">Package</th>
                       <th className="px-6 py-4 font-cinzel font-semibold">Duration</th>
                       <th className="px-6 py-4 font-cinzel font-semibold">Price</th>

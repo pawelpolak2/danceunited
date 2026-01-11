@@ -47,7 +47,8 @@ export default function Team() {
           Our Team
         </ShinyText>
         <ShinyText as="p" variant="body" className="!block mx-auto max-w-2xl text-center text-gray-300 text-xl">
-          Our team is a group of enthusiasts, experienced dancers, and educators who share their knowledge with commitment. Meet the people who will introduce you to the world of dance!
+          Our team is a group of enthusiasts, experienced dancers, and educators who share their knowledge with
+          commitment. Meet the people who will introduce you to the world of dance!
         </ShinyText>
       </div>
 
