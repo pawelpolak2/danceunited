@@ -31,7 +31,12 @@ const buttonTextConfig = {
   day: 'day',
 } as const
 
-export function DashboardCalendar({ events = [], onDateSelect, onEventClick, readOnly = false }: DashboardCalendarProps) {
+export function DashboardCalendar({
+  events = [],
+  onDateSelect,
+  onEventClick,
+  readOnly = false,
+}: DashboardCalendarProps) {
   const [isClient, setIsClient] = useState(false)
   const calendarRef = useRef<FullCalendar>(null)
 
