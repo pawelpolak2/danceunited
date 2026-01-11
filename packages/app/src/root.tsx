@@ -11,7 +11,7 @@ import {
 } from 'react-router'
 
 import type { Route } from './+types/root'
-import { MetallicButton, MetallicLink, ShinyText } from './components/ui'
+import { EasterEggGuide, ExplosionManager, MetallicButton, MetallicLink, MoonPhaseManager, ShinyText, WeeklyEasterEggManager } from './components/ui'
 import { getCurrentUser } from './lib/auth.server'
 import './app.css'
 
@@ -173,6 +173,10 @@ export default function App() {
           <ShinyText variant="body">&copy; {new Date().getFullYear()} dance united. All rights reserved.</ShinyText>
         </div>
       </footer>
+      <ExplosionManager />
+      <MoonPhaseManager />
+      <WeeklyEasterEggManager />
+      <EasterEggGuide />
     </div>
   )
 }
