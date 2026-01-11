@@ -1,4 +1,4 @@
-import { Carousel, MetallicLink, ShinyText } from '../components/ui'
+import { Carousel, GoldDust, MetallicLink, ShinyText } from '../components/ui'
 import type { Route } from './+types/_index'
 
 // biome-ignore lint/correctness/noEmptyPattern: this is boilerplate code!
@@ -12,10 +12,22 @@ export function meta({}: Route.MetaArgs) {
 export default function HomePage() {
   return (
     <main className="flex min-h-screen flex-col bg-gray-950">
+      <GoldDust />
       {/* Hero Section */}
-      {/* Hero Section */}
-      <section className="flex flex-col items-center justify-center pt-16 pb-8">
-        <div className="w-full max-w-4xl px-4 text-center">
+      <section className="relative flex min-h-[600px] flex-col items-center justify-center overflow-hidden pt-16 pb-8 text-white sm:min-h-[700px]">
+        {/* Background Carousel */}
+        <div className="absolute inset-0 z-0">
+          <Carousel
+            images={['/img/hero-1.png', '/img/hero-2.png', '/img/hero-3.png']}
+            className="h-full w-full opacity-60"
+            autoPlayInterval={5000}
+          />
+          {/* Gradient Overlay for Text Readability */}
+          <div className="absolute inset-0 z-10 bg-gradient-to-t from-gray-950/90 via-gray-950/50 to-transparent" />
+        </div>
+
+        {/* Hero Content */}
+        <div className="relative z-20 w-full max-w-4xl px-4 text-center">
           <ShinyText
             as="h1"
             variant="title"
@@ -23,21 +35,13 @@ export default function HomePage() {
           >
             welcome to dance united
           </ShinyText>
-          <ShinyText as="p" variant="body" className="mb-12 text-xl">
+          <ShinyText as="p" variant="body" className="mb-12 text-gray-200 text-xl">
             Your premier platform for dance classes, community, and connection
           </ShinyText>
         </div>
 
-        {/* Full Width Carousel */}
-        <div className="mb-12 w-full">
-          <Carousel
-            images={['/img/hero-1.png', '/img/hero-2.png', '/img/hero-3.png']}
-            className="w-full rounded-none border-amber-900/40 border-y"
-          />
-        </div>
-
         {/* CTA Buttons */}
-        <div className="w-full max-w-4xl px-4 text-center">
+        <div className="relative z-20 w-full max-w-4xl px-4 text-center">
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <MetallicLink
               to="/login"
