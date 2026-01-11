@@ -70,12 +70,66 @@ export default function App() {
     <div className="flex min-h-screen flex-col bg-gray-950">
       <header className="border-amber-900/20 border-b bg-gray-950">
         <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-          <Link to="/" className="flex items-center gap-3">
-            <img src="/logos/logo-transparent.png" alt="Dance United" className="h-10 w-auto" />
-            <ShinyText as="span" variant="title" className="text-2xl">
-              dance united
-            </ShinyText>
-          </Link>
+          <div className="flex items-center gap-8">
+            <Link to="/" className="flex items-center gap-3">
+              <img src="/logos/logo-transparent.png" alt="Dance United" className="h-10 w-auto" />
+              <ShinyText as="span" variant="title" className="text-2xl">
+                dance united
+              </ShinyText>
+            </Link>
+
+            {/* Desktop Navigation */}
+            <div className="hidden items-center gap-6 md:flex">
+              <Link to="/about">
+                <ShinyText
+                  variant="body"
+                  className="text-xl uppercase tracking-wider transition-colors hover:text-gold"
+                >
+                  O nas
+                </ShinyText>
+              </Link>
+              <Link to="/team">
+                <ShinyText
+                  variant="body"
+                  className="text-xl uppercase tracking-wider transition-colors hover:text-gold"
+                >
+                  Kadra
+                </ShinyText>
+              </Link>
+              <Link to="/pricing">
+                <ShinyText
+                  variant="body"
+                  className="text-xl uppercase tracking-wider transition-colors hover:text-gold"
+                >
+                  Cennik
+                </ShinyText>
+              </Link>
+              <Link to="/schedule">
+                <ShinyText
+                  variant="body"
+                  className="text-xl uppercase tracking-wider transition-colors hover:text-gold"
+                >
+                  Grafik
+                </ShinyText>
+              </Link>
+              <Link to="/contact">
+                <ShinyText
+                  variant="body"
+                  className="text-xl uppercase tracking-wider transition-colors hover:text-gold"
+                >
+                  Kontakt
+                </ShinyText>
+              </Link>
+              <Link to="/gallery">
+                <ShinyText
+                  variant="body"
+                  className="text-xl uppercase tracking-wider transition-colors hover:text-gold"
+                >
+                  Galeria
+                </ShinyText>
+              </Link>
+            </div>
+          </div>
           <div className="flex items-center gap-4">
             {user ? (
               <>
