@@ -14,6 +14,7 @@ interface DashboardCalendarProps {
   events?: EventInput[]
   onDateSelect?: (selectInfo: DateSelectArg) => void
   onEventClick?: (clickInfo: EventClickArg) => void
+  readOnly?: boolean
 }
 
 // Move static config outside component to prevent re-creation
@@ -30,7 +31,12 @@ const buttonTextConfig = {
   day: 'day',
 } as const
 
-export function DashboardCalendar({ events = [], onDateSelect, onEventClick }: DashboardCalendarProps) {
+export function DashboardCalendar({
+  events = [],
+  onDateSelect,
+  onEventClick,
+  readOnly = false,
+}: DashboardCalendarProps) {
   const [isClient, setIsClient] = useState(false)
   const calendarRef = useRef<FullCalendar>(null)
 
@@ -58,6 +64,8 @@ export function DashboardCalendar({ events = [], onDateSelect, onEventClick }: D
   // Memoize handlers to prevent recreation
   const handleDateSelect = useCallback(
     (selectInfo: DateSelectArg) => {
+      if (readOnly) return
+
       if (onDateSelect) {
         onDateSelect(selectInfo)
       } else {
@@ -65,19 +73,20 @@ export function DashboardCalendar({ events = [], onDateSelect, onEventClick }: D
         alert(`Selected: ${selectInfo.startStr} to ${selectInfo.endStr}`)
       }
     },
-    [onDateSelect]
+    [onDateSelect, readOnly]
   )
 
   const handleEventClick = useCallback(
     (clickInfo: EventClickArg) => {
+      // Allow click in readOnly mode for details view, but don't show default alert if readOnly
       if (onEventClick) {
         onEventClick(clickInfo)
-      } else {
-        // Default: show event details
+      } else if (!readOnly) {
+        // Default: show event details only if not readOnly (unless handled by parent)
         alert(`Event: ${clickInfo.event.title}`)
       }
     },
-    [onEventClick]
+    [onEventClick, readOnly]
   )
 
   // Memoize events array
@@ -104,9 +113,9 @@ export function DashboardCalendar({ events = [], onDateSelect, onEventClick }: D
         initialView="dayGridMonth"
         headerToolbar={headerToolbarConfig}
         events={calendarEvents}
-        selectable={true}
-        selectMirror={true}
-        dayMaxEvents={true}
+        selectable={!readOnly}
+        selectMirror={!readOnly}
+        dayMaxEvents={false}
         weekends={true}
         select={handleDateSelect}
         eventClick={handleEventClick}
