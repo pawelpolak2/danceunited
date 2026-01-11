@@ -85,7 +85,7 @@ export default function App() {
                   variant="body"
                   className="text-xl uppercase tracking-wider transition-colors hover:text-gold"
                 >
-                  O nas
+                  About Us
                 </ShinyText>
               </Link>
               <Link to="/team">
@@ -93,7 +93,7 @@ export default function App() {
                   variant="body"
                   className="text-xl uppercase tracking-wider transition-colors hover:text-gold"
                 >
-                  Kadra
+                  Team
                 </ShinyText>
               </Link>
               <Link to="/pricing">
@@ -101,7 +101,7 @@ export default function App() {
                   variant="body"
                   className="text-xl uppercase tracking-wider transition-colors hover:text-gold"
                 >
-                  Cennik
+                  Pricing
                 </ShinyText>
               </Link>
               <Link to="/schedule">
@@ -109,7 +109,7 @@ export default function App() {
                   variant="body"
                   className="text-xl uppercase tracking-wider transition-colors hover:text-gold"
                 >
-                  Grafik
+                  Schedule
                 </ShinyText>
               </Link>
               <Link to="/contact">
@@ -117,7 +117,7 @@ export default function App() {
                   variant="body"
                   className="text-xl uppercase tracking-wider transition-colors hover:text-gold"
                 >
-                  Kontakt
+                  Contact
                 </ShinyText>
               </Link>
               <Link to="/gallery">
@@ -125,7 +125,7 @@ export default function App() {
                   variant="body"
                   className="text-xl uppercase tracking-wider transition-colors hover:text-gold"
                 >
-                  Galeria
+                  Gallery
                 </ShinyText>
               </Link>
             </div>

@@ -3,39 +3,39 @@ import { ShinyText } from '../components/ui'
 const trainers = [
   {
     name: 'Anna Kowalska',
-    role: 'Taniec Towarzyski',
+    role: 'Ballroom Dance',
     image: '/trainers/trainer_1.png',
-    description: 'Wielokrotna mistrzyni Polski z 10-letnim doświadczeniem w nauczaniu.',
+    description: 'Multiple Polish Champion with 10 years of teaching experience.',
   },
   {
     name: 'Janusz Wiśniewski',
-    role: 'Taniec Towarzyski',
+    role: 'Ballroom Dance',
     image: '/trainers/trainer_ballroom_male.png',
-    description: 'Ekspert w standardowych tańcach towarzyskich, sędzia międzynarodowy.',
+    description: 'Expert in standard ballroom dances, international judge.',
   },
   {
     name: 'Maria Wiśniewska',
-    role: 'Taniec Współczesny',
+    role: 'Contemporary Dance',
     image: '/trainers/trainer_3.png',
-    description: 'Specjalistka od techniki i wyrazu artystycznego w tańcu.',
+    description: 'Specialist in technique and artistic expression in dance.',
   },
   {
     name: 'Krzysztof Zieliński',
     role: 'Salsa & Bachata',
     image: '/trainers/trainer_4.png',
-    description: 'Poczuj rytm latynoskich tańców pod okiem doświadczonego tancerza.',
+    description: 'Feel the rhythm of Latin dances under the guidance of an experienced dancer.',
   },
   {
     name: 'Katarzyna Lewandowska',
-    role: 'Balet dla dzieci',
+    role: 'Ballet for Kids',
     image: '/trainers/trainer_5.png',
-    description: 'Cierpliwa i pełna uśmiechu instruktorka najmłodszych talentów.',
+    description: 'Patient and smiling instructor for the youngest talents.',
   },
   {
     name: 'Tomasz Dąbrowski',
     role: 'Breakdance',
     image: '/trainers/trainer_6.png',
-    description: 'Mistrz akrobacji i stylu, nauczy Cię panować nad ciałem.',
+    description: 'Master of acrobatics and style, teaches you to control your body.',
   },
 ]
 
@@ -44,11 +44,11 @@ export default function Team() {
     <div className="container mx-auto px-4 pt-4 pb-12">
       <div className="mb-12 text-center">
         <ShinyText as="h1" variant="title" className="!block !w-full mb-4 text-center text-5xl">
-          Nasza Kadra
+          Our Team
         </ShinyText>
         <ShinyText as="p" variant="body" className="!block mx-auto max-w-2xl text-center text-gray-300 text-xl">
-          Nasz zespół to grupa pasjonatów, doświadczonych tancerzy i pedagogów, którzy z zaangażowaniem dzielą się swoją
-          wiedzą. Poznaj ludzi, którzy wprowadzą Cię w świat tańca!
+          Our team is a group of enthusiasts, experienced dancers, and educators who share their knowledge with
+          commitment. Meet the people who will introduce you to the world of dance!
         </ShinyText>
       </div>
 
