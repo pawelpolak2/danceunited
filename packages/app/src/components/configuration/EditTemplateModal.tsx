@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Form, useNavigation } from 'react-router'
 import { MetallicButton } from '../ui/MetallicButton'
 import { Modal } from '../ui/Modal'
+import { WhitelistManager } from './WhitelistManager'
 
 // These should match your Prism schema enums and relations
 interface DanceStyle {
@@ -13,6 +14,7 @@ interface User {
   id: string
   firstName: string
   lastName: string
+  email: string // Added email to match WhitelistManager User
 }
 
 interface ClassTemplate {
@@ -26,6 +28,7 @@ interface ClassTemplate {
   duration: number
   isActive: boolean
   isWhitelistEnabled: boolean
+  whitelist?: { user: User }[]
 }
 
 interface EditTemplateModalProps {
@@ -34,12 +37,13 @@ interface EditTemplateModalProps {
   template: ClassTemplate | null // null means "Create Mode"
   styles: DanceStyle[]
   trainers: User[]
+  users: User[]
 }
 
 const CLASS_LEVELS = ['OPEN', 'BEGINNER', 'INTERMEDIATE', 'ADVANCED']
 const DANCE_HALLS = ['HALL1', 'HALL2']
 
-export function EditTemplateModal({ isOpen, onClose, template, styles, trainers }: EditTemplateModalProps) {
+export function EditTemplateModal({ isOpen, onClose, template, styles, trainers, users }: EditTemplateModalProps) {
   const navigation = useNavigation()
   const isSubmitting = navigation.state === 'submitting'
 
@@ -53,6 +57,9 @@ export function EditTemplateModal({ isOpen, onClose, template, styles, trainers 
   const [duration, setDuration] = useState(60) // minutes
   const [isActive, setIsActive] = useState(true)
   const [isWhitelistEnabled, setIsWhitelistEnabled] = useState(false)
+
+  // Create Mode Whitelist State
+  const [pendingWhitelist, setPendingWhitelist] = useState<User[]>([])
 
   // Initialize form
   useEffect(() => {
@@ -78,9 +85,10 @@ export function EditTemplateModal({ isOpen, onClose, template, styles, trainers 
         setDuration(60)
         setIsActive(true)
         setIsWhitelistEnabled(false)
+        setPendingWhitelist([])
       }
     }
-  }, [isOpen, template, styles, trainers])
+  }, [isOpen, template?.id])
 
   if (!isOpen) return null
 
@@ -98,6 +106,9 @@ export function EditTemplateModal({ isOpen, onClose, template, styles, trainers 
       >
         <input type="hidden" name="intent" value={isEdit ? 'update_template' : 'create_template'} />
         {isEdit && <input type="hidden" name="id" value={template.id} />}
+        {!isEdit && isWhitelistEnabled && (
+          <input type="hidden" name="whitelistUserIds" value={JSON.stringify(pendingWhitelist.map((u) => u.id))} />
+        )}
 
         {/* Name */}
         <div className="space-y-1">
@@ -249,6 +260,26 @@ export function EditTemplateModal({ isOpen, onClose, template, styles, trainers 
             <span className="text-gray-300 text-sm">Restricted Access (Whitelist)</span>
           </label>
         </div>
+
+        {isWhitelistEnabled && (
+          <div className="border-white/10 border-t pt-4">
+            {template ? (
+              <WhitelistManager
+                templateId={template.id}
+                initialWhitelist={template.whitelist || []}
+                allUsers={users}
+                mode="live"
+              />
+            ) : (
+              <WhitelistManager
+                initialWhitelist={pendingWhitelist.map((u) => ({ user: u }))}
+                allUsers={users}
+                mode="local"
+                onUpdate={setPendingWhitelist}
+              />
+            )}
+          </div>
+        )}
 
         <div className="mt-6 flex justify-end gap-3 pt-2">
           <button

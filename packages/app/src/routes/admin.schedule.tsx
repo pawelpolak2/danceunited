@@ -2,7 +2,7 @@ import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/c
 import { prisma } from 'db'
 import { useState } from 'react'
 import { redirect, useFetcher, useLoaderData } from 'react-router'
-import { CreateClassTemplateModal } from '../components/dashboard/CreateClassTemplateModal'
+import { EditTemplateModal } from '../components/configuration/EditTemplateModal'
 import { DashboardCalendar } from '../components/dashboard/DashboardCalendar'
 import { EditClassModal } from '../components/dashboard/EditClassModal'
 import { ScheduleClassModal } from '../components/dashboard/ScheduleClassModal'
@@ -41,7 +41,14 @@ export async function loader({ request }: Route.LoaderArgs) {
       isActive: true,
     },
     orderBy: { firstName: 'asc' },
-    select: { id: true, firstName: true, lastName: true },
+    select: { id: true, firstName: true, lastName: true, email: true },
+  })
+
+  // Fetch Dancers for Whitelist
+  const users = await prisma.user.findMany({
+    where: { isActive: true },
+    orderBy: { firstName: 'asc' },
+    select: { id: true, firstName: true, lastName: true, email: true },
   })
 
   // Fetch ALL classes for the calendar (Admin sees everything)
@@ -70,7 +77,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     editable: true, // Allow drag & drop for admin
   }))
 
-  return { user, danceStyles, classTemplates, events, classes: serializedClasses, trainers }
+  return { user, danceStyles, classTemplates, events, classes: serializedClasses, trainers, users }
 }
 
 export async function action({ request }: Route.ActionArgs) {
@@ -86,7 +93,8 @@ export async function action({ request }: Route.ActionArgs) {
   // In a real app, I'd extract this logic to a shared service/helper
 
   // 1. Create Template
-  if (intent === 'createClassTemplate') {
+  // 1. Create Template (Unified Intent)
+  if (intent === 'create_template') {
     const name = formData.get('name') as string
     const description = formData.get('description') as string
     const level = formData.get('level') as any
@@ -96,6 +104,23 @@ export async function action({ request }: Route.ActionArgs) {
     const hallId = formData.get('hallId') as any
     const isWhitelistEnabled = formData.get('isWhitelistEnabled') === 'on'
     const trainerId = formData.get('trainerId') as string
+
+    // Parse whitelist
+    const whitelistUserIdsStr = formData.get('whitelistUserIds') as string
+    let whitelistCreateData = {}
+
+    if (isWhitelistEnabled && whitelistUserIdsStr) {
+      try {
+        const ids = JSON.parse(whitelistUserIdsStr) as string[]
+        if (ids.length > 0) {
+          whitelistCreateData = {
+            create: ids.map((userId) => ({ userId })),
+          }
+        }
+      } catch (e) {
+        console.error('Failed to parse whitelist IDs', e)
+      }
+    }
 
     if (!name || !styleId || !trainerId) {
       return { error: 'Name, Style and Default Trainer are required' }
@@ -112,9 +137,10 @@ export async function action({ request }: Route.ActionArgs) {
           hallId,
           isWhitelistEnabled,
           trainerId,
+          whitelist: whitelistCreateData,
         },
       })
-      return { success: true, intent: 'createClassTemplate' }
+      return { success: true, intent: 'create_template' }
     } catch (error) {
       console.error('Failed to create class template:', error)
       return { error: 'Failed to create class template' }
@@ -240,7 +266,7 @@ export async function action({ request }: Route.ActionArgs) {
 }
 
 export default function AdminSchedulePage() {
-  const { danceStyles, classTemplates, events, classes, trainers } = useLoaderData<typeof loader>()
+  const { danceStyles, classTemplates, events, classes, trainers, users } = useLoaderData<typeof loader>()
   const fetcher = useFetcher()
 
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false)
@@ -251,7 +277,7 @@ export default function AdminSchedulePage() {
 
   // Close modals on success
   if (fetcher.data?.success) {
-    if (fetcher.data.intent === 'createClassTemplate' && isTemplateModalOpen) setIsTemplateModalOpen(false)
+    if (fetcher.data.intent === 'create_template' && isTemplateModalOpen) setIsTemplateModalOpen(false)
     if (fetcher.data.intent === 'scheduleClass' && isScheduleModalOpen) setIsScheduleModalOpen(false)
     if ((fetcher.data.intent === 'updateClass' || fetcher.data.intent === 'deleteClass') && isEditModalOpen)
       setIsEditModalOpen(false)
@@ -329,11 +355,13 @@ export default function AdminSchedulePage() {
       </div>
 
       {/* Modals reused from Trainer Dashboard components */}
-      <CreateClassTemplateModal
+      <EditTemplateModal
         isOpen={isTemplateModalOpen}
         onClose={() => setIsTemplateModalOpen(false)}
-        danceStyles={danceStyles}
+        template={null}
+        styles={danceStyles}
         trainers={trainers}
+        users={users}
       />
       <ScheduleClassModal
         isOpen={isScheduleModalOpen}
