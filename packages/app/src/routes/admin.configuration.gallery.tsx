@@ -1,6 +1,7 @@
-import { Trash2 } from 'lucide-react'
-import { useState } from 'react'
-import { Form, useLoaderData, useNavigation } from 'react-router'
+import { AlertTriangle, Trash2, Upload } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Form, useActionData, useLoaderData, useNavigation } from 'react-router'
+
 import { MetallicButton } from '../components/ui/MetallicButton'
 import { ShinyText } from '../components/ui/ShinyText'
 import type { Route } from './+types/admin.configuration.gallery'
@@ -44,6 +45,18 @@ export const action = async ({ request }: Route.ActionArgs) => {
     if (!file || file.size === 0) return { success: false, error: 'No file uploaded' }
     if (!GALLERY_CATEGORIES.includes(category as any)) return { success: false, error: 'Invalid category' }
 
+    // Validation
+    const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/jpg']
+    const MAX_SIZE = 5 * 1024 * 1024 // 5MB
+
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      return { success: false, error: 'Invalid file type. Only PNG and JPG are allowed.' }
+    }
+
+    if (file.size > MAX_SIZE) {
+      return { success: false, error: 'File too large. Maximum size is 5MB.' }
+    }
+
     const buffer = Buffer.from(await file.arrayBuffer())
     const safeFilename = file.name.replace(/[^a-zA-Z0-9.-]/g, '_')
     const targetDir = path.join(process.cwd(), 'public', 'gallery', category)
@@ -75,9 +88,18 @@ export const action = async ({ request }: Route.ActionArgs) => {
 
 export default function GalleryConfiguration() {
   const { galleryImages: images } = useLoaderData<typeof loader>()
+  const actionData = useActionData<typeof action>()
   const [selectedCategory, setSelectedCategory] = useState<GalleryCategory>('camps')
+  const [selectedFileName, setSelectedFileName] = useState<string | null>(null)
   const navigation = useNavigation()
   const isUploading = navigation.formData?.get('intent') === 'upload_image'
+
+  // Reset file name on success
+  useEffect(() => {
+    if (actionData?.success) {
+      setSelectedFileName(null)
+    }
+  }, [actionData])
 
   const currentImages = images[selectedCategory] || []
 
@@ -96,6 +118,14 @@ export default function GalleryConfiguration() {
         {/* Upload Form */}
         <div className="mb-8 rounded-lg border border-white/10 bg-white/5 p-4">
           <h4 className="mb-4 font-bold text-sm text-white uppercase tracking-wider">Upload New Image</h4>
+
+          {actionData?.error && (
+            <div className="mb-4 flex items-center gap-2 rounded-md border border-red-500/50 bg-red-900/20 p-3 text-red-200 text-sm">
+              <AlertTriangle size={16} />
+              <span>{actionData.error}</span>
+            </div>
+          )}
+
           <Form method="post" encType="multipart/form-data" className="flex flex-col items-end gap-4 md:flex-row">
             <input type="hidden" name="intent" value="upload_image" />
 
@@ -116,14 +146,30 @@ export default function GalleryConfiguration() {
             </div>
 
             <div className="w-full flex-[2] space-y-1">
-              <label className="text-gray-400 text-xs">Image File</label>
-              <input
-                type="file"
-                name="file"
-                accept="image/*"
-                required
-                className="w-full text-gray-400 text-sm file:mr-4 file:rounded file:border-0 file:bg-primary file:px-4 file:py-2 file:font-semibold file:text-sm file:text-white hover:file:bg-primary/80"
-              />
+              <label className="text-gray-400 text-xs">Image File (PNG, JPG, Max 5MB)</label>
+              <div className="relative">
+                <input
+                  type="file"
+                  id="file-upload"
+                  name="file"
+                  accept="image/png, image/jpeg, image/jpg"
+                  required
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    setSelectedFileName(file ? file.name : null)
+                  }}
+                />
+                <label
+                  htmlFor="file-upload"
+                  className="flex w-full cursor-pointer items-center justify-between rounded border border-white/10 bg-black/40 px-3 py-2 text-white transition-colors hover:border-gold hover:bg-white/5"
+                >
+                  <span className={`text-sm ${selectedFileName ? 'text-white' : 'text-gray-500'}`}>
+                    {selectedFileName || 'Choose file...'}
+                  </span>
+                  <Upload size={16} className="text-gold" />
+                </label>
+              </div>
             </div>
 
             <MetallicButton
