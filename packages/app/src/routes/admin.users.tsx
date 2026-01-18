@@ -48,7 +48,14 @@ export async function loader({ request }: Route.LoaderArgs) {
   const users = await prisma.user.findMany({
     where,
     orderBy: { createdAt: 'desc' },
-    include: {
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      email: true,
+      role: true,
+      isActive: true,
+      createdAt: true,
       purchases: {
         where: { status: 'ACTIVE' },
         select: { id: true, classesRemaining: true, expiryDate: true, package: { select: { name: true } } },
