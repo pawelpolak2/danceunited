@@ -128,6 +128,18 @@ function DashboardCalendarComponent({
         eventClassNames="calendar-event"
         dayHeaderClassNames="calendar-day-header"
         buttonText={buttonTextConfig}
+        eventTimeFormat={{
+          hour: '2-digit',
+          minute: '2-digit',
+          meridiem: false,
+          hour12: false,
+        }}
+        slotLabelFormat={{
+          hour: '2-digit',
+          minute: '2-digit',
+          meridiem: false,
+          hour12: false,
+        }}
       />
     </div>
   )
