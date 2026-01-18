@@ -1,6 +1,6 @@
 import { Ban, Pencil, RefreshCw, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { Form, useLoaderData } from 'react-router'
+import { Form, useLoaderData, useSubmit } from 'react-router'
 import { EditTemplateModal } from '../components/configuration/EditTemplateModal'
 import { Checkbox } from '../components/ui/Checkbox'
 import { MetallicButton } from '../components/ui/MetallicButton'
@@ -8,11 +8,26 @@ import { MetallicTooltip } from '../components/ui/MetallicTooltip'
 import { ShinyText } from '../components/ui/ShinyText'
 import type { Route } from './+types/admin.configuration.templates'
 
-export const loader = async () => {
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const { prisma } = await import('db')
+  const url = new URL(request.url)
+  const search = url.searchParams.get('q') || ''
+
+  const where: any = {}
+  if (search) {
+    const term = search.trim()
+    where.OR = [
+      { name: { contains: term, mode: 'insensitive' } },
+      { description: { contains: term, mode: 'insensitive' } },
+      { style: { name: { contains: term, mode: 'insensitive' } } },
+      { trainer: { firstName: { contains: term, mode: 'insensitive' } } },
+      { trainer: { lastName: { contains: term, mode: 'insensitive' } } },
+    ]
+  }
 
   // Load Templates
   const templates = await prisma.classTemplate.findMany({
+    where,
     orderBy: { name: 'asc' },
     include: {
       style: true,
@@ -43,7 +58,7 @@ export const loader = async () => {
     select: { id: true, firstName: true, lastName: true, email: true },
   })
 
-  return { templates, danceStyles, trainers, users }
+  return { templates, danceStyles, trainers, users, search }
 }
 
 export const action = async ({ request }: Route.ActionArgs) => {
@@ -165,10 +180,14 @@ export const action = async ({ request }: Route.ActionArgs) => {
 }
 
 export default function TemplatesConfiguration() {
-  const { templates, danceStyles: styles, trainers, users } = useLoaderData<typeof loader>()
+  const { templates, danceStyles: styles, trainers, users, search } = useLoaderData<typeof loader>()
+  const submit = useSubmit()
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState<any | null>(null)
+
+  // Search State
+  const [query, setQuery] = useState(search)
 
   // Sync selectedTemplate with updated loader data
   useEffect(() => {
@@ -179,6 +198,16 @@ export default function TemplatesConfiguration() {
       }
     }
   }, [templates])
+
+  // Debounced Search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (query !== search) {
+        submit({ q: query }, { method: 'get', replace: true })
+      }
+    }, 400)
+    return () => clearTimeout(timer)
+  }, [query, search, submit])
 
   const [showInactive, setShowInactive] = useState(false)
 
@@ -195,7 +224,19 @@ export default function TemplatesConfiguration() {
 
       <div className="rounded-xl border border-white/10 bg-black/20 p-6">
         <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center">
-          <h3 className="font-bold text-gold text-xl">Templates List</h3>
+          <div className="flex flex-1 items-center gap-4">
+            <h3 className="whitespace-nowrap font-bold text-gold text-xl">Templates List</h3>
+            <Form className="w-full max-w-xs">
+              <input
+                type="text"
+                name="q"
+                placeholder="Search templates..."
+                className="w-full rounded border border-amber-900/50 bg-gray-950 px-4 py-2 text-amber-100 text-sm placeholder-gray-600 focus:border-amber-500/50 focus:outline-none"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+            </Form>
+          </div>
           <div className="flex items-center gap-4">
             <Checkbox
               checked={showInactive}
