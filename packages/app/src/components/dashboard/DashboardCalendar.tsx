@@ -1,4 +1,4 @@
-import type { DateSelectArg, EventClickArg, EventInput } from '@fullcalendar/core'
+import type { DateSelectArg, EventClickArg, EventDropArg, EventInput } from '@fullcalendar/core'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import FullCalendar from '@fullcalendar/react'
@@ -6,15 +6,13 @@ import timeGridPlugin from '@fullcalendar/timegrid'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ShinyText } from '../ui'
 
-// Note: FullCalendar v6 CSS should be imported, but paths may vary
-// If you see styling issues, you may need to add CSS imports manually
-// or use a CDN link in the root.tsx links function
-
 interface DashboardCalendarProps {
   events?: EventInput[]
   onDateSelect?: (selectInfo: DateSelectArg) => void
   onEventClick?: (clickInfo: EventClickArg) => void
+  onEventDrop?: (dropInfo: EventDropArg) => void
   readOnly?: boolean
+  editable?: boolean
 }
 
 // Move static config outside component to prevent re-creation
@@ -35,9 +33,12 @@ export function DashboardCalendar({
   events = [],
   onDateSelect,
   onEventClick,
+  onEventDrop,
   readOnly = false,
+  editable = false,
 }: DashboardCalendarProps) {
   const [isClient, setIsClient] = useState(false)
+  // ...
   const calendarRef = useRef<FullCalendar>(null)
 
   // Only render on client to avoid SSR hydration issues
@@ -119,6 +120,8 @@ export function DashboardCalendar({
         weekends={true}
         select={handleDateSelect}
         eventClick={handleEventClick}
+        editable={editable}
+        eventDrop={onEventDrop}
         height={600}
         aspectRatio={1.8}
         eventClassNames="calendar-event"

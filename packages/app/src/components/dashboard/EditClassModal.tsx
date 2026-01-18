@@ -12,6 +12,7 @@ interface ClassInstance {
   id: string
   startTime: string // ISO string
   actualHall: string
+  actualTrainerId: string
   notes?: string | null
   recurrenceGroupId?: string | null
   classTemplate: ClassTemplate
@@ -21,15 +22,17 @@ interface EditClassModalProps {
   isOpen: boolean
   onClose: () => void
   classInstance: ClassInstance | null
+  trainers: { id: string; firstName: string; lastName: string }[]
 }
 
-export function EditClassModal({ isOpen, onClose, classInstance }: EditClassModalProps) {
+export function EditClassModal({ isOpen, onClose, classInstance, trainers }: EditClassModalProps) {
   const navigation = useNavigation()
   const isSubmitting = navigation.state === 'submitting'
 
   const [startTime, setStartTime] = useState<string>('')
   const [endTime, setEndTime] = useState<string>('')
   const [hall, setHall] = useState<string>('HALL1')
+  const [trainerId, setTrainerId] = useState<string>('')
   const [notes, setNotes] = useState<string>('')
   const [updateScope, setUpdateScope] = useState<string>('single')
 
@@ -44,6 +47,7 @@ export function EditClassModal({ isOpen, onClose, classInstance }: EditClassModa
       }
       setStartTime(toLocalISO(start))
       setHall(classInstance.actualHall)
+      setTrainerId(classInstance.actualTrainerId)
       setNotes(classInstance.notes || '')
       setUpdateScope('single') // Reset scope when classInstance changes
     }
@@ -75,6 +79,26 @@ export function EditClassModal({ isOpen, onClose, classInstance }: EditClassModa
           <div className="w-full rounded-md border border-amber-900/30 bg-gray-900/30 px-3 py-2 text-gold">
             {classInstance.classTemplate.name}
           </div>
+        </div>
+
+        <div className="space-y-1">
+          <label htmlFor="edit-trainer" className="block font-cinzel font-medium text-amber-100/80 text-sm">
+            Trainer
+          </label>
+          <select
+            id="edit-trainer"
+            name="actualTrainerId"
+            required
+            value={trainerId}
+            onChange={(e) => setTrainerId(e.target.value)}
+            className="w-full rounded-md border border-amber-900/30 bg-gray-900/50 px-3 py-2 text-gold transition-all focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 [&>option]:bg-gray-900"
+          >
+            {trainers.map((trainer) => (
+              <option key={trainer.id} value={trainer.id}>
+                {trainer.firstName} {trainer.lastName}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
@@ -203,7 +227,7 @@ export function EditClassModal({ isOpen, onClose, classInstance }: EditClassModa
             name="intent"
             value="updateClass"
             disabled={isSubmitting}
-            className="min-w-[100px]"
+            className="min-w-[100px] rounded-md border-2 px-4 py-2"
           >
             {isSubmitting ? 'Updating...' : 'Save Changes'}
           </MetallicButton>

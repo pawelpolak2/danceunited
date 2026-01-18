@@ -8,7 +8,7 @@ const categories = [
   { id: 'camps', label: 'Camps & Courses' },
   { id: 'classes', label: 'Classes' },
   { id: 'tournaments', label: 'Tournaments' },
-  { id: 'studio', label: 'Dance Hall' },
+  { id: 'studio', label: 'Studio' },
 ]
 
 export const loader = async () => {
@@ -20,7 +20,7 @@ export const loader = async () => {
         .readdirSync(dir)
         .filter((file) => /\.(png|jpg|jpeg|webp)$/i.test(file))
         .map((file) => ({
-          src: `/gallery/${category}/${file}`,
+          src: `/resources/gallery/${category}/${file}`,
           alt: `${category} photo`,
         }))
     } catch (error) {

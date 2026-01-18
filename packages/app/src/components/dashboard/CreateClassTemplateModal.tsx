@@ -12,9 +12,10 @@ interface CreateClassTemplateModalProps {
   isOpen: boolean
   onClose: () => void
   danceStyles: DanceStyle[]
+  trainers: { id: string; firstName: string; lastName: string }[]
 }
 
-export function CreateClassTemplateModal({ isOpen, onClose, danceStyles }: CreateClassTemplateModalProps) {
+export function CreateClassTemplateModal({ isOpen, onClose, danceStyles, trainers }: CreateClassTemplateModalProps) {
   const navigation = useNavigation()
   const isSubmitting = navigation.state === 'submitting'
 
@@ -40,6 +41,27 @@ export function CreateClassTemplateModal({ isOpen, onClose, danceStyles }: Creat
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1">
+            <label htmlFor="trainerId" className="block font-cinzel font-medium text-amber-100/80 text-sm">
+              Default Trainer
+            </label>
+            <select
+              id="trainerId"
+              name="trainerId"
+              required
+              className="w-full rounded-md border border-amber-900/30 bg-gray-900/50 px-3 py-2 text-gold transition-all focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 [&>option]:bg-gray-900"
+            >
+              <option value="" disabled selected>
+                Select a trainer
+              </option>
+              {trainers.map((trainer) => (
+                <option key={trainer.id} value={trainer.id}>
+                  {trainer.firstName} {trainer.lastName}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="space-y-1">
             <label htmlFor="level" className="block font-cinzel font-medium text-amber-100/80 text-sm">
               Level
             </label>
@@ -55,7 +77,9 @@ export function CreateClassTemplateModal({ isOpen, onClose, danceStyles }: Creat
               <option value="ADVANCED">Advanced</option>
             </select>
           </div>
+        </div>
 
+        <div className="grid grid-cols-2 gap-4">
           <FormField
             label="Duration (minutes)"
             name="duration"
@@ -64,41 +88,6 @@ export function CreateClassTemplateModal({ isOpen, onClose, danceStyles }: Creat
             placeholder="e.g. 60"
             required
           />
-        </div>
-
-        <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            id="isRestricted"
-            name="isRestricted"
-            className="h-4 w-4 rounded border-amber-900/30 bg-gray-900/50 text-amber-500 focus:ring-amber-500/20"
-          />
-          <label htmlFor="isRestricted" className="font-cinzel text-amber-100/80 text-sm">
-            Restrict Visibility (Trainers & Enrolled only)
-          </label>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1">
-            <label htmlFor="styleId" className="block font-cinzel font-medium text-amber-100/80 text-sm">
-              Dance Style
-            </label>
-            <select
-              id="styleId"
-              name="styleId"
-              required
-              className="w-full rounded-md border border-amber-900/30 bg-gray-900/50 px-3 py-2 text-gold transition-all focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 [&>option]:bg-gray-900"
-            >
-              <option value="" disabled selected>
-                Select a style
-              </option>
-              {danceStyles.map((style) => (
-                <option key={style.id} value={style.id}>
-                  {style.name}
-                </option>
-              ))}
-            </select>
-          </div>
 
           <div className="space-y-1">
             <label htmlFor="hallId" className="block font-cinzel font-medium text-amber-100/80 text-sm">
@@ -116,6 +105,39 @@ export function CreateClassTemplateModal({ isOpen, onClose, danceStyles }: Creat
           </div>
         </div>
 
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            id="isRestricted"
+            name="isRestricted"
+            className="h-4 w-4 rounded border-amber-900/30 bg-gray-900/50 text-amber-500 focus:ring-amber-500/20"
+          />
+          <label htmlFor="isRestricted" className="font-cinzel text-amber-100/80 text-sm">
+            Restrict Visibility (Trainers & Enrolled only)
+          </label>
+        </div>
+
+        <div className="space-y-1">
+          <label htmlFor="styleId" className="block font-cinzel font-medium text-amber-100/80 text-sm">
+            Dance Style
+          </label>
+          <select
+            id="styleId"
+            name="styleId"
+            required
+            className="w-full rounded-md border border-amber-900/30 bg-gray-900/50 px-3 py-2 text-gold transition-all focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 [&>option]:bg-gray-900"
+          >
+            <option value="" disabled selected>
+              Select a style
+            </option>
+            {danceStyles.map((style) => (
+              <option key={style.id} value={style.id}>
+                {style.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div className="mt-6 flex justify-end gap-3 border-amber-900/30 border-t pt-4">
           <button
             type="button"
@@ -124,7 +146,7 @@ export function CreateClassTemplateModal({ isOpen, onClose, danceStyles }: Creat
           >
             Cancel
           </button>
-          <MetallicButton type="submit" disabled={isSubmitting} className="min-w-[100px]">
+          <MetallicButton type="submit" disabled={isSubmitting} className="min-w-[100px] rounded-md border-2 px-4 py-2">
             {isSubmitting ? 'Creating...' : 'Create Class'}
           </MetallicButton>
         </div>
