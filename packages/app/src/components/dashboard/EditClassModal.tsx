@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Form, useNavigation } from 'react-router'
+import { Combobox } from '../ui/Combobox'
 import { MetallicButton } from '../ui/MetallicButton'
 import { Modal } from '../ui/Modal'
 
@@ -85,20 +86,14 @@ export function EditClassModal({ isOpen, onClose, classInstance, trainers }: Edi
           <label htmlFor="edit-trainer" className="block font-cinzel font-medium text-amber-100/80 text-sm">
             Trainer
           </label>
-          <select
-            id="edit-trainer"
+          <Combobox
             name="actualTrainerId"
-            required
             value={trainerId}
-            onChange={(e) => setTrainerId(e.target.value)}
-            className="w-full rounded-md border border-amber-900/30 bg-gray-900/50 px-3 py-2 text-gold transition-all focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 [&>option]:bg-gray-900"
-          >
-            {trainers.map((trainer) => (
-              <option key={trainer.id} value={trainer.id}>
-                {trainer.firstName} {trainer.lastName}
-              </option>
-            ))}
-          </select>
+            onChange={setTrainerId}
+            options={trainers.map((t) => ({ value: t.id, label: `${t.firstName} ${t.lastName}` }))}
+            placeholder="Select Trainer"
+            required
+          />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
