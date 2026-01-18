@@ -1,5 +1,5 @@
 import { prisma } from 'db'
-import { useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { Form, useNavigation } from 'react-router'
 import { DashboardCalendar } from '../components/dashboard/DashboardCalendar'
 import { ShinyText } from '../components/ui'
@@ -9,12 +9,18 @@ import type { Route } from './+types/schedule'
 export async function loader({ request }: Route.LoaderArgs) {
   const user = await getCurrentUser(request)
 
+  // Calculate date 3 months ago to limit history
+  const threeMonthsAgo = new Date()
+  threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3)
+
   const rawClasses = await prisma.classInstance.findMany({
     where: {
       status: {
         not: 'CANCELLED',
       },
-      // We process visibility in JS
+      startTime: {
+        gte: threeMonthsAgo,
+      },
     },
     select: {
       id: true,
@@ -131,21 +137,30 @@ export default function Schedule({ loaderData }: Route.ComponentProps) {
   const navigation = useNavigation()
   const isSubmitting = navigation.state === 'submitting'
 
-  const events = classes.map((c) => ({
-    id: c.id,
-    title: c.classTemplate.name,
-    start: c.startTime.toISOString(),
-    end: c.endTime.toISOString(),
-    backgroundColor: myAttendance.includes(c.id) ? '#4ade80' : '#ffd700', // Green if enrolled
-    borderColor: myAttendance.includes(c.id) ? '#4ade80' : '#ffd700',
-    textColor: '#000000',
-    extendedProps: {
-      description: c.classTemplate.description,
-      trainer: `${c.classTemplate.trainer.firstName} ${c.classTemplate.trainer.lastName}`,
-      hall: c.actualHall,
-      isEnrolled: myAttendance.includes(c.id),
-    },
-  }))
+  // Memoize events to prevent unnecessary re-renders of the calendar
+  const events = useMemo(
+    () =>
+      classes.map((c) => ({
+        id: c.id,
+        title: c.classTemplate.name,
+        start: c.startTime, // Ensure this is ISO string if needed by FullCalendar props, component below expects strings or Date objects? FullCalendar handles both but check usage. Log above says toISOString().
+        // The previous code used c.startTime.toISOString(). Prisma returns Date objects.
+        // JSON serialization in loader converts Date to string in props? No, using react-router types, Date objects persist if using single-fetch?
+        // Actually remix/react-router loader data is serialized to JSON. So they are strings on the client.
+        // Let's assume strings.
+        end: c.endTime,
+        backgroundColor: myAttendance.includes(c.id) ? '#4ade80' : '#ffd700', // Green if enrolled
+        borderColor: myAttendance.includes(c.id) ? '#4ade80' : '#ffd700',
+        textColor: '#000000',
+        extendedProps: {
+          description: c.classTemplate.description,
+          trainer: `${c.classTemplate.trainer.firstName} ${c.classTemplate.trainer.lastName}`,
+          hall: c.actualHall,
+          isEnrolled: myAttendance.includes(c.id),
+        },
+      })),
+    [classes, myAttendance]
+  )
 
   return (
     <div className="container relative mx-auto p-8 text-center">
@@ -160,7 +175,7 @@ export default function Schedule({ loaderData }: Route.ComponentProps) {
         <DashboardCalendar
           events={events}
           readOnly={true}
-          onEventClick={(info) => {
+          onEventClick={useCallback((info: any) => {
             setSelectedEvent({
               id: info.event.id,
               title: info.event.title,
@@ -168,7 +183,7 @@ export default function Schedule({ loaderData }: Route.ComponentProps) {
               end: info.event.end,
               ...info.event.extendedProps,
             })
-          }}
+          }, [])}
         />
       </div>
 
