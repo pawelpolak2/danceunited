@@ -139,11 +139,17 @@ export async function loader({ request }: Route.LoaderArgs) {
     occupancy: c._count.attendances,
     capacity: 20,
     raw: {
-      ...c,
-      startTime: c.startTime.toISOString(), // Serialize dates
+      id: c.id,
+      startTime: c.startTime.toISOString(),
       endTime: c.endTime.toISOString(),
-      createdAt: c.createdAt.toISOString(),
-      updatedAt: c.updatedAt.toISOString(),
+      actualHall: c.actualHall,
+      actualTrainerId: c.actualTrainerId,
+      notes: null,
+      recurrenceGroupId: null,
+      classTemplate: {
+        name: c.classTemplate.name,
+        duration: c.classTemplate.duration,
+      },
     },
   }))
 
@@ -340,27 +346,6 @@ export default function ManagerDashboardPage() {
   }, [actionData])
 
   // Find the full class object for the modal when ID is selected
-  // Note: 'agenda' from loader is mapped. We need the raw data structure for EditClassModal.
-  // However, the loader returns mapped 'agenda'. EditClassModal needs 'ClassInstance' shape.
-  // Solution: Map 'agenda' back or pass enough data?
-  // EditClassModal expects: id, startTime, actualHall, actualTrainerId, notes, classTemplate...
-  // The current 'agenda' map is simplified.
-  // I should update the 'agenda' map in loader to include everything or return raw 'agendaRaw' as 'classes' alongside 'agenda'.
-  // Or better: update 'agenda' in loader to just include the full raw object inside as 'raw'.
-
-  // Let's rely on finding it from a new prop 'classes' passed from loader, OR
-  // Just inject the required props into the `agenda` items in loader.
-  // I'll update the loader to include `raw` property in agenda items. But I can't edit loader here easily without seeing line numbers.
-  // I'll assume I update loader in next step or include it here if I edit enough lines.
-  // Wait, replace_file_content is for one block. I should do loader edits separately if they are far apart.
-  // They are far apart (lines 26-253 vs 255-472).
-  // I will act on the request to "replace pencil" and "add modal" here. I'll need 'raw' data.
-  // I will edit the loader in a separate call or try to match the mapped agenda if possible.
-  // EditClassModal needs: { id, startTime, actualHall, actualTrainerId, notes, recurrenceGroupId, classTemplate: {name, duration} }
-  // The current 'agenda' has: id, startTime, className, hall, trainerName, occupancy, capacity.
-  // Missing: actualTrainerId, notes, recurrenceGroupId, duration.
-  // I MUST update the loader.
-
   const selectedClass = agenda.find((c) => c.id === selectedClassId)?.raw || null
 
   // Function to set range
