@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Form, useNavigation } from 'react-router'
 import { Combobox } from '../ui/Combobox'
 import { MetallicButton } from '../ui/MetallicButton'
+import { MetallicDateTimePicker } from '../ui/MetallicDateTimePicker'
 import { Modal } from '../ui/Modal'
 
 interface ClassTemplate {
@@ -30,7 +31,9 @@ export function EditClassModal({ isOpen, onClose, classInstance, trainers }: Edi
   const navigation = useNavigation()
   const isSubmitting = navigation.state === 'submitting'
 
-  const [startTime, setStartTime] = useState<string>('')
+  // State for MetallicDateTimePicker
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined)
+
   const [endTime, setEndTime] = useState<string>('')
   const [hall, setHall] = useState<string>('HALL1')
   const [trainerId, setTrainerId] = useState<string>('')
@@ -40,13 +43,7 @@ export function EditClassModal({ isOpen, onClose, classInstance, trainers }: Edi
   // Initialize form from classInstance
   useEffect(() => {
     if (classInstance && isOpen) {
-      // Format to YYYY-MM-DDTHH:mm for datetime-local input
-      const start = new Date(classInstance.startTime)
-      const toLocalISO = (date: Date) => {
-        const pad = (n: number) => n.toString().padStart(2, '0')
-        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
-      }
-      setStartTime(toLocalISO(start))
+      setStartDate(new Date(classInstance.startTime))
       setHall(classInstance.actualHall)
       setTrainerId(classInstance.actualTrainerId)
       setNotes(classInstance.notes || '')
@@ -54,19 +51,24 @@ export function EditClassModal({ isOpen, onClose, classInstance, trainers }: Edi
     }
   }, [classInstance, isOpen])
 
-  // Update calculated endTime when startTime changes
+  // Update calculated endTime when startDate changes
   useEffect(() => {
-    if (startTime && classInstance) {
-      const start = new Date(startTime)
+    if (startDate && classInstance) {
       const duration = classInstance.classTemplate.duration
-      const end = new Date(start.getTime() + duration * 1000)
+      const end = new Date(startDate.getTime() + duration * 1000)
 
       const formatTime = (date: Date) => {
         return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }
-      setEndTime(`${formatTime(start)} - ${formatTime(end)} (${Math.round(duration / 60)} mins)`)
+      setEndTime(`${formatTime(startDate)} - ${formatTime(end)} (${Math.round(duration / 60)} mins)`)
     }
-  }, [startTime, classInstance])
+  }, [startDate, classInstance])
+
+  // Helper to format Date to datetime-local string for hidden input
+  const toLocalISO = (date: Date) => {
+    const pad = (n: number) => n.toString().padStart(2, '0')
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
+  }
 
   if (!classInstance) return null
 
@@ -98,17 +100,12 @@ export function EditClassModal({ isOpen, onClose, classInstance, trainers }: Edi
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1">
-            <label htmlFor="edit-startTime" className="block font-cinzel font-medium text-amber-100/80 text-sm">
-              Start Time
-            </label>
-            <input
-              type="datetime-local"
-              id="edit-startTime"
-              name="startTime"
-              required
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
-              className="w-full rounded-md border border-amber-900/30 bg-gray-900/50 px-3 py-2 text-gold transition-all focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+            <input type="hidden" name="startTime" value={startDate ? toLocalISO(startDate) : ''} />
+            <MetallicDateTimePicker
+              date={startDate}
+              setDate={(d) => setStartDate(d)}
+              label="Start Time"
+              className="w-full"
             />
           </div>
 
