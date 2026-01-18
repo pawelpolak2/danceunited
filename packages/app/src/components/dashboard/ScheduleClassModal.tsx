@@ -3,6 +3,7 @@ import { Form, useNavigation } from 'react-router'
 import { Checkbox } from '../ui/Checkbox'
 import { Combobox } from '../ui/Combobox'
 import { MetallicButton } from '../ui/MetallicButton'
+import { MetallicDateTimePicker } from '../ui/MetallicDateTimePicker'
 import { Modal } from '../ui/Modal'
 
 interface ClassTemplate {
@@ -24,33 +25,37 @@ export function ScheduleClassModal({ isOpen, onClose, templates, defaultDate }: 
   const isSubmitting = navigation.state === 'submitting'
 
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('')
-  const [startTime, setStartTime] = useState<string>('')
+  // State for MetallicDateTimePicker
+  const [startDate, setStartDate] = useState<Date | undefined>(defaultDate)
   const [endTime, setEndTime] = useState<string>('')
 
-  // Initialize start time from defaultDate
+  // Sync prop defaultDate to state
   useEffect(() => {
     if (defaultDate && isOpen) {
-      // Format to YYYY-MM-DDTHH:mm for datetime-local input
-      const isoString = defaultDate.toISOString().slice(0, 16)
-      setStartTime(isoString)
+      setStartDate(defaultDate)
     }
   }, [defaultDate, isOpen])
 
-  // Update endTime when template or startTime changes
+  // Update endTime when template or startDate changes
   useEffect(() => {
-    if (startTime && selectedTemplateId) {
+    if (startDate && selectedTemplateId) {
       const template = templates.find((t) => t.id === selectedTemplateId)
       if (template) {
-        const start = new Date(startTime)
-        const end = new Date(start.getTime() + template.duration * 1000)
+        const end = new Date(startDate.getTime() + template.duration * 1000)
         // Format for display
         const formatTime = (date: Date) => {
           return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         }
-        setEndTime(`${formatTime(start)} - ${formatTime(end)} (${Math.round(template.duration / 60)} mins)`)
+        setEndTime(`${formatTime(startDate)} - ${formatTime(end)} (${Math.round(template.duration / 60)} mins)`)
       }
     }
-  }, [startTime, selectedTemplateId, templates])
+  }, [startDate, selectedTemplateId, templates])
+
+  // Helper to format Date to datetime-local string for hidden input
+  const toLocalISO = (date: Date) => {
+    const pad = (n: number) => n.toString().padStart(2, '0')
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
+  }
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Schedule Class">
@@ -76,17 +81,12 @@ export function ScheduleClassModal({ isOpen, onClose, templates, defaultDate }: 
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1">
-            <label htmlFor="startTime" className="block font-cinzel font-medium text-amber-100/80 text-sm">
-              Start Time
-            </label>
-            <input
-              type="datetime-local"
-              id="startTime"
-              name="startTime"
-              required
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
-              className="w-full rounded-md border border-amber-900/30 bg-gray-900/50 px-3 py-2 text-gold transition-all focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+            <input type="hidden" name="startTime" value={startDate ? toLocalISO(startDate) : ''} />
+            <MetallicDateTimePicker
+              date={startDate}
+              setDate={(d) => setStartDate(d)}
+              label="Start Time"
+              className="w-full"
             />
           </div>
 
