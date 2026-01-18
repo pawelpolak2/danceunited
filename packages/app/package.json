@@ -8,7 +8,7 @@
     "start": "react-router-serve ./build/server/index.js",
     "typegen": "react-router typegen",
     "lint": "biome check . && tsc",
-    "lint:fix": "biome check . --write"
+    "lint:fix": "biome check . --write --unsafe"
   },
   "dependencies": {
     "@fullcalendar/core": "^6.1.15",

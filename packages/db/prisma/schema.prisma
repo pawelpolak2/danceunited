@@ -104,6 +104,7 @@ model ClassTemplate {
   trainerId          String     @map("trainer_id") @db.Uuid
   isActive           Boolean    @default(true) @map("is_active")
   isWhitelistEnabled Boolean    @default(false) @map("is_whitelist_enabled")
+  isIndividual       Boolean    @default(false) @map("is_individual")
   createdAt          DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt          DateTime   @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
@@ -170,7 +171,6 @@ model Package {
   validityDays Int             @default(30) @map("validity_days")
   isActive     Boolean         @default(true) @map("is_active")
   category     PackageCategory @default(UNIVERSAL)
-  isIndividual Boolean         @default(false) @map("is_individual")
   createdAt    DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt    DateTime        @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
