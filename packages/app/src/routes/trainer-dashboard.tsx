@@ -2,7 +2,7 @@ import type { DateSelectArg, EventClickArg } from '@fullcalendar/core'
 import { prisma } from 'db'
 import { useState } from 'react'
 import { redirect, useFetcher, useLoaderData } from 'react-router'
-import { CreateClassTemplateModal } from '../components/dashboard/CreateClassTemplateModal'
+import { EditTemplateModal } from '../components/configuration/EditTemplateModal'
 import { DashboardCalendar } from '../components/dashboard/DashboardCalendar'
 import { EditClassModal } from '../components/dashboard/EditClassModal'
 import { ScheduleClassModal } from '../components/dashboard/ScheduleClassModal'
@@ -38,8 +38,15 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   const trainers = await prisma.user.findMany({
     where: { role: 'TRAINER', isActive: true },
-    select: { id: true, firstName: true, lastName: true },
+    select: { id: true, firstName: true, lastName: true, email: true },
     orderBy: { firstName: 'asc' },
+  })
+
+  // Fetch Dancers for Whitelist
+  const users = await prisma.user.findMany({
+    where: { isActive: true },
+    orderBy: { firstName: 'asc' },
+    select: { id: true, firstName: true, lastName: true, email: true },
   })
 
   // Fetch class templates for scheduling
@@ -82,7 +89,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     borderColor: '#b45309',
   }))
 
-  return { user, danceStyles, classTemplates, events, classes: serializedClasses, trainers }
+  return { user, danceStyles, classTemplates, events, classes: serializedClasses, trainers, users }
 }
 
 export async function action({ request }: Route.ActionArgs) {
@@ -94,7 +101,7 @@ export async function action({ request }: Route.ActionArgs) {
   const formData = await request.formData()
   const intent = formData.get('intent')
 
-  if (intent === 'createClassTemplate') {
+  if (intent === 'create_template') {
     const name = formData.get('name') as string
     const description = formData.get('description') as string
     const level = formData.get('level') as any
@@ -102,7 +109,24 @@ export async function action({ request }: Route.ActionArgs) {
     const durationSeconds = durationMinutes * 60
     const styleId = formData.get('styleId') as string
     const hallId = formData.get('hallId') as any
-    const isWhitelistEnabled = formData.get('isRestricted') === 'on'
+    const isWhitelistEnabled = formData.get('isWhitelistEnabled') === 'on'
+
+    // Parse whitelist
+    const whitelistUserIdsStr = formData.get('whitelistUserIds') as string
+    let whitelistCreateData = {}
+
+    if (isWhitelistEnabled && whitelistUserIdsStr) {
+      try {
+        const ids = JSON.parse(whitelistUserIdsStr) as string[]
+        if (ids.length > 0) {
+          whitelistCreateData = {
+            create: ids.map((userId) => ({ userId })),
+          }
+        }
+      } catch (e) {
+        console.error('Failed to parse whitelist IDs', e)
+      }
+    }
 
     if (!name || !styleId) {
       return { error: 'Name and Style are required' }
@@ -119,9 +143,10 @@ export async function action({ request }: Route.ActionArgs) {
           hallId,
           isWhitelistEnabled,
           trainerId: user.userId,
+          whitelist: whitelistCreateData,
         },
       })
-      return { success: true, intent: 'createClassTemplate' }
+      return { success: true, intent: 'create_template' }
     } catch (error) {
       console.error('Failed to create class template:', error)
       return { error: 'Failed to create class template' }
@@ -284,7 +309,7 @@ export async function action({ request }: Route.ActionArgs) {
 }
 
 export default function TrainerDashboardPage() {
-  const { danceStyles, classTemplates, events, classes, trainers } = useLoaderData<typeof loader>()
+  const { danceStyles, classTemplates, events, classes, trainers, users } = useLoaderData<typeof loader>()
 
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false)
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false)
@@ -296,12 +321,8 @@ export default function TrainerDashboardPage() {
 
   // Close modals on success
   if (fetcher.data?.success) {
-    if (fetcher.data.intent === 'createClassTemplate' && isTemplateModalOpen) {
-      setIsTemplateModalOpen(false)
-    }
-    if (fetcher.data.intent === 'scheduleClass' && isScheduleModalOpen) {
-      setIsScheduleModalOpen(false)
-    }
+    if (fetcher.data.intent === 'create_template' && isTemplateModalOpen) setIsTemplateModalOpen(false)
+    if (fetcher.data.intent === 'scheduleClass' && isScheduleModalOpen) setIsScheduleModalOpen(false)
     if ((fetcher.data.intent === 'updateClass' || fetcher.data.intent === 'deleteClass') && isEditModalOpen) {
       setIsEditModalOpen(false)
     }
@@ -353,11 +374,14 @@ export default function TrainerDashboardPage() {
         </div>
       </div>
 
-      <CreateClassTemplateModal
+      {/* Create Template Modal */}
+      <EditTemplateModal
         isOpen={isTemplateModalOpen}
         onClose={() => setIsTemplateModalOpen(false)}
-        danceStyles={danceStyles}
+        template={null}
+        styles={danceStyles}
         trainers={trainers}
+        users={users}
       />
 
       <ScheduleClassModal

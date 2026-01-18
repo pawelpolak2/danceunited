@@ -1,5 +1,5 @@
 import { Ban, Pencil, RefreshCw, Trash2 } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Form, useLoaderData } from 'react-router'
 import { EditTemplateModal } from '../components/configuration/EditTemplateModal'
 import { MetallicButton } from '../components/ui/MetallicButton'
@@ -17,6 +17,7 @@ export const loader = async () => {
       style: true,
       trainer: true,
       _count: { select: { classInstances: true } },
+      whitelist: { include: { user: true } },
     },
   })
 
@@ -31,10 +32,17 @@ export const loader = async () => {
       isActive: true,
     },
     orderBy: { firstName: 'asc' },
-    select: { id: true, firstName: true, lastName: true },
+    select: { id: true, firstName: true, lastName: true, email: true },
   })
 
-  return { templates, danceStyles, trainers }
+  // Load Dancers/All Users for Whitelist
+  const users = await prisma.user.findMany({
+    where: { isActive: true },
+    orderBy: { firstName: 'asc' },
+    select: { id: true, firstName: true, lastName: true, email: true },
+  })
+
+  return { templates, danceStyles, trainers, users }
 }
 
 export const action = async ({ request }: Route.ActionArgs) => {
@@ -53,6 +61,23 @@ export const action = async ({ request }: Route.ActionArgs) => {
     const isActive = formData.get('isActive') === 'on'
     const isWhitelistEnabled = formData.get('isWhitelistEnabled') === 'on'
 
+    // Parse whitelist from create form
+    const whitelistUserIdsStr = formData.get('whitelistUserIds') as string
+    let whitelistCreateData = {}
+
+    if (isWhitelistEnabled && whitelistUserIdsStr) {
+      try {
+        const ids = JSON.parse(whitelistUserIdsStr) as string[]
+        if (ids.length > 0) {
+          whitelistCreateData = {
+            create: ids.map((userId) => ({ userId })),
+          }
+        }
+      } catch (e) {
+        console.error('Failed to parse whitelist IDs', e)
+      }
+    }
+
     await prisma.classTemplate.create({
       data: {
         name,
@@ -64,6 +89,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
         duration,
         isActive,
         isWhitelistEnabled,
+        whitelist: whitelistCreateData,
       },
     })
   }
@@ -116,14 +142,43 @@ export const action = async ({ request }: Route.ActionArgs) => {
     }
   }
 
+  if (intent === 'add_whitelist_user') {
+    const templateId = formData.get('templateId') as string
+    const userId = formData.get('userId') as string
+    await prisma.classWhitelist.create({
+      data: { classTemplateId: templateId, userId },
+    })
+  }
+
+  if (intent === 'remove_whitelist_user') {
+    const templateId = formData.get('templateId') as string
+    const userId = formData.get('userId') as string
+    await prisma.classWhitelist.delete({
+      where: {
+        userId_classTemplateId: { userId, classTemplateId: templateId },
+      },
+    })
+  }
+
   return { success: true }
 }
 
 export default function TemplatesConfiguration() {
-  const { templates, danceStyles: styles, trainers } = useLoaderData<typeof loader>()
+  const { templates, danceStyles: styles, trainers, users } = useLoaderData<typeof loader>()
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState<any | null>(null)
+
+  // Sync selectedTemplate with updated loader data
+  useEffect(() => {
+    if (selectedTemplate) {
+      const updated = templates.find((t) => t.id === selectedTemplate.id)
+      if (updated) {
+        setSelectedTemplate(updated)
+      }
+    }
+  }, [templates])
+
   const [showInactive, setShowInactive] = useState(false)
 
   const filteredTemplates = templates.filter((t) => showInactive || t.isActive)
@@ -291,6 +346,7 @@ export default function TemplatesConfiguration() {
         template={selectedTemplate}
         styles={styles}
         trainers={trainers}
+        users={users}
       />
     </div>
   )
