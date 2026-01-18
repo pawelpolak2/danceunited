@@ -88,6 +88,9 @@ export function parseSession(cookieHeader: string | null): UserSession | null {
 
   try {
     const sessionData = JSON.parse(Buffer.from(sessionValue, 'base64').toString())
+    if (!sessionData || typeof sessionData !== 'object' || !sessionData.userId) {
+      return null
+    }
     return sessionData as UserSession
   } catch {
     return null

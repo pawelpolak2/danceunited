@@ -7,6 +7,6 @@ export default defineConfig({
   },
   engine: "classic",
   datasource: {
-    url: process.env.DATABASE_URL || "postgresql://user:password@localhost:5432/db",
+    url: process.env.DATABASE_URL || "postgresql://devuser:devpassword@localhost:5432/devdb",
   },
 });

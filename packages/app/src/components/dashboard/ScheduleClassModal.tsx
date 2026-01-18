@@ -208,7 +208,7 @@ export function ScheduleClassModal({ isOpen, onClose, templates, defaultDate }: 
           >
             Cancel
           </button>
-          <MetallicButton type="submit" disabled={isSubmitting} className="min-w-[100px]">
+          <MetallicButton type="submit" disabled={isSubmitting} className="min-w-[100px] rounded-md border-2 px-4 py-2">
             {isSubmitting ? 'Scheduling...' : 'Schedule Class'}
           </MetallicButton>
         </div>
