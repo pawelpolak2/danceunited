@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Form, useNavigation } from 'react-router'
+import { Checkbox } from '../ui/Checkbox'
 import { Combobox } from '../ui/Combobox'
 import { MetallicButton } from '../ui/MetallicButton'
 import { Modal } from '../ui/Modal'
@@ -114,25 +115,19 @@ export function ScheduleClassModal({ isOpen, onClose, templates, defaultDate }: 
         </div>
 
         <div className="space-y-3 border-amber-900/10 border-t pt-2">
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="isRecurring"
-              name="isRecurring"
-              onChange={(e) => {
-                const isChecked = e.target.checked
-                const container = document.getElementById('recurrence-options')
-                if (container) {
-                  if (isChecked) container.classList.remove('hidden')
-                  else container.classList.add('hidden')
-                }
-              }}
-              className="h-4 w-4 rounded border-amber-900/30 bg-gray-900/50 text-amber-500 focus:ring-amber-500/20"
-            />
-            <label htmlFor="isRecurring" className="font-cinzel text-amber-100/80 text-sm">
-              Repeat Weekly
-            </label>
-          </div>
+          <Checkbox
+            id="isRecurring"
+            name="isRecurring"
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              const isChecked = e.target.checked
+              const container = document.getElementById('recurrence-options')
+              if (container) {
+                if (isChecked) container.classList.remove('hidden')
+                else container.classList.add('hidden')
+              }
+            }}
+            label="Repeat Weekly"
+          />
 
           <div id="recurrence-options" className="hidden space-y-3 pl-6">
             <div className="space-y-1">

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Form, useNavigation } from 'react-router'
+import { Checkbox } from '../ui/Checkbox'
 import { Combobox } from '../ui/Combobox'
 import { MetallicButton } from '../ui/MetallicButton'
 import { Modal } from '../ui/Modal'
@@ -220,30 +221,19 @@ export function EditTemplateModal({ isOpen, onClose, template, styles, trainers,
 
         {/* Switches */}
         <div className="flex justify-between gap-4 border-white/10 border-t pt-4">
-          <label className="flex cursor-pointer items-center gap-2">
-            <input
-              type="checkbox"
-              name="isActive"
-              checked={isActive}
-              onChange={(e) => setIsActive(e.target.checked)}
-              className="h-4 w-4 accent-gold"
-              // In form submission, checkboxes only send 'on' if checked. We can use a hidden input fallback or just check presence.
-              // Actually Remix/React Router Form data handling: if unchecked it's missing.
-              // We'll handle 'on' check in action.
-            />
-            <span className="text-gray-300 text-sm">Active</span>
-          </label>
+          <Checkbox
+            name="isActive"
+            checked={isActive}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setIsActive(e.target.checked)}
+            label="Active"
+          />
 
-          <label className="flex cursor-pointer items-center gap-2">
-            <input
-              type="checkbox"
-              name="isWhitelistEnabled"
-              checked={isWhitelistEnabled}
-              onChange={(e) => setIsWhitelistEnabled(e.target.checked)}
-              className="h-4 w-4 accent-gold"
-            />
-            <span className="text-gray-300 text-sm">Restricted Access (Whitelist)</span>
-          </label>
+          <Checkbox
+            name="isWhitelistEnabled"
+            checked={isWhitelistEnabled}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setIsWhitelistEnabled(e.target.checked)}
+            label="Restricted Access (Whitelist)"
+          />
         </div>
 
         {isWhitelistEnabled && (

@@ -3,6 +3,7 @@ import { Ban, Pencil, RefreshCw, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Form, Link, redirect, useActionData, useLoaderData, useSubmit } from 'react-router'
 import { MetallicButton, Modal, ShinyText } from '../components/ui'
+import { Checkbox } from '../components/ui/Checkbox'
 import { MetallicTooltip } from '../components/ui/MetallicTooltip'
 import { getCurrentUser, hashPassword } from '../lib/auth.server'
 import type { Route } from './+types/admin.users'
@@ -503,15 +504,11 @@ export default function AdminUsersPage() {
           </div>
 
           <div>
-            <label className="flex cursor-pointer items-center gap-2 text-gray-400 text-sm">
-              <input
-                type="checkbox"
-                name="isActive"
-                defaultChecked={editingUser ? editingUser.isActive : true}
-                className="h-4 w-4 accent-amber-500"
-              />
-              User is Active
-            </label>
+            <Checkbox
+              name="isActive"
+              defaultChecked={editingUser ? editingUser.isActive : true}
+              label="User is Active"
+            />
           </div>
 
           <div>
