@@ -22,10 +22,7 @@ export const loader = async () => {
           src: `/resources/gallery/${category}/${file}`,
           alt: `${category} photo`,
         }))
-    } catch (error) {
-      if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
-        console.error(`Error reading gallery directory for ${category}:`, error)
-      }
+    } catch {
       return []
     }
   }
