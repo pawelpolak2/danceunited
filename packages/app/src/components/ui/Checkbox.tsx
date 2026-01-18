@@ -2,7 +2,7 @@ import { Check } from 'lucide-react'
 import { forwardRef } from 'react'
 
 export interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label?: string
+  label?: React.ReactNode
   className?: string
 }
 
