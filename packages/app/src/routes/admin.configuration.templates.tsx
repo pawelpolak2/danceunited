@@ -2,6 +2,7 @@ import { Ban, Pencil, RefreshCw, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Form, useLoaderData } from 'react-router'
 import { EditTemplateModal } from '../components/configuration/EditTemplateModal'
+import { Checkbox } from '../components/ui/Checkbox'
 import { MetallicButton } from '../components/ui/MetallicButton'
 import { MetallicTooltip } from '../components/ui/MetallicTooltip'
 import { ShinyText } from '../components/ui/ShinyText'
@@ -196,15 +197,11 @@ export default function TemplatesConfiguration() {
         <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center">
           <h3 className="font-bold text-gold text-xl">Templates List</h3>
           <div className="flex items-center gap-4">
-            <label className="flex cursor-pointer items-center gap-2 text-gray-400 text-sm">
-              <input
-                type="checkbox"
-                checked={showInactive}
-                onChange={(e) => setShowInactive(e.target.checked)}
-                className="h-4 w-4 accent-gold"
-              />
-              Show Inactive
-            </label>
+            <Checkbox
+              checked={showInactive}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setShowInactive(e.target.checked)}
+              label="Show Inactive"
+            />
             <MetallicButton
               type="button"
               onClick={() => {
