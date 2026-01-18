@@ -1,4 +1,15 @@
-import { BarChart3, Calendar, CreditCard, LayoutDashboard, Settings, Users } from 'lucide-react'
+import {
+  BarChart3,
+  Calendar,
+  CreditCard,
+  DollarSign,
+  FileBox,
+  Image,
+  LayoutDashboard,
+  Palette,
+  Settings,
+  Users,
+} from 'lucide-react'
 import { Link, Outlet, redirect, useLocation } from 'react-router'
 import { ShinyText } from '../components/ui'
 import { getCurrentUser } from '../lib/auth.server'
@@ -38,9 +49,15 @@ export default function AdminLayout() {
     },
     {
       title: 'ANALYSIS',
+      items: [{ label: 'Statistics', path: '/admin/analytics', icon: BarChart3 }],
+    },
+    {
+      title: 'CONFIGURATION',
       items: [
-        { label: 'Statistics', path: '/admin/analytics', icon: BarChart3 },
-        { label: 'Configuration', path: '/admin/configuration', icon: Settings },
+        { label: 'Pricing', path: '/admin/configuration/pricing', icon: DollarSign },
+        { label: 'Gallery', path: '/admin/configuration/gallery', icon: Image },
+        { label: 'Styles', path: '/admin/configuration/styles', icon: Palette },
+        { label: 'Templates', path: '/admin/configuration/templates', icon: FileBox },
       ],
     },
   ]

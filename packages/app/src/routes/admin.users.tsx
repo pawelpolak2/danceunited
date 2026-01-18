@@ -1,7 +1,9 @@
 import { prisma } from 'db'
+import { Ban, Pencil, RefreshCw, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Form, Link, redirect, useActionData, useLoaderData, useSubmit } from 'react-router'
 import { MetallicButton, Modal, ShinyText } from '../components/ui'
+import { MetallicTooltip } from '../components/ui/MetallicTooltip'
 import { getCurrentUser, hashPassword } from '../lib/auth.server'
 import type { Route } from './+types/admin.users'
 
@@ -27,11 +29,14 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   // Search filter
   if (search) {
-    where.OR = [
-      { firstName: { contains: search, mode: 'insensitive' } },
-      { lastName: { contains: search, mode: 'insensitive' } },
-      { email: { contains: search, mode: 'insensitive' } },
-    ]
+    const terms = search.trim().split(/\s+/)
+    where.AND = terms.map((term) => ({
+      OR: [
+        { firstName: { contains: term, mode: 'insensitive' } },
+        { lastName: { contains: term, mode: 'insensitive' } },
+        { email: { contains: term, mode: 'insensitive' } },
+      ],
+    }))
   }
 
   // Role filter
@@ -48,7 +53,11 @@ export async function loader({ request }: Route.LoaderArgs) {
         select: { id: true, classesRemaining: true, expiryDate: true, package: { select: { name: true } } },
       },
       _count: {
-        select: { attendances: true },
+        select: {
+          attendances: true,
+          classTemplatesAsTrainer: true,
+          classInstancesAsTrainer: true,
+        },
       },
     },
     take: 50,
@@ -103,6 +112,7 @@ export async function action({ request }: Route.ActionArgs) {
     const lastName = formData.get('lastName') as string
     const email = formData.get('email') as string
     const role = formData.get('role') as string
+    const isActive = formData.get('isActive') === 'on'
     const password = formData.get('password') as string
 
     if (!userId || !firstName || !lastName || !email || !role) {
@@ -114,6 +124,7 @@ export async function action({ request }: Route.ActionArgs) {
       lastName,
       email,
       role: role as any,
+      isActive,
     }
 
     if (password && password.trim() !== '') {
@@ -131,13 +142,62 @@ export async function action({ request }: Route.ActionArgs) {
     }
   }
 
+  if (intent === 'toggle-user-active') {
+    const userId = formData.get('userId') as string
+    const isActive = formData.get('isActive') === 'true'
+
+    try {
+      await prisma.user.update({
+        where: { id: userId },
+        data: { isActive },
+      })
+      return { success: true }
+    } catch (_e) {
+      return { error: 'Failed to update user status' }
+    }
+  }
+
+  if (intent === 'delete-user') {
+    const userId = formData.get('userId') as string
+
+    // Safety check
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        _count: {
+          select: {
+            classTemplatesAsTrainer: true,
+            classInstancesAsTrainer: true,
+          },
+        },
+      },
+    })
+
+    if (!user) return { error: 'User not found' }
+
+    const usageCount = user._count.classTemplatesAsTrainer + user._count.classInstancesAsTrainer
+
+    if (usageCount > 0) {
+      return { error: 'Cannot delete user: assigned to classes or templates' }
+    }
+
+    try {
+      await prisma.user.delete({
+        where: { id: userId },
+      })
+      return { success: true }
+    } catch (_e) {
+      return { error: 'Failed to delete user' }
+    }
+  }
+
   return null
 }
 
 export default function AdminUsersPage() {
   const { users, search, roleFilter } = useLoaderData<typeof loader>()
   const actionData = useActionData<typeof action>()
-  const _submit = useSubmit()
+  const submit = useSubmit()
 
   // UI State
   const [query, setQuery] = useState(search)
@@ -151,6 +211,18 @@ export default function AdminUsersPage() {
       setEditingUser(null)
     }
   }, [actionData])
+
+  // Debounced Search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      // Only submit if query differs from search prop (prevent initial double load)
+      if (query !== search) {
+        submit({ q: query, role: roleFilter }, { method: 'get', replace: true })
+      }
+    }, 400)
+
+    return () => clearTimeout(timer)
+  }, [query, search, roleFilter, submit])
 
   const handleCreate = () => {
     setEditingUser(null)
@@ -190,7 +262,7 @@ export default function AdminUsersPage() {
               name="q"
               placeholder="Search by name or email..."
               className="w-full rounded border border-amber-900/50 bg-gray-950 px-4 py-2 text-amber-100 placeholder-gray-600 focus:border-amber-500/50 focus:outline-none"
-              defaultValue={search}
+              value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
             {/* Hidden submit to enable Enter key */}
@@ -280,14 +352,62 @@ export default function AdminUsersPage() {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex w-full justify-end">
-                      <button
-                        type="button"
-                        onClick={() => handleEdit(user)}
-                        className="flex h-8 w-8 items-center justify-center rounded-full p-2 text-gray-500 text-lg transition-colors hover:bg-amber-900/20 hover:text-amber-400"
-                        title="Edit User"
-                      >
-                        •••
-                      </button>
+                      <div className="flex justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleEdit(user)}
+                          className="p-1 text-amber-500/80 transition-colors hover:text-amber-500"
+                          title="Edit User"
+                        >
+                          <Pencil size={16} />
+                        </button>
+
+                        <Form method="post" style={{ display: 'inline' }}>
+                          <input type="hidden" name="intent" value="toggle-user-active" />
+                          <input type="hidden" name="userId" value={user.id} />
+                          <input type="hidden" name="isActive" value={user.isActive ? 'false' : 'true'} />
+                          <button
+                            type="submit"
+                            className={`p-1 transition-colors ${user.isActive ? 'text-amber-600 hover:text-amber-500' : 'text-green-600 hover:text-green-500'}`}
+                            title={user.isActive ? 'Deactivate' : 'Activate'}
+                          >
+                            {user.isActive ? <Ban size={16} /> : <RefreshCw size={16} />}
+                          </button>
+                        </Form>
+
+                        {(() => {
+                          const usageCount =
+                            (user._count?.classTemplatesAsTrainer || 0) + (user._count?.classInstancesAsTrainer || 0)
+                          const canDelete = usageCount === 0
+
+                          return (
+                            <MetallicTooltip
+                              content={`Cannot delete: Assigned to ${usageCount} classes/templates`}
+                              shouldShow={!canDelete}
+                              align="end"
+                            >
+                              <Form
+                                method="post"
+                                onSubmit={(e) => !confirm('Permanently delete this user?') && e.preventDefault()}
+                                style={{ display: 'inline' }}
+                              >
+                                <input type="hidden" name="intent" value="delete-user" />
+                                <input type="hidden" name="userId" value={user.id} />
+                                <button
+                                  type="submit"
+                                  disabled={!canDelete}
+                                  className={`p-1 transition-colors ${
+                                    canDelete ? 'text-gray-400 hover:text-red-400' : 'cursor-not-allowed text-gray-600'
+                                  }`}
+                                  title="Delete User"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              </Form>
+                            </MetallicTooltip>
+                          )
+                        })()}
+                      </div>
                     </div>
                   </td>
                 </tr>
@@ -383,6 +503,18 @@ export default function AdminUsersPage() {
           </div>
 
           <div>
+            <label className="flex cursor-pointer items-center gap-2 text-gray-400 text-sm">
+              <input
+                type="checkbox"
+                name="isActive"
+                defaultChecked={editingUser ? editingUser.isActive : true}
+                className="h-4 w-4 accent-amber-500"
+              />
+              User is Active
+            </label>
+          </div>
+
+          <div>
             <label className="mb-1 block font-bold text-gray-500 text-xs uppercase">
               {editingUser ? 'New Password (leave blank to keep)' : 'Password'}
             </label>
@@ -411,6 +543,8 @@ export default function AdminUsersPage() {
             </MetallicButton>
           </div>
         </Form>
+
+        {/* Extra Actions for Edit Mode */}
       </Modal>
     </div>
   )

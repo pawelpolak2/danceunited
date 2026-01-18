@@ -14,7 +14,10 @@ export default [
     route('admin/users', 'routes/admin.users.tsx'),
     route('admin/schedule', 'routes/admin.schedule.tsx'),
     route('admin/analytics', 'routes/admin.analytics.tsx'),
-    route('/admin/configuration', 'routes/admin.configuration.tsx'),
+    route('admin/configuration/pricing', 'routes/admin.configuration.pricing.tsx'),
+    route('admin/configuration/gallery', 'routes/admin.configuration.gallery.tsx'),
+    route('admin/configuration/styles', 'routes/admin.configuration.styles.tsx'),
+    route('admin/configuration/templates', 'routes/admin.configuration.templates.tsx'),
   ]),
 
   // Resource Routes
