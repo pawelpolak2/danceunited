@@ -37,16 +37,17 @@ export async function loader({ request }: Route.LoaderArgs) {
   })
 
   const revenueByMonth = new Map<string, number>()
+  const monthYearFormatter = new Intl.DateTimeFormat('default', { month: 'short', year: '2-digit' })
   // Init months
   for (let i = 0; i < 6; i++) {
     const d = new Date(sixMonthsAgo)
     d.setMonth(sixMonthsAgo.getMonth() + i)
-    const key = d.toLocaleString('default', { month: 'short', year: '2-digit' })
+    const key = monthYearFormatter.format(d)
     revenueByMonth.set(key, 0)
   }
 
   payments.forEach((p) => {
-    const key = p.paymentDate.toLocaleString('default', { month: 'short', year: '2-digit' })
+    const key = monthYearFormatter.format(p.paymentDate)
     if (revenueByMonth.has(key)) {
       revenueByMonth.set(key, (revenueByMonth.get(key) || 0) + Number(p.amount))
     }
