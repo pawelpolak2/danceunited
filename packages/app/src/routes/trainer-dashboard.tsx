@@ -102,7 +102,7 @@ export async function action({ request }: Route.ActionArgs) {
     const durationSeconds = durationMinutes * 60
     const styleId = formData.get('styleId') as string
     const hallId = formData.get('hallId') as any
-    const isRestricted = formData.get('isRestricted') === 'on'
+    const isWhitelistEnabled = formData.get('isRestricted') === 'on'
 
     if (!name || !styleId) {
       return { error: 'Name and Style are required' }
@@ -117,7 +117,7 @@ export async function action({ request }: Route.ActionArgs) {
           duration: durationSeconds,
           styleId,
           hallId,
-          isRestricted,
+          isWhitelistEnabled,
           trainerId: user.userId,
         },
       })
@@ -132,7 +132,6 @@ export async function action({ request }: Route.ActionArgs) {
     const classTemplateId = formData.get('classTemplateId') as string
     const startTimeStr = formData.get('startTime') as string
     const hall = formData.get('hall') as any
-    const notes = formData.get('notes') as string
 
     // Recurrence fields
     const isRecurring = formData.get('isRecurring') === 'on'
@@ -156,7 +155,6 @@ export async function action({ request }: Route.ActionArgs) {
 
       const instancesData = []
       const baseStartTime = new Date(startTimeStr)
-      const recurrenceGroupId = isRecurring ? crypto.randomUUID() : null
 
       // Default to just one instance
       let maxCount = 1
@@ -192,8 +190,6 @@ export async function action({ request }: Route.ActionArgs) {
           endTime: instanceEndTime,
           actualHall: hall,
           actualTrainerId: user.userId,
-          notes,
-          recurrenceGroupId,
         })
       }
 
@@ -211,8 +207,6 @@ export async function action({ request }: Route.ActionArgs) {
     const classInstanceId = formData.get('classInstanceId') as string
     const startTimeStr = formData.get('startTime') as string
     const hall = formData.get('hall') as any
-    const notes = formData.get('notes') as string
-    const updateScope = formData.get('updateScope') as string
 
     if (!classInstanceId || !startTimeStr) {
       return { error: 'Missing required fields' }
@@ -237,45 +231,16 @@ export async function action({ request }: Route.ActionArgs) {
       const newStartTime = new Date(startTimeStr)
       const templateDuration = instance.classTemplate.duration
 
-      if (updateScope === 'series' && instance.recurrenceGroupId) {
-        // Calculate time difference
-        const timeDiff = newStartTime.getTime() - instance.startTime.getTime()
-
-        // Find all future instances in the group (or all? usually all future, but "series" implies all)
-        // Let's do all for consistency to keep the series aligned
-        const seriesInstances = await prisma.classInstance.findMany({
-          where: { recurrenceGroupId: instance.recurrenceGroupId },
-        })
-
-        const updates = seriesInstances.map((s) => {
-          const sNewStart = new Date(s.startTime.getTime() + timeDiff)
-          const sNewEnd = new Date(sNewStart.getTime() + templateDuration * 1000)
-
-          return prisma.classInstance.update({
-            where: { id: s.id },
-            data: {
-              startTime: sNewStart,
-              endTime: sNewEnd,
-              actualHall: hall,
-              notes, // Apply notes to all? Yes, simpler for now.
-            },
-          })
-        })
-
-        await prisma.$transaction(updates)
-      } else {
-        // Single update
-        const endTime = new Date(newStartTime.getTime() + templateDuration * 1000)
-        await prisma.classInstance.update({
-          where: { id: classInstanceId },
-          data: {
-            startTime: newStartTime,
-            endTime,
-            actualHall: hall,
-            notes,
-          },
-        })
-      }
+      // Single update
+      const endTime = new Date(newStartTime.getTime() + templateDuration * 1000)
+      await prisma.classInstance.update({
+        where: { id: classInstanceId },
+        data: {
+          startTime: newStartTime,
+          endTime,
+          actualHall: hall,
+        },
+      })
 
       return { success: true, intent: 'updateClass' }
     } catch (error) {
@@ -286,7 +251,6 @@ export async function action({ request }: Route.ActionArgs) {
 
   if (intent === 'deleteClass') {
     const classInstanceId = formData.get('classInstanceId') as string
-    const updateScope = formData.get('updateScope') as string
 
     if (!classInstanceId) {
       return { error: 'Missing required fields' }
@@ -305,15 +269,9 @@ export async function action({ request }: Route.ActionArgs) {
         return { error: 'Unauthorized to delete this class' }
       }
 
-      if (updateScope === 'series' && instance.recurrenceGroupId) {
-        await prisma.classInstance.deleteMany({
-          where: { recurrenceGroupId: instance.recurrenceGroupId },
-        })
-      } else {
-        await prisma.classInstance.delete({
-          where: { id: classInstanceId },
-        })
-      }
+      await prisma.classInstance.delete({
+        where: { id: classInstanceId },
+      })
 
       return { success: true, intent: 'deleteClass' }
     } catch (error) {

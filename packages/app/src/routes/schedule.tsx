@@ -9,14 +9,12 @@ import type { Route } from './+types/schedule'
 export async function loader({ request }: Route.LoaderArgs) {
   const user = await getCurrentUser(request)
 
-  const classes = await prisma.classInstance.findMany({
+  const rawClasses = await prisma.classInstance.findMany({
     where: {
-      classTemplate: {
-        isRestricted: false,
-      },
       status: {
         not: 'CANCELLED',
       },
+      // We process visibility in JS
     },
     select: {
       id: true,
@@ -25,8 +23,10 @@ export async function loader({ request }: Route.LoaderArgs) {
       actualHall: true,
       classTemplate: {
         select: {
+          id: true,
           name: true,
           description: true,
+          isWhitelistEnabled: true,
           trainer: {
             select: {
               firstName: true,
@@ -40,6 +40,26 @@ export async function loader({ request }: Route.LoaderArgs) {
       startTime: 'asc',
     },
   })
+
+  // Filter classes: Show if NOT whitelist enabled OR (enabled AND user is whitelisted)
+  // We need to check whitelist status if user is logged in
+  let classesToCheck = rawClasses
+  if (user) {
+    const whitelistedTemplates = await prisma.classWhitelist.findMany({
+      where: { userId: user.userId },
+      select: { classTemplateId: true },
+    })
+    const allowedTemplateIds = new Set(whitelistedTemplates.map((w) => w.classTemplateId))
+
+    classesToCheck = rawClasses.filter(
+      (c) => !c.classTemplate.isWhitelistEnabled || allowedTemplateIds.has(c.classTemplate.id)
+    )
+  } else {
+    // Guest: Only show public classes (whitelist not enabled)
+    classesToCheck = rawClasses.filter((c) => !c.classTemplate.isWhitelistEnabled)
+  }
+
+  const classes = classesToCheck
 
   let myAttendance: string[] = []
   if (user) {
@@ -70,6 +90,26 @@ export async function action({ request }: Route.ActionArgs) {
 
   try {
     if (intent === 'enroll') {
+      // Verify whitelist
+      const instance = await prisma.classInstance.findUnique({
+        where: { id: classId },
+        include: { classTemplate: true },
+      })
+
+      if (!instance) return { success: false, error: 'Class not found' }
+
+      if (instance.classTemplate.isWhitelistEnabled) {
+        const entry = await prisma.classWhitelist.findUnique({
+          where: {
+            userId_classTemplateId: {
+              userId: user.userId,
+              classTemplateId: instance.classTemplateId,
+            },
+          },
+        })
+        if (!entry) return { success: false, error: 'You are not on the whitelist for this class.' }
+      }
+
       await prisma.attendance.create({
         data: { userId: user.userId, classId },
       })
