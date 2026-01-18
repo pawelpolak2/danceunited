@@ -1,0 +1,18 @@
+
+> app@ start /app/packages/app
+> react-router-serve ./build/server/index.js
+
+Error: Cannot find package '@prisma/client' imported from /app/packages/app/build/server/index.js
+Did you mean to import "@prisma/client/runtime/client.js"?
+    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:314:9)
+    at packageResolve (node:internal/modules/esm/resolve:767:81)
+    at moduleResolve (node:internal/modules/esm/resolve:853:18)
+    at defaultResolve (node:internal/modules/esm/resolve:983:11)
+    at ModuleLoader.#cachedDefaultResolve (node:internal/modules/esm/loader:731:20)
+    at ModuleLoader.resolve (node:internal/modules/esm/loader:708:38)
+    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:310:38)
+    at ModuleJob._link (node:internal/modules/esm/module_job:182:49)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+/app/packages/app:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  app@ start: `react-router-serve ./build/server/index.js`
+Exit status 1

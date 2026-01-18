@@ -1,0 +1,12 @@
+
+> app@ dev /app/packages/app
+> react-router dev
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: http://192.168.0.2:5173/
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+7:26:45 PM [vite] (client) ✨ new dependencies optimized: lucide-react, bcryptjs
+7:26:45 PM [vite] (client) ✨ optimized dependencies changed. reloading
+/app/packages/app:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  app@ dev: `react-router dev`
+Command failed with signal "SIGTERM"
