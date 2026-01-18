@@ -1,4 +1,4 @@
-import type { DanceStyle, Package } from 'db'
+import type { DanceStyle } from 'db'
 import { Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { Form, useLoaderData, useNavigation, useSearchParams } from 'react-router'
@@ -13,7 +13,8 @@ import type { Route } from './+types/admin.configuration'
 const GALLERY_CATEGORIES = ['camps', 'classes', 'tournaments', 'studio'] as const
 type GalleryCategory = (typeof GALLERY_CATEGORIES)[number]
 
-function PricingTab({ packages }: { packages: Package[] }) {
+// Use a looser type for props since data over the wire (loader) serializes Decimal to string/number
+function PricingTab({ packages }: { packages: any[] }) {
   const _navigation = useNavigation()
   // Simple "Add" state or "Edit" state.
   // For a real app, maybe a Modal is better, but inline row editing or a simple form at top works too.

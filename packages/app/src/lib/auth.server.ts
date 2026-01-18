@@ -61,8 +61,9 @@ export function createSessionCookie(sessionData: UserSession): string {
   // In production, use a proper session store (Redis, database, etc.)
   // For now, we'll use a simple JSON-encoded cookie
   const sessionValue = Buffer.from(JSON.stringify(sessionData)).toString('base64')
-  return `${SESSION_COOKIE_NAME}=${sessionValue}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${SESSION_MAX_AGE}; ${process.env.NODE_ENV === 'production' ? 'Secure;' : ''
-    }`
+  return `${SESSION_COOKIE_NAME}=${sessionValue}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${SESSION_MAX_AGE}; ${
+    process.env.NODE_ENV === 'production' ? 'Secure;' : ''
+  }`
 }
 
 /**
@@ -126,6 +127,7 @@ export async function getCurrentUser(request: Request): Promise<UserSession | nu
  * Create logout cookie (clears session)
  */
 export function createLogoutCookie(): string {
-  return `${SESSION_COOKIE_NAME}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0; ${process.env.NODE_ENV === 'production' ? 'Secure;' : ''
-    }`
+  return `${SESSION_COOKIE_NAME}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0; ${
+    process.env.NODE_ENV === 'production' ? 'Secure;' : ''
+  }`
 }

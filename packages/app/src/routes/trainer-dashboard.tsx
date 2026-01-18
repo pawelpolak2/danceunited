@@ -36,6 +36,12 @@ export async function loader({ request }: Route.LoaderArgs) {
     select: { id: true, name: true },
   })
 
+  const trainers = await prisma.user.findMany({
+    where: { role: 'TRAINER', isActive: true },
+    select: { id: true, firstName: true, lastName: true },
+    orderBy: { firstName: 'asc' },
+  })
+
   // Fetch class templates for scheduling
   const classTemplates = await prisma.classTemplate.findMany({
     where: { isActive: true },
@@ -76,7 +82,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     borderColor: '#b45309',
   }))
 
-  return { user, danceStyles, classTemplates, events, classes: serializedClasses }
+  return { user, danceStyles, classTemplates, events, classes: serializedClasses, trainers }
 }
 
 export async function action({ request }: Route.ActionArgs) {
@@ -320,7 +326,7 @@ export async function action({ request }: Route.ActionArgs) {
 }
 
 export default function TrainerDashboardPage() {
-  const { danceStyles, classTemplates, events, classes } = useLoaderData<typeof loader>()
+  const { danceStyles, classTemplates, events, classes, trainers } = useLoaderData<typeof loader>()
 
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false)
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false)
@@ -393,6 +399,7 @@ export default function TrainerDashboardPage() {
         isOpen={isTemplateModalOpen}
         onClose={() => setIsTemplateModalOpen(false)}
         danceStyles={danceStyles}
+        trainers={trainers}
       />
 
       <ScheduleClassModal
@@ -406,6 +413,7 @@ export default function TrainerDashboardPage() {
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         classInstance={selectedClass}
+        trainers={trainers}
       />
     </div>
   )

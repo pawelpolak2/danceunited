@@ -16,7 +16,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   if (!user) return redirect('/login')
 
   const purchases = await prisma.userPurchase.findMany({
-    where: { userId: user.id },
+    where: { userId: user.userId },
     include: { package: true },
     orderBy: { purchaseDate: 'desc' },
   })
@@ -38,7 +38,7 @@ export async function action({ request }: Route.ActionArgs) {
     if (!firstName || !lastName) return { error: 'Name is required' }
 
     await prisma.user.update({
-      where: { id: user.id },
+      where: { id: user.userId },
       data: { firstName, lastName },
     })
     return { success: 'Details updated successfully' }
@@ -53,16 +53,16 @@ export async function action({ request }: Route.ActionArgs) {
     if (newPassword !== confirmPassword) return { error: 'New passwords do not match' }
 
     // Verify current password - we need to fetch the password hash which is not in the session user
-    const dbUser = await prisma.user.findUnique({ where: { id: user.id } })
+    const dbUser = await prisma.user.findUnique({ where: { id: user.userId } })
     if (!dbUser) return redirect('/login')
 
-    const isValid = await bcrypt.compare(currentPassword, dbUser.password)
+    const isValid = await bcrypt.compare(currentPassword, dbUser.passwordHash)
     if (!isValid) return { error: 'Incorrect current password' }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10)
     await prisma.user.update({
-      where: { id: user.id },
-      data: { password: hashedPassword },
+      where: { id: user.userId },
+      data: { passwordHash: hashedPassword },
     })
 
     return { success: 'Password changed successfully' }
