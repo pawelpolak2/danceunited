@@ -94,7 +94,7 @@ export async function action({ request }: Route.ActionArgs) {
     const durationSeconds = durationMinutes * 60
     const styleId = formData.get('styleId') as string
     const hallId = formData.get('hallId') as any
-    const isWhitelistEnabled = formData.get('isRestricted') === 'on'
+    const isWhitelistEnabled = formData.get('isWhitelistEnabled') === 'on'
     const trainerId = formData.get('trainerId') as string
 
     if (!name || !styleId || !trainerId) {

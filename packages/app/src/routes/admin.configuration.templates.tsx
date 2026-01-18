@@ -1,0 +1,297 @@
+import { Ban, Pencil, RefreshCw, Trash2 } from 'lucide-react'
+import { useState } from 'react'
+import { Form, useLoaderData } from 'react-router'
+import { EditTemplateModal } from '../components/configuration/EditTemplateModal'
+import { MetallicButton } from '../components/ui/MetallicButton'
+import { MetallicTooltip } from '../components/ui/MetallicTooltip'
+import { ShinyText } from '../components/ui/ShinyText'
+import type { Route } from './+types/admin.configuration.templates'
+
+export const loader = async () => {
+  const { prisma } = await import('db')
+
+  // Load Templates
+  const templates = await prisma.classTemplate.findMany({
+    orderBy: { name: 'asc' },
+    include: {
+      style: true,
+      trainer: true,
+      _count: { select: { classInstances: true } },
+    },
+  })
+
+  const danceStyles = await prisma.danceStyle.findMany({
+    orderBy: { name: 'asc' },
+  })
+
+  // Load Trainers for dropdown
+  const trainers = await prisma.user.findMany({
+    where: {
+      role: { in: ['TRAINER', 'MANAGER'] },
+      isActive: true,
+    },
+    orderBy: { firstName: 'asc' },
+    select: { id: true, firstName: true, lastName: true },
+  })
+
+  return { templates, danceStyles, trainers }
+}
+
+export const action = async ({ request }: Route.ActionArgs) => {
+  const { prisma } = await import('db')
+  const formData = await request.formData()
+  const intent = formData.get('intent')
+
+  if (intent === 'create_template') {
+    const name = formData.get('name') as string
+    const description = formData.get('description') as string
+    const styleId = formData.get('styleId') as string
+    const trainerId = formData.get('trainerId') as string
+    const hallId = formData.get('hallId') as any
+    const level = formData.get('level') as any
+    const duration = parseInt(formData.get('duration') as string) * 60 // convert to seconds
+    const isActive = formData.get('isActive') === 'on'
+    const isWhitelistEnabled = formData.get('isWhitelistEnabled') === 'on'
+
+    await prisma.classTemplate.create({
+      data: {
+        name,
+        description,
+        styleId,
+        trainerId,
+        hallId,
+        level,
+        duration,
+        isActive,
+        isWhitelistEnabled,
+      },
+    })
+  }
+
+  if (intent === 'update_template') {
+    const id = formData.get('id') as string
+    const name = formData.get('name') as string
+    const description = formData.get('description') as string
+    const styleId = formData.get('styleId') as string
+    const trainerId = formData.get('trainerId') as string
+    const hallId = formData.get('hallId') as any
+    const level = formData.get('level') as any
+    const duration = parseInt(formData.get('duration') as string) * 60
+
+    const isActive = formData.get('isActive') === 'on'
+    const isWhitelistEnabled = formData.get('isWhitelistEnabled') === 'on'
+
+    await prisma.classTemplate.update({
+      where: { id },
+      data: {
+        name,
+        description,
+        styleId,
+        trainerId,
+        hallId,
+        level,
+        duration,
+        isActive,
+        isWhitelistEnabled,
+      },
+    })
+  }
+
+  if (intent === 'toggle_template_active') {
+    const id = formData.get('id') as string
+    const isActive = formData.get('isActive') === 'true'
+    await prisma.classTemplate.update({
+      where: { id },
+      data: { isActive },
+    })
+  }
+
+  if (intent === 'delete_template') {
+    const id = formData.get('id') as string
+    const usage = await prisma.classInstance.count({ where: { classTemplateId: id } })
+    if (usage === 0) {
+      await prisma.classTemplate.delete({ where: { id } })
+    } else {
+      return { success: false, error: 'Cannot delete template in use' }
+    }
+  }
+
+  return { success: true }
+}
+
+export default function TemplatesConfiguration() {
+  const { templates, danceStyles: styles, trainers } = useLoaderData<typeof loader>()
+
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedTemplate, setSelectedTemplate] = useState<any | null>(null)
+  const [showInactive, setShowInactive] = useState(false)
+
+  const filteredTemplates = templates.filter((t) => showInactive || t.isActive)
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <ShinyText as="h1" variant="title" className="mb-2 font-bold text-3xl text-white">
+          Class Templates
+        </ShinyText>
+        <p className="text-gray-400">Manage templates for classes.</p>
+      </div>
+
+      <div className="rounded-xl border border-white/10 bg-black/20 p-6">
+        <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center">
+          <h3 className="font-bold text-gold text-xl">Templates List</h3>
+          <div className="flex items-center gap-4">
+            <label className="flex cursor-pointer items-center gap-2 text-gray-400 text-sm">
+              <input
+                type="checkbox"
+                checked={showInactive}
+                onChange={(e) => setShowInactive(e.target.checked)}
+                className="h-4 w-4 accent-gold"
+              />
+              Show Inactive
+            </label>
+            <MetallicButton
+              type="button"
+              onClick={() => {
+                setSelectedTemplate(null)
+                setIsModalOpen(true)
+              }}
+              className="rounded-md border-2 border-gold/50 px-4 py-2"
+            >
+              + Create Template
+            </MetallicButton>
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-left">
+            <thead>
+              <tr className="border-white/10 border-b text-gray-500 text-xs uppercase">
+                <th className="px-4 py-3">Name</th>
+                <th className="px-4 py-3">Style</th>
+                <th className="px-4 py-3">Defaults</th>
+                <th className="px-4 py-3 text-center">In Use</th>
+                <th className="px-4 py-3 text-center">Status</th>
+                <th className="px-4 py-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredTemplates.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-8 text-center text-gray-500 italic">
+                    No templates found.
+                  </td>
+                </tr>
+              ) : (
+                filteredTemplates.map((tpl) => (
+                  <tr key={tpl.id} className="border-white/5 border-b transition-colors hover:bg-white/5">
+                    <td className="px-4 py-3">
+                      <div className="font-medium text-white">{tpl.name}</div>
+                      {tpl.description && <div className="text-gray-500 text-xs">{tpl.description}</div>}
+                    </td>
+                    <td className="px-4 py-3 text-gray-300 text-sm">{tpl.style.name}</td>
+                    <td className="px-4 py-3 text-gray-400 text-xs">
+                      <div>
+                        <span className="text-gray-500">Hall:</span> {tpl.hallId}
+                      </div>
+                      <div>
+                        <span className="text-gray-500">Trainer:</span> {tpl.trainer.firstName} {tpl.trainer.lastName}
+                      </div>
+                      <div>
+                        <span className="text-gray-500">Duration:</span> {Math.round(tpl.duration / 60)}m
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-center text-gray-400 text-sm">{tpl._count.classInstances}</td>
+                    <td className="px-4 py-3 text-center">
+                      {tpl.isActive ? (
+                        <span className="rounded border border-green-900/40 bg-green-900/20 px-2 py-1 text-green-400 text-xs">
+                          Active
+                        </span>
+                      ) : (
+                        <span className="rounded border border-gray-700 bg-gray-800 px-2 py-1 text-gray-400 text-xs">
+                          Inactive
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <div className="flex justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedTemplate(tpl)
+                            setIsModalOpen(true)
+                          }}
+                          className="p-1 text-gold/80 transition-colors hover:text-gold"
+                          title="Edit"
+                        >
+                          <Pencil size={16} />
+                        </button>
+
+                        {/* Deactivate/Activate Toggle */}
+                        <Form method="post" style={{ display: 'inline' }}>
+                          <input type="hidden" name="intent" value="toggle_template_active" />
+                          <input type="hidden" name="id" value={tpl.id} />
+                          <input type="hidden" name="isActive" value={tpl.isActive ? 'false' : 'true'} />
+                          <button
+                            type="submit"
+                            className={`p-1 transition-colors ${tpl.isActive ? 'text-amber-600 hover:text-amber-500' : 'text-green-600 hover:text-green-500'}`}
+                            title={tpl.isActive ? 'Deactivate' : 'Activate'}
+                          >
+                            {tpl.isActive ? <Ban size={16} /> : <RefreshCw size={16} />}
+                          </button>
+                        </Form>
+
+                        <MetallicTooltip
+                          content="Cannot delete template that is in use. Deactivate it instead."
+                          shouldShow={tpl._count.classInstances > 0}
+                          align="end"
+                        >
+                          <Form
+                            method="post"
+                            onSubmit={(e) => {
+                              if (tpl._count.classInstances > 0) {
+                                e.preventDefault()
+                                return
+                              }
+                              if (!confirm('Permanently delete this template?')) e.preventDefault()
+                            }}
+                            style={{ display: 'inline' }}
+                          >
+                            <input type="hidden" name="intent" value="delete_template" />
+                            <input type="hidden" name="id" value={tpl.id} />
+                            <button
+                              type="submit"
+                              disabled={tpl._count.classInstances > 0}
+                              className={`p-1 transition-colors ${
+                                tpl._count.classInstances > 0
+                                  ? 'cursor-not-allowed text-gray-600'
+                                  : 'text-gray-400 hover:text-red-400'
+                              }`}
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </Form>
+                        </MetallicTooltip>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <EditTemplateModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false)
+          setSelectedTemplate(null)
+        }}
+        template={selectedTemplate}
+        styles={styles}
+        trainers={trainers}
+      />
+    </div>
+  )
+}
