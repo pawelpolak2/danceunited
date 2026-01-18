@@ -3,7 +3,7 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import FullCalendar from '@fullcalendar/react'
 import timeGridPlugin from '@fullcalendar/timegrid'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ShinyText } from '../ui'
 
 interface DashboardCalendarProps {
@@ -29,7 +29,9 @@ const buttonTextConfig = {
   day: 'day',
 } as const
 
-export function DashboardCalendar({
+const calendarPlugins = [dayGridPlugin, timeGridPlugin, interactionPlugin]
+
+function DashboardCalendarComponent({
   events = [],
   onDateSelect,
   onEventClick,
@@ -38,7 +40,6 @@ export function DashboardCalendar({
   editable = false,
 }: DashboardCalendarProps) {
   const [isClient, setIsClient] = useState(false)
-  // ...
   const calendarRef = useRef<FullCalendar>(null)
 
   // Only render on client to avoid SSR hydration issues
@@ -110,7 +111,7 @@ export function DashboardCalendar({
     <div className="dashboard-calendar">
       <FullCalendar
         ref={calendarRef}
-        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+        plugins={calendarPlugins}
         initialView="dayGridMonth"
         headerToolbar={headerToolbarConfig}
         events={calendarEvents}
@@ -131,3 +132,5 @@ export function DashboardCalendar({
     </div>
   )
 }
+
+export const DashboardCalendar = React.memo(DashboardCalendarComponent)

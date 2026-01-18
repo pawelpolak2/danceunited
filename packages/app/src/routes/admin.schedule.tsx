@@ -1,6 +1,6 @@
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core'
 import { prisma } from 'db'
-import { useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { redirect, useFetcher, useLoaderData } from 'react-router'
 import { EditTemplateModal } from '../components/configuration/EditTemplateModal'
 import { DashboardCalendar } from '../components/dashboard/DashboardCalendar'
@@ -51,11 +51,23 @@ export async function loader({ request }: Route.LoaderArgs) {
     select: { id: true, firstName: true, lastName: true, email: true },
   })
 
+  // Limit history to last 3 months
+  const threeMonthsAgo = new Date()
+  threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3)
+
   // Fetch ALL classes for the calendar (Admin sees everything)
   const classes = await prisma.classInstance.findMany({
+    where: {
+      startTime: {
+        gte: threeMonthsAgo,
+      },
+    },
     include: {
       classTemplate: true,
       actualTrainer: true,
+    },
+    orderBy: {
+      startTime: 'asc',
     },
   })
 
@@ -283,38 +295,61 @@ export default function AdminSchedulePage() {
       setIsEditModalOpen(false)
   }
 
-  const handleDateSelect = (selectInfo: DateSelectArg) => {
+  const handleDateSelect = useCallback((selectInfo: DateSelectArg) => {
     setSelectedDate(selectInfo.start)
     setIsScheduleModalOpen(true)
-  }
+  }, [])
 
-  const handleEventClick = (clickInfo: EventClickArg) => {
-    const classId = clickInfo.event.id
-    const foundClass = classes.find((c) => c.id === classId)
-    if (foundClass) {
-      setSelectedClass(foundClass)
-      setIsEditModalOpen(true)
-    }
-  }
+  const handleEventClick = useCallback(
+    (clickInfo: EventClickArg) => {
+      const classId = clickInfo.event.id
+      // This looks up in `classes` array. If classes array is new every render (from loaderData),
+      // we need `classes` in dependency array.
+      // However, if we want `handleEventClick` to be stable, we should likely rely on `clickInfo` data
+      // OR ensure `classes` in `loaderData` is memoized? `useLoaderData` returns new object on nav?
 
-  const handleEventDrop = (dropInfo: EventDropArg) => {
-    // Confirm? Or just save.
-    if (!confirm(`Move ${dropInfo.event.title} to ${dropInfo.event.start?.toLocaleString()}?`)) {
-      dropInfo.revert()
-      return
-    }
+      // Actually, `clickInfo` has `event`. We can store `event.id` and let `EditClassModal` fetch details?
+      // Or just pass `classes` dependency.
+      const foundClass = classes.find((c) => c.id === classId)
+      if (foundClass) {
+        setSelectedClass(foundClass)
+        setIsEditModalOpen(true)
+      }
+    },
+    [classes]
+  ) // `classes` might change, so this callback changes.
 
-    // Optimistic UI handled by fullcalendar, but we need to send data
-    const formData = new FormData()
-    formData.append('intent', 'moveClass')
-    formData.append('classInstanceId', dropInfo.event.id)
-    formData.append('startTime', dropInfo.event.start?.toISOString() || '')
-    // We don't have recurrence scope prompt here easily, assuming single instance move for Drag&Drop for simplicity
-    // Or we could trigger a modal. For now, SINGLE move.
-    formData.append('updateScope', 'single')
+  const handleEventDrop = useCallback(
+    (dropInfo: EventDropArg) => {
+      // Confirm? Or just save.
+      if (!confirm(`Move ${dropInfo.event.title} to ${dropInfo.event.start?.toLocaleString()}?`)) {
+        dropInfo.revert()
+        return
+      }
 
-    fetcher.submit(formData, { method: 'post' })
-  }
+      // Optimistic UI handled by fullcalendar, but we need to send data
+      const formData = new FormData()
+      formData.append('intent', 'moveClass')
+      formData.append('classInstanceId', dropInfo.event.id)
+      formData.append('startTime', dropInfo.event.start?.toISOString() || '')
+      // We don't have recurrence scope prompt here easily, assuming single instance move for Drag&Drop for simplicity
+      // Or we could trigger a modal. For now, SINGLE move.
+      formData.append('updateScope', 'single')
+
+      fetcher.submit(formData, { method: 'post' })
+    },
+    [fetcher]
+  )
+
+  // Memoize events array for the calendar
+  // Use `useMemo` on `events` from loaderData if it's passed directly?
+  // No, `events` from loaderData is already an array. If `loaderData` changes, `events` changes.
+  // BUT `DashboardCalendar` checks `prevProps`.
+  // Ideally, we shouldn't pass `events` from loader directly if we want to avoid re-renders when other loader data changes?
+  // But loader data likely changes together.
+
+  // Actually, let's just memoize the array passed to component to be safe
+  const calendarEvents = useMemo(() => events, [events])
 
   return (
     <div className="flex h-full flex-col text-amber-50">
@@ -346,7 +381,7 @@ export default function AdminSchedulePage() {
 
       <div className="flex-1 rounded-lg border border-amber-900/20 bg-gray-900/20 p-4">
         <DashboardCalendar
-          events={events}
+          events={calendarEvents}
           onDateSelect={handleDateSelect}
           onEventClick={handleEventClick}
           editable={true} // Enable Drag & Drop

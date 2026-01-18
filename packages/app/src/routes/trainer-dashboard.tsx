@@ -1,6 +1,6 @@
 import type { DateSelectArg, EventClickArg } from '@fullcalendar/core'
 import { prisma } from 'db'
-import { useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { redirect, useFetcher, useLoaderData } from 'react-router'
 import { EditTemplateModal } from '../components/configuration/EditTemplateModal'
 import { DashboardCalendar } from '../components/dashboard/DashboardCalendar'
@@ -58,15 +58,24 @@ export async function loader({ request }: Route.LoaderArgs) {
     select: { id: true, name: true, duration: true, hallId: true },
   })
 
+  // Limit history to last 3 months
+  const threeMonthsAgo = new Date()
+  threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3)
+
   // Fetch created classes (instances) for the calendar
   // Fetching all future classes or a range. For simplicity, fetching all relevant ones.
   const classes = await prisma.classInstance.findMany({
     where: {
       actualTrainerId: user.userId, // Show classes taught by this trainer
-      // potentially also show classes where they are substituting, etc.
+      startTime: {
+        gte: threeMonthsAgo,
+      },
     },
     include: {
       classTemplate: true,
+    },
+    orderBy: {
+      startTime: 'asc',
     },
     // Notes: recurrenceGroupId is included by default with findMany unless selected specifically
   })
@@ -328,20 +337,26 @@ export default function TrainerDashboardPage() {
     }
   }
 
-  const handleDateSelect = (selectInfo: DateSelectArg) => {
+  const handleDateSelect = useCallback((selectInfo: DateSelectArg) => {
     // selectInfo.start is the selected date (with time if timeGrid)
     setSelectedDate(selectInfo.start)
     setIsScheduleModalOpen(true)
-  }
+  }, [])
 
-  const handleEventClick = (clickInfo: EventClickArg) => {
-    const classId = clickInfo.event.id
-    const foundClass = classes.find((c) => c.id === classId)
-    if (foundClass) {
-      setSelectedClass(foundClass)
-      setIsEditModalOpen(true)
-    }
-  }
+  const handleEventClick = useCallback(
+    (clickInfo: EventClickArg) => {
+      const classId = clickInfo.event.id
+      const foundClass = classes.find((c) => c.id === classId)
+      if (foundClass) {
+        setSelectedClass(foundClass)
+        setIsEditModalOpen(true)
+      }
+    },
+    [classes]
+  )
+
+  // Memoize events
+  const calendarEvents = useMemo(() => events, [events])
 
   return (
     <div className="min-h-screen bg-gray-950 px-4 py-8">
@@ -370,7 +385,7 @@ export default function TrainerDashboardPage() {
         </div>
 
         <div className="rounded-lg border border-amber-900/20 bg-gray-900/30 p-4">
-          <DashboardCalendar events={events} onDateSelect={handleDateSelect} onEventClick={handleEventClick} />
+          <DashboardCalendar events={calendarEvents} onDateSelect={handleDateSelect} onEventClick={handleEventClick} />
         </div>
       </div>
 
