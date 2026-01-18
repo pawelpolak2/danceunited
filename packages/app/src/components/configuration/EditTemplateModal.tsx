@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Form, useNavigation } from 'react-router'
+import { Combobox } from '../ui/Combobox'
 import { MetallicButton } from '../ui/MetallicButton'
 import { Modal } from '../ui/Modal'
 import { WhitelistManager } from './WhitelistManager'
@@ -146,41 +147,25 @@ export function EditTemplateModal({ isOpen, onClose, template, styles, trainers,
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1">
             <label className="block font-medium text-gray-400 text-xs">Style</label>
-            <select
+            <Combobox
               name="styleId"
-              required
               value={styleId}
-              onChange={(e) => setStyleId(e.target.value)}
-              className="w-full rounded border border-white/10 bg-black/40 px-3 py-2 text-white outline-none focus:border-gold"
-            >
-              <option value="" disabled>
-                Select Style
-              </option>
-              {styles.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name}
-                </option>
-              ))}
-            </select>
+              onChange={setStyleId}
+              options={styles.map((s) => ({ value: s.id, label: s.name }))}
+              placeholder="Select Style"
+              required
+            />
           </div>
           <div className="space-y-1">
             <label className="block font-medium text-gray-400 text-xs">Default Trainer</label>
-            <select
+            <Combobox
               name="trainerId"
-              required
               value={trainerId}
-              onChange={(e) => setTrainerId(e.target.value)}
-              className="w-full rounded border border-white/10 bg-black/40 px-3 py-2 text-white outline-none focus:border-gold"
-            >
-              <option value="" disabled>
-                Select Trainer
-              </option>
-              {trainers.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.firstName} {t.lastName}
-                </option>
-              ))}
-            </select>
+              onChange={setTrainerId}
+              options={trainers.map((t) => ({ value: t.id, label: `${t.firstName} ${t.lastName}` }))}
+              placeholder="Select Trainer"
+              required
+            />
           </div>
         </div>
 
