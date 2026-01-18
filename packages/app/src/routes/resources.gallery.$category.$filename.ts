@@ -50,16 +50,7 @@ export async function loader({ params, request: _request }: LoaderFunctionArgs) 
   // We can just read the file into a buffer for simplicity if files are small,
   // or use a utility to convert. For images < 5MB, Buffer is fine.
 
-  // Using await here satisfying "useAwait" rule, although readFileSync is sync.
-  // In a real server environment we might use fs.promises.readFile
-  // But to fix the "async without await", we can just make it synchronous?
-  // Loader can be sync or async.
-  // However, fs.promises is better. Let's switch to fs.promises.
-
-  // Actually, simplest fix that keeps logic:
-  await Promise.resolve()
-
-  const buffer = fs.readFileSync(filePath)
+  const buffer = await fs.promises.readFile(filePath)
 
   return new Response(buffer, {
     headers: {
