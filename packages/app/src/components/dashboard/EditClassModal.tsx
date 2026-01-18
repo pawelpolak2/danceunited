@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Form, useNavigation } from 'react-router'
 import { Combobox } from '../ui/Combobox'
 import { MetallicButton } from '../ui/MetallicButton'
+import { MetallicDateTimePicker } from '../ui/MetallicDateTimePicker'
 import { Modal } from '../ui/Modal'
 
 interface ClassTemplate {
@@ -30,8 +31,8 @@ export function EditClassModal({ isOpen, onClose, classInstance, trainers }: Edi
   const navigation = useNavigation()
   const isSubmitting = navigation.state === 'submitting'
 
-  const [startTime, setStartTime] = useState<string>('')
-  const [endTime, setEndTime] = useState<string>('')
+  const [startTime, setStartTime] = useState<Date | undefined>(undefined)
+  const [endTimeDisplay, setEndTimeDisplay] = useState<string>('')
   const [hall, setHall] = useState<string>('HALL1')
   const [trainerId, setTrainerId] = useState<string>('')
   const [notes, setNotes] = useState<string>('')
@@ -40,13 +41,8 @@ export function EditClassModal({ isOpen, onClose, classInstance, trainers }: Edi
   // Initialize form from classInstance
   useEffect(() => {
     if (classInstance && isOpen) {
-      // Format to YYYY-MM-DDTHH:mm for datetime-local input
       const start = new Date(classInstance.startTime)
-      const toLocalISO = (date: Date) => {
-        const pad = (n: number) => n.toString().padStart(2, '0')
-        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
-      }
-      setStartTime(toLocalISO(start))
+      setStartTime(start)
       setHall(classInstance.actualHall)
       setTrainerId(classInstance.actualTrainerId)
       setNotes(classInstance.notes || '')
@@ -57,14 +53,13 @@ export function EditClassModal({ isOpen, onClose, classInstance, trainers }: Edi
   // Update calculated endTime when startTime changes
   useEffect(() => {
     if (startTime && classInstance) {
-      const start = new Date(startTime)
       const duration = classInstance.classTemplate.duration
-      const end = new Date(start.getTime() + duration * 1000)
+      const end = new Date(startTime.getTime() + duration * 1000)
 
       const formatTime = (date: Date) => {
-        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })
       }
-      setEndTime(`${formatTime(start)} - ${formatTime(end)} (${Math.round(duration / 60)} mins)`)
+      setEndTimeDisplay(`${formatTime(startTime)} - ${formatTime(end)} (${Math.round(duration / 60)} mins)`)
     }
   }, [startTime, classInstance])
 
@@ -101,21 +96,17 @@ export function EditClassModal({ isOpen, onClose, classInstance, trainers }: Edi
             <label htmlFor="edit-startTime" className="block font-cinzel font-medium text-amber-100/80 text-sm">
               Start Time
             </label>
-            <input
-              type="datetime-local"
-              id="edit-startTime"
-              name="startTime"
-              required
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
-              className="w-full rounded-md border border-amber-900/30 bg-gray-900/50 px-3 py-2 text-gold transition-all focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
-            />
+            <label htmlFor="edit-startTime" className="block font-cinzel font-medium text-amber-100/80 text-sm">
+              Start Time
+            </label>
+            <input type="hidden" name="startTime" value={startTime ? startTime.toISOString() : ''} />
+            <MetallicDateTimePicker date={startTime} setDate={setStartTime} />
           </div>
 
           <div className="space-y-1">
             <label className="block font-cinzel font-medium text-amber-100/80 text-sm">End Time (Calculated)</label>
             <div className="w-full rounded-md border border-amber-900/30 bg-gray-900/30 px-3 py-2 text-gray-400">
-              {endTime}
+              {endTimeDisplay}
             </div>
           </div>
         </div>

@@ -140,7 +140,7 @@ export default function AdminLayout() {
 
       {/* Main Content Area */}
       <main className="relative z-10 flex min-w-0 flex-1 flex-col overflow-hidden">
-        <div className="flex-1 overflow-y-auto scroll-smooth p-4 pt-24 md:p-8">
+        <div className="scrollbar-metallic flex-1 overflow-y-auto scroll-smooth p-4 pt-24 md:p-8">
           <Outlet />
         </div>
       </main>
