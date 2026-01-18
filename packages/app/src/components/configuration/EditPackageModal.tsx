@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { Form, useNavigation } from 'react-router'
-import { Checkbox } from '../ui/Checkbox'
 import { MetallicButton } from '../ui/MetallicButton'
 import { Modal } from '../ui/Modal'
 import { MultiCombobox } from '../ui/MultiCombobox'
@@ -13,7 +12,6 @@ interface Package {
   classCount: number
   validityDays: number
   category: string
-  isIndividual: boolean
   isActive: boolean
   classLinks?: { classTemplateId: string }[]
 }
@@ -44,7 +42,6 @@ export function EditPackageModal({ isOpen, onClose, pkg, classTemplates }: EditP
   const [classCount, setClassCount] = useState(1)
   const [validityDays, setValidityDays] = useState(30)
   const [category, setCategory] = useState('UNIVERSAL')
-  const [isIndividual, setIsIndividual] = useState(false)
   const [selectedTemplateIds, setSelectedTemplateIds] = useState<string[]>([])
 
   useEffect(() => {
@@ -56,7 +53,7 @@ export function EditPackageModal({ isOpen, onClose, pkg, classTemplates }: EditP
         setClassCount(pkg.classCount)
         setValidityDays(pkg.validityDays)
         setCategory(pkg.category)
-        setIsIndividual(pkg.isIndividual)
+        setCategory(pkg.category)
         setSelectedTemplateIds(pkg.classLinks?.map((l) => l.classTemplateId) || [])
       } else {
         // Defaults
@@ -66,7 +63,6 @@ export function EditPackageModal({ isOpen, onClose, pkg, classTemplates }: EditP
         setClassCount(1)
         setValidityDays(30)
         setCategory('UNIVERSAL')
-        setIsIndividual(false)
         setSelectedTemplateIds([])
       }
     }
@@ -190,15 +186,6 @@ export function EditPackageModal({ isOpen, onClose, pkg, classTemplates }: EditP
             placeholder="Select classes this package applies to..."
           />
           <p className="text-gray-500 text-xs">Leave empty to apply to all compatible classes.</p>
-        </div>
-
-        <div className="flex gap-6 border-white/10 border-t pt-4">
-          <Checkbox
-            name="isIndividual"
-            checked={isIndividual}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setIsIndividual(e.target.checked)}
-            label="Individual Class"
-          />
         </div>
 
         <div className="mt-6 flex justify-end gap-3 pt-2">

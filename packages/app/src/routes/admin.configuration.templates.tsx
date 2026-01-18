@@ -75,6 +75,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
     const level = formData.get('level') as any
     const duration = parseInt(formData.get('duration') as string) * 60 // convert to seconds
     const isActive = formData.get('isActive') === 'on'
+    const isIndividual = formData.get('isIndividual') === 'on'
     const isWhitelistEnabled = formData.get('isWhitelistEnabled') === 'on'
 
     // Parse whitelist from create form
@@ -104,6 +105,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
         level,
         duration,
         isActive,
+        isIndividual,
         isWhitelistEnabled,
         whitelist: whitelistCreateData,
       },
@@ -121,6 +123,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
     const duration = parseInt(formData.get('duration') as string) * 60
 
     const isActive = formData.get('isActive') === 'on'
+    const isIndividual = formData.get('isIndividual') === 'on'
     const isWhitelistEnabled = formData.get('isWhitelistEnabled') === 'on'
 
     await prisma.classTemplate.update({
@@ -134,6 +137,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
         level,
         duration,
         isActive,
+        isIndividual,
         isWhitelistEnabled,
       },
     })
@@ -293,6 +297,13 @@ export default function TemplatesConfiguration() {
                       <div>
                         <span className="text-gray-500">Duration:</span> {Math.round(tpl.duration / 60)}m
                       </div>
+                      {tpl.isIndividual && (
+                        <div className="mt-1">
+                          <span className="rounded border border-gold/30 bg-gold/10 px-1.5 py-0.5 text-[10px] text-gold uppercase">
+                            Individual
+                          </span>
+                        </div>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-center text-gray-400 text-sm">{tpl._count.classInstances}</td>
                     <td className="px-4 py-3 text-center">

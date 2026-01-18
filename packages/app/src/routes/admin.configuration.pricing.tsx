@@ -61,7 +61,6 @@ export const action = async ({ request }: Route.ActionArgs) => {
     const classCount = parseInt(formData.get('classCount') as string)
     const validityDays = parseInt(formData.get('validityDays') as string)
     const category = formData.get('category') as any
-    const isIndividual = formData.get('isIndividual') === 'on'
     // isActive is always true on creation
     const isActive = true
 
@@ -93,7 +92,6 @@ export const action = async ({ request }: Route.ActionArgs) => {
         classCount,
         validityDays,
         category,
-        isIndividual,
         isActive,
         classLinks: classLinksCreate,
       },
@@ -108,7 +106,6 @@ export const action = async ({ request }: Route.ActionArgs) => {
     const classCount = parseInt(formData.get('classCount') as string)
     const validityDays = parseInt(formData.get('validityDays') as string)
     const category = formData.get('category') as any
-    const isIndividual = formData.get('isIndividual') === 'on'
     const _isActive = formData.get('isActive') === 'on'
 
     const classTemplateIdsStr = formData.get('classTemplateIds') as string
@@ -134,7 +131,6 @@ export const action = async ({ request }: Route.ActionArgs) => {
           classCount,
           validityDays,
           category,
-          isIndividual,
         },
       }),
       // Reset links
@@ -268,10 +264,7 @@ export default function PricingConfiguration() {
                       {pkg.description && <div className="text-gray-500 text-xs">{pkg.description}</div>}
                     </td>
                     <td className="px-4 py-3 text-gray-300 text-xs">{pkg.category}</td>
-                    <td className="px-4 py-3 text-gray-300 text-sm">
-                      {pkg.classCount}
-                      {pkg.isIndividual && <span className="ml-1 text-[10px] text-gold uppercase">(Indiv.)</span>}
-                    </td>
+                    <td className="px-4 py-3 text-gray-300 text-sm">{pkg.classCount}</td>
                     <td className="px-4 py-3 text-gray-300 text-sm">{pkg.validityDays} days</td>
                     <td className="px-4 py-3 font-bold text-gold">{Number(pkg.price).toFixed(2)} zł</td>
                     <td className="px-4 py-3">

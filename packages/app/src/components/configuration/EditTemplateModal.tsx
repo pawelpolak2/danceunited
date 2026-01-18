@@ -29,6 +29,7 @@ interface ClassTemplate {
   level: string // ClassLevel enum
   duration: number
   isActive: boolean
+  isIndividual: boolean
   isWhitelistEnabled: boolean
   whitelist?: { user: User }[]
 }
@@ -57,6 +58,7 @@ export function EditTemplateModal({ isOpen, onClose, template, styles, trainers,
   const [hallId, setHallId] = useState('HALL1')
   const [level, setLevel] = useState('OPEN')
   const [duration, setDuration] = useState(60) // minutes
+  const [isIndividual, setIsIndividual] = useState(false)
   const [isActive, setIsActive] = useState(true)
   const [isWhitelistEnabled, setIsWhitelistEnabled] = useState(false)
 
@@ -74,6 +76,7 @@ export function EditTemplateModal({ isOpen, onClose, template, styles, trainers,
         setHallId(template.hallId)
         setLevel(template.level)
         setDuration(Math.round(template.duration / 60))
+        setIsIndividual(template.isIndividual)
         setIsActive(template.isActive)
         setIsWhitelistEnabled(template.isWhitelistEnabled)
       } else {
@@ -85,6 +88,7 @@ export function EditTemplateModal({ isOpen, onClose, template, styles, trainers,
         setHallId('HALL1')
         setLevel('OPEN')
         setDuration(60)
+        setIsIndividual(false)
         setIsActive(true)
         setIsWhitelistEnabled(false)
         setPendingWhitelist([])
@@ -221,6 +225,13 @@ export function EditTemplateModal({ isOpen, onClose, template, styles, trainers,
 
         {/* Switches */}
         <div className="flex justify-between gap-4 border-white/10 border-t pt-4">
+          <Checkbox
+            name="isIndividual"
+            checked={isIndividual}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setIsIndividual(e.target.checked)}
+            label="Individual Class"
+          />
+
           <Checkbox
             name="isActive"
             checked={isActive}
