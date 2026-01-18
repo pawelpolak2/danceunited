@@ -15,6 +15,8 @@ export function validateRegistration(data: {
   lastName?: string | null
   email?: string | null
   password?: string | null
+  tosAccepted?: boolean
+  privacyAccepted?: boolean
 }): ValidationResult {
   const errors: Record<string, string> = {}
 

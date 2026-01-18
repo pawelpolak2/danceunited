@@ -1,5 +1,7 @@
 import { prisma } from 'db'
+import { useState } from 'react'
 import { Form, redirect, useActionData, useNavigation } from 'react-router'
+import { LegalConsents } from '../components/auth/LegalConsents'
 import { FormError, FormField, MetallicButton, ShinyText } from '../components/ui'
 import { createSessionCookie, hashPassword } from '../lib/auth.server'
 import { validateRegistration } from '../lib/validation'
@@ -19,7 +21,18 @@ export async function action({ request }: Route.ActionArgs) {
     const password = formData.get('password') as string | null
 
     // Validate input
-    const validation = validateRegistration({ firstName, lastName, email, password })
+    const tosAccepted = formData.get('tosAccepted') === 'on'
+    const privacyAccepted = formData.get('privacyAccepted') === 'on'
+
+    const validation = validateRegistration({
+      firstName,
+      lastName,
+      email,
+      password,
+      tosAccepted,
+      privacyAccepted,
+    })
+
     if (!validation.valid) {
       return Response.json({ success: false, errors: validation.errors }, { status: 200 })
     }
@@ -90,6 +103,12 @@ export default function RegisterPage() {
   const navigation = useNavigation()
   const isSubmitting = navigation.state === 'submitting'
 
+  // State for consents to allow modal interaction to update checkbox
+  // Initialize from actionData if present (to persist on error)?
+  // Browser restores form state mostly, but controlled components might reset.
+  const [tosAccepted, setTosAccepted] = useState(false)
+  const [privacyAccepted, setPrivacyAccepted] = useState(false)
+
   return (
     <div className="flex min-h-[calc(100vh-200px)] items-center justify-center px-4 py-12">
       <div className="form-container">
@@ -145,6 +164,19 @@ export default function RegisterPage() {
               placeholder="••••••••"
               error={actionData?.errors?.password}
               hint="Must be at least 8 characters with uppercase, lowercase, and a number"
+            />
+          </div>
+
+          <div className="border-white/10 border-t pt-4">
+            <LegalConsents
+              tosAccepted={tosAccepted}
+              privacyAccepted={privacyAccepted}
+              onTosChange={setTosAccepted}
+              onPrivacyChange={setPrivacyAccepted}
+              errors={{
+                tos: actionData?.errors?.tos,
+                privacy: actionData?.errors?.privacy,
+              }}
             />
           </div>
 
