@@ -12,28 +12,33 @@ const categories = [
 ]
 
 export const loader = async () => {
-  const getImages = (category: string) => {
+  const getImages = async (category: string) => {
     const dir = path.join(process.cwd(), 'public', 'gallery', category)
     try {
-      if (!fs.existsSync(dir)) return []
-      return fs
-        .readdirSync(dir)
+      const files = await fs.promises.readdir(dir)
+      return files
         .filter((file) => /\.(png|jpg|jpeg|webp)$/i.test(file))
         .map((file) => ({
           src: `/resources/gallery/${category}/${file}`,
           alt: `${category} photo`,
         }))
-    } catch (error) {
-      console.error(`Error reading gallery directory for ${category}:`, error)
+    } catch {
       return []
     }
   }
 
+  const [camps, classes, tournaments, studio] = await Promise.all([
+    getImages('camps'),
+    getImages('classes'),
+    getImages('tournaments'),
+    getImages('studio'),
+  ])
+
   return {
-    camps: getImages('camps'),
-    classes: getImages('classes'),
-    tournaments: getImages('tournaments'),
-    studio: getImages('studio'),
+    camps,
+    classes,
+    tournaments,
+    studio,
   }
 }
 
