@@ -1,9 +1,9 @@
 import { prisma } from 'db'
-import { Ticket, Calendar } from 'lucide-react'
+import { Calendar, Ticket } from 'lucide-react'
 import { ShinyText } from '../components/ui'
 import type { Route } from './+types/pricing'
 
-export async function loader({ request }: Route.LoaderArgs) {
+export async function loader() {
   // Fetch all active packages
   const packages = await prisma.package.findMany({
     where: {
@@ -64,69 +64,65 @@ export default function Pricing({ loaderData }: Route.ComponentProps) {
               <div key={category} className="space-y-12">
                 {/* Section Header */}
                 <div className="relative text-center">
-                  <div className="absolute top-1/2 left-0 w-full h-px bg-gradient-to-r from-transparent via-gold/30 to-transparent" />
+                  <div className="absolute top-1/2 left-0 h-px w-full bg-gradient-to-r from-transparent via-gold/30 to-transparent" />
                   <div className="relative inline-block bg-gray-950 px-8">
-                    <ShinyText as="h2" variant="title" className="text-3xl md:text-4xl text-gold uppercase tracking-widest">
+                    <ShinyText
+                      as="h2"
+                      variant="title"
+                      className="text-3xl text-gold uppercase tracking-widest md:text-4xl"
+                    >
                       {category}
                     </ShinyText>
                   </div>
                 </div>
 
                 {/* Grid Layout: 1 col on mobile, 3 cols on desktop */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
                   {categoryPackages.map((pkg) => (
                     <div
                       key={pkg.id}
-                      className="group relative flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-gray-900/40 backdrop-blur-sm transition-all duration-300 hover:border-gold/50 hover:bg-gray-900/60 hover:-translate-y-2 hover:shadow-[0_10px_40px_-10px_rgba(212,175,55,0.2)]"
+                      className="group hover:-translate-y-2 relative flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-gray-900/40 backdrop-blur-sm transition-all duration-300 hover:border-gold/50 hover:bg-gray-900/60 hover:shadow-[0_10px_40px_-10px_rgba(212,175,55,0.2)]"
                     >
                       {/* Card Content Container */}
-                      <div className="p-8 flex flex-col items-center h-full relative z-10 text-center">
-
+                      <div className="relative z-10 flex h-full flex-col items-center p-8 text-center">
                         {/* A. Header: Name & Price */}
                         <div className="mb-8 w-full">
-                          <h3 className="text-gold font-cinzel font-bold text-2xl mb-4 tracking-wide uppercase drop-shadow-sm">
+                          <h3 className="mb-4 font-bold font-cinzel text-2xl text-gold uppercase tracking-wide drop-shadow-sm">
                             {pkg.name}
                           </h3>
                           <div className="flex items-baseline justify-center gap-1 text-white">
-                            <span className="text-5xl font-bold tracking-tighter drop-shadow-lg">
-                              {pkg.price}
-                            </span>
-                            <span className="text-xl text-gray-400 font-light">zł</span>
+                            <span className="font-bold text-5xl tracking-tighter drop-shadow-lg">{pkg.price}</span>
+                            <span className="font-light text-gray-400 text-xl">zł</span>
                           </div>
                         </div>
 
                         {/* B. Meta-Data Section */}
-                        <div className="w-full grid grid-cols-2 gap-4 mb-8">
+                        <div className="mb-8 grid w-full grid-cols-2 gap-4">
                           {/* Class Count */}
-                          <div className="flex flex-col items-center justify-center p-3 rounded-lg bg-white/5 border border-white/5 transition-colors group-hover:bg-gold/10 group-hover:border-gold/20">
-                            <Ticket className="w-6 h-6 text-gold mb-2 opacity-80" />
-                            <span className="text-lg font-bold text-white">{pkg.classCount}</span>
-                            <span className="text-[10px] uppercase tracking-wider text-gray-400">Classes</span>
+                          <div className="flex flex-col items-center justify-center rounded-lg border border-white/5 bg-white/5 p-3 transition-colors group-hover:border-gold/20 group-hover:bg-gold/10">
+                            <Ticket className="mb-2 h-6 w-6 text-gold opacity-80" />
+                            <span className="font-bold text-lg text-white">{pkg.classCount}</span>
+                            <span className="text-[10px] text-gray-400 uppercase tracking-wider">Classes</span>
                           </div>
 
                           {/* Validity Days */}
-                          <div className="flex flex-col items-center justify-center p-3 rounded-lg bg-white/5 border border-white/5 transition-colors group-hover:bg-gold/10 group-hover:border-gold/20">
-                            <Calendar className="w-6 h-6 text-gold mb-2 opacity-80" />
-                            <span className="text-lg font-bold text-white">{pkg.validityDays}</span>
-                            <span className="text-[10px] uppercase tracking-wider text-gray-400">Days</span>
+                          <div className="flex flex-col items-center justify-center rounded-lg border border-white/5 bg-white/5 p-3 transition-colors group-hover:border-gold/20 group-hover:bg-gold/10">
+                            <Calendar className="mb-2 h-6 w-6 text-gold opacity-80" />
+                            <span className="font-bold text-lg text-white">{pkg.validityDays}</span>
+                            <span className="text-[10px] text-gray-400 uppercase tracking-wider">Days</span>
                           </div>
                         </div>
 
                         {/* C. Description */}
                         <div className="mb-8 flex-grow">
                           {pkg.description ? (
-                            <p className="text-gray-400 text-sm leading-relaxed whitespace-pre-wrap">
+                            <p className="whitespace-pre-wrap text-gray-400 text-sm leading-relaxed">
                               {pkg.description}
                             </p>
                           ) : (
-                            <p className="text-gray-600 text-sm italic">
-                              No additional description
-                            </p>
+                            <p className="text-gray-600 text-sm italic">No additional description</p>
                           )}
                         </div>
-
-
-
                       </div>
                     </div>
                   ))}
@@ -136,11 +132,10 @@ export default function Pricing({ loaderData }: Route.ComponentProps) {
           })}
 
           {sortedCategories.length === 0 && (
-            <div className="text-gray-500 italic text-xl">Currently no packages available.</div>
+            <div className="text-gray-500 text-xl italic">Currently no packages available.</div>
           )}
         </div>
       </section>
     </div>
   )
 }
-
