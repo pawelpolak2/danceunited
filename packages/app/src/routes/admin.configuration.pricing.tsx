@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { Form, useLoaderData, useSubmit } from 'react-router'
 import { EditPackageModal } from '../components/configuration/EditPackageModal'
 import { Checkbox } from '../components/ui/Checkbox'
+import { ConfirmModal } from '../components/ui/ConfirmModal'
 import { MetallicButton } from '../components/ui/MetallicButton'
 import { ShinyText } from '../components/ui/ShinyText'
 import { StatusBadge } from '../components/ui/StatusBadge'
@@ -178,6 +179,7 @@ export default function PricingConfiguration() {
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedPackage, setSelectedPackage] = useState<any | null>(null)
+  const [deletingPackageId, setDeletingPackageId] = useState<string | null>(null)
 
   // Search State
   const [query, setQuery] = useState(search)
@@ -305,25 +307,16 @@ export default function PricingConfiguration() {
                             {pkg.isActive ? <Ban size={16} /> : <RefreshCw size={16} />}
                           </button>
                         </Form>
-                        <Form
-                          method="post"
-                          onSubmit={(e) => {
+                        <button
+                          type="button"
+                          onClick={(e) => {
                             e.stopPropagation()
-                            if (!confirm('Delete this package?')) e.preventDefault()
+                            setDeletingPackageId(pkg.id)
                           }}
-                          style={{ display: 'inline-block' }}
-                          onClick={(e) => e.stopPropagation()}
+                          className="p-1 text-gray-400 transition-colors hover:text-red-400"
                         >
-                          <input type="hidden" name="intent" value="delete_package" />
-                          <input type="hidden" name="id" value={pkg.id} />
-                          <button
-                            type="submit"
-                            onClick={(e) => e.stopPropagation()}
-                            className="p-1 text-gray-400 transition-colors hover:text-red-400"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </Form>
+                          <Trash2 size={16} />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -342,6 +335,21 @@ export default function PricingConfiguration() {
         }}
         pkg={selectedPackage}
         classTemplates={classTemplates}
+      />
+
+      <ConfirmModal
+        isOpen={!!deletingPackageId}
+        onClose={() => setDeletingPackageId(null)}
+        onConfirm={() => {
+          if (deletingPackageId) {
+            submit({ intent: 'delete_package', id: deletingPackageId }, { method: 'post' })
+            setDeletingPackageId(null)
+          }
+        }}
+        title="Delete Package"
+        description="Are you sure you want to delete this package? This will archive it."
+        confirmLabel="Delete"
+        isDestructive
       />
     </div>
   )

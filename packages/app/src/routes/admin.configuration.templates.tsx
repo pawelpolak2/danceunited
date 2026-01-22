@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { Form, useLoaderData, useSubmit } from 'react-router'
 import { EditTemplateModal } from '../components/configuration/EditTemplateModal'
 import { Checkbox } from '../components/ui/Checkbox'
+import { ConfirmModal } from '../components/ui/ConfirmModal'
 import { MetallicButton } from '../components/ui/MetallicButton'
 import { MetallicTooltip } from '../components/ui/MetallicTooltip'
 import { ShinyText } from '../components/ui/ShinyText'
@@ -190,6 +191,7 @@ export default function TemplatesConfiguration() {
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState<any | null>(null)
+  const [deletingTemplateId, setDeletingTemplateId] = useState<string | null>(null)
 
   // Search State
   const [query, setQuery] = useState(search)
@@ -267,6 +269,7 @@ export default function TemplatesConfiguration() {
               <tr className="border-white/10 border-b text-gray-500 text-xs uppercase">
                 <th className="px-4 py-3">Name</th>
                 <th className="px-4 py-3">Style</th>
+                <th className="px-4 py-3 text-center">Whitelist</th>
                 <th className="px-4 py-3">Defaults</th>
                 <th className="px-4 py-3 text-center">In Use</th>
                 <th className="px-4 py-3 text-center">Status</th>
@@ -295,6 +298,17 @@ export default function TemplatesConfiguration() {
                       {tpl.description && <div className="text-gray-500 text-xs">{tpl.description}</div>}
                     </td>
                     <td className="px-4 py-3 text-gray-300 text-sm">{tpl.style.name}</td>
+                    <td className="px-4 py-3 text-center">
+                      {tpl.isWhitelistEnabled ? (
+                        <span className="rounded border border-gold/30 bg-gold/10 px-1.5 py-0.5 font-medium text-[10px] text-gold uppercase">
+                          Enabled
+                        </span>
+                      ) : (
+                        <span className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5 font-medium text-[10px] text-gray-400 uppercase">
+                          Disabled
+                        </span>
+                      )}
+                    </td>
                     <td className="px-4 py-3 text-gray-400 text-xs">
                       <div>
                         <span className="text-gray-500">Hall:</span> {tpl.hallId}
@@ -352,34 +366,23 @@ export default function TemplatesConfiguration() {
                           shouldShow={tpl._count.classInstances > 0}
                           align="end"
                         >
-                          <Form
-                            method="post"
-                            onSubmit={(e) => {
+                          <button
+                            type="button"
+                            onClick={(e) => {
                               e.stopPropagation()
-                              if (tpl._count.classInstances > 0) {
-                                e.preventDefault()
-                                return
+                              if (tpl._count.classInstances === 0) {
+                                setDeletingTemplateId(tpl.id)
                               }
-                              if (!confirm('Permanently delete this template?')) e.preventDefault()
                             }}
-                            style={{ display: 'inline' }}
-                            onClick={(e) => e.stopPropagation()}
+                            disabled={tpl._count.classInstances > 0}
+                            className={`p-1 transition-colors ${
+                              tpl._count.classInstances > 0
+                                ? 'cursor-not-allowed text-gray-600'
+                                : 'text-gray-400 hover:text-red-400'
+                            }`}
                           >
-                            <input type="hidden" name="intent" value="delete_template" />
-                            <input type="hidden" name="id" value={tpl.id} />
-                            <button
-                              type="submit"
-                              onClick={(e) => e.stopPropagation()}
-                              disabled={tpl._count.classInstances > 0}
-                              className={`p-1 transition-colors ${
-                                tpl._count.classInstances > 0
-                                  ? 'cursor-not-allowed text-gray-600'
-                                  : 'text-gray-400 hover:text-red-400'
-                              }`}
-                            >
-                              <Trash2 size={16} />
-                            </button>
-                          </Form>
+                            <Trash2 size={16} />
+                          </button>
                         </MetallicTooltip>
                       </div>
                     </td>
@@ -401,6 +404,21 @@ export default function TemplatesConfiguration() {
         styles={styles}
         trainers={trainers}
         users={users}
+      />
+
+      <ConfirmModal
+        isOpen={!!deletingTemplateId}
+        onClose={() => setDeletingTemplateId(null)}
+        onConfirm={() => {
+          if (deletingTemplateId) {
+            submit({ intent: 'delete_template', id: deletingTemplateId }, { method: 'post' })
+            setDeletingTemplateId(null)
+          }
+        }}
+        title="Delete Template"
+        description="Are you sure you want to delete this template? This cannot be undone."
+        confirmLabel="Delete"
+        isDestructive
       />
     </div>
   )

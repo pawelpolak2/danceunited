@@ -211,6 +211,7 @@ export default function AdminUsersPage() {
   const [query, setQuery] = useState(search)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingUser, setEditingUser] = useState<any>(null)
+  const [_deletingUserId, _setDeletingUserId] = useState<string | null>(null)
 
   // Close modal on success
   useEffect(() => {
