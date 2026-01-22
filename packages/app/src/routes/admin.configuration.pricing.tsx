@@ -3,8 +3,10 @@ import { useEffect, useState } from 'react'
 import { Form, useLoaderData, useSubmit } from 'react-router'
 import { EditPackageModal } from '../components/configuration/EditPackageModal'
 import { Checkbox } from '../components/ui/Checkbox'
+import { ConfirmModal } from '../components/ui/ConfirmModal'
 import { MetallicButton } from '../components/ui/MetallicButton'
 import { ShinyText } from '../components/ui/ShinyText'
+import { StatusBadge } from '../components/ui/StatusBadge'
 import type { Route } from './+types/admin.configuration.pricing'
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
@@ -177,6 +179,7 @@ export default function PricingConfiguration() {
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedPackage, setSelectedPackage] = useState<any | null>(null)
+  const [deletingPackageId, setDeletingPackageId] = useState<string | null>(null)
 
   // Search State
   const [query, setQuery] = useState(search)
@@ -258,7 +261,14 @@ export default function PricingConfiguration() {
                 </tr>
               ) : (
                 filteredPackages.map((pkg) => (
-                  <tr key={pkg.id} className="border-white/5 border-b transition-colors hover:bg-white/5">
+                  <tr
+                    key={pkg.id}
+                    className="cursor-pointer border-white/5 border-b transition-colors hover:bg-white/5"
+                    onClick={() => {
+                      setSelectedPackage(pkg)
+                      setIsModalOpen(true)
+                    }}
+                  >
                     <td className="px-4 py-3">
                       <div className="font-medium text-white">{pkg.name}</div>
                       {pkg.description && <div className="text-gray-500 text-xs">{pkg.description}</div>}
@@ -268,21 +278,14 @@ export default function PricingConfiguration() {
                     <td className="px-4 py-3 text-gray-300 text-sm">{pkg.validityDays} days</td>
                     <td className="px-4 py-3 font-bold text-gold">{Number(pkg.price).toFixed(2)} zł</td>
                     <td className="px-4 py-3">
-                      {pkg.isActive ? (
-                        <span className="rounded border border-green-800 bg-green-900/40 px-2 py-1 text-green-400 text-xs">
-                          Active
-                        </span>
-                      ) : (
-                        <span className="rounded border border-red-800 bg-red-900/40 px-2 py-1 text-red-400 text-xs">
-                          Inactive
-                        </span>
-                      )}
+                      <StatusBadge isActive={pkg.isActive} />
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <div className="flex justify-end gap-2">
+                      <div className="flex justify-end gap-2" onClick={(e) => e.stopPropagation()}>
                         <button
                           type="button"
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation()
                             setSelectedPackage(pkg)
                             setIsModalOpen(true)
                           }}
@@ -291,29 +294,29 @@ export default function PricingConfiguration() {
                         >
                           <Pencil size={16} />
                         </button>
-                        <Form method="post" style={{ display: 'inline-block' }}>
+                        <Form method="post" style={{ display: 'inline-block' }} onSubmit={(e) => e.stopPropagation()}>
                           <input type="hidden" name="intent" value="toggle_package_active" />
                           <input type="hidden" name="id" value={pkg.id} />
                           <input type="hidden" name="isActive" value={pkg.isActive ? 'false' : 'true'} />
                           <button
                             type="submit"
+                            onClick={(e) => e.stopPropagation()}
                             className={`p-1 transition-colors ${pkg.isActive ? 'text-amber-600 hover:text-amber-500' : 'text-green-600 hover:text-green-500'}`}
                             title={pkg.isActive ? 'Deactivate' : 'Activate'}
                           >
                             {pkg.isActive ? <Ban size={16} /> : <RefreshCw size={16} />}
                           </button>
                         </Form>
-                        <Form
-                          method="post"
-                          onSubmit={(e) => !confirm('Delete this package?') && e.preventDefault()}
-                          style={{ display: 'inline-block' }}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setDeletingPackageId(pkg.id)
+                          }}
+                          className="p-1 text-gray-400 transition-colors hover:text-red-400"
                         >
-                          <input type="hidden" name="intent" value="delete_package" />
-                          <input type="hidden" name="id" value={pkg.id} />
-                          <button type="submit" className="p-1 text-gray-400 transition-colors hover:text-red-400">
-                            <Trash2 size={16} />
-                          </button>
-                        </Form>
+                          <Trash2 size={16} />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -332,6 +335,21 @@ export default function PricingConfiguration() {
         }}
         pkg={selectedPackage}
         classTemplates={classTemplates}
+      />
+
+      <ConfirmModal
+        isOpen={!!deletingPackageId}
+        onClose={() => setDeletingPackageId(null)}
+        onConfirm={() => {
+          if (deletingPackageId) {
+            submit({ intent: 'delete_package', id: deletingPackageId }, { method: 'post' })
+            setDeletingPackageId(null)
+          }
+        }}
+        title="Delete Package"
+        description="Are you sure you want to delete this package? This will archive it."
+        confirmLabel="Delete"
+        isDestructive
       />
     </div>
   )

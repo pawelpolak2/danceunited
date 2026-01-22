@@ -70,148 +70,156 @@ export default function App() {
   // useLocation logic to handle global overflow
   const location = useLocation()
 
-  // Dashboard routes (Admin and Trainer) will handle their own scrolling
+  // Dashboard routes (Admin, Trainer, Dancer) will handle their own scrolling
   // This logic toggles the overflow of the main content area
-  const isDashboard = location.pathname.startsWith('/admin') || location.pathname.startsWith('/trainer') || location.pathname.startsWith('/dashboard')
+  // Checks for /admin, /trainer, /dancer, and /dashboard
+  const isDashboard =
+    location.pathname.startsWith('/admin') ||
+    location.pathname.startsWith('/trainer') ||
+    location.pathname.startsWith('/dancer') ||
+    location.pathname.startsWith('/dashboard') ||
+    location.pathname.startsWith('/trainer-dashboard') // specific check from other branch logic if needed
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-gray-950">
-      <header className="border-amber-900/20 border-b bg-gray-950 flex-none z-50 relative">
-        <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-8">
-            <Link to="/" className="flex items-center gap-3">
-              <img src="/logos/logo-transparent.png" alt="Dance United" className="h-16 w-auto" />
-              <ShinyText as="span" variant="title" className="text-3xl">
-                dance united
-              </ShinyText>
-            </Link>
+    <div className={`flex flex-col bg-gray-950 ${isDashboard ? 'h-screen overflow-hidden' : 'min-h-screen'}`}>
+      {!isDashboard && (
+        <header className="border-amber-900/20 border-b bg-gray-950 flex-none z-50 relative">
+          <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+            <div className="flex items-center gap-8">
+              <Link to="/" className="flex items-center gap-3">
+                <img src="/logos/logo-transparent.png" alt="Dance United" className="h-16 w-auto" />
+                <ShinyText as="span" variant="title" className="text-3xl">
+                  dance united
+                </ShinyText>
+              </Link>
 
-            {/* Desktop Navigation */}
-            <div className="hidden items-center gap-6 md:flex">
-              <Link to="/about">
-                <ShinyText
-                  variant="body"
-                  className="text-xl uppercase tracking-wider transition-colors hover:text-gold"
-                >
-                  About Us
-                </ShinyText>
-              </Link>
-              <Link to="/team">
-                <ShinyText
-                  variant="body"
-                  className="text-xl uppercase tracking-wider transition-colors hover:text-gold"
-                >
-                  Team
-                </ShinyText>
-              </Link>
-              <Link to="/pricing">
-                <ShinyText
-                  variant="body"
-                  className="text-xl uppercase tracking-wider transition-colors hover:text-gold"
-                >
-                  Pricing
-                </ShinyText>
-              </Link>
-              <Link to="/schedule">
-                <ShinyText
-                  variant="body"
-                  className="text-xl uppercase tracking-wider transition-colors hover:text-gold"
-                >
-                  Schedule
-                </ShinyText>
-              </Link>
-              <Link to="/contact">
-                <ShinyText
-                  variant="body"
-                  className="text-xl uppercase tracking-wider transition-colors hover:text-gold"
-                >
-                  Contact
-                </ShinyText>
-              </Link>
-              <Link to="/gallery">
-                <ShinyText
-                  variant="body"
-                  className="text-xl uppercase tracking-wider transition-colors hover:text-gold"
-                >
-                  Gallery
-                </ShinyText>
-              </Link>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            {user ? (
-              <details className="group relative">
-                <summary className="flex cursor-pointer list-none items-center gap-2 transition-colors hover:text-amber-400 [&::webkit-details-marker]:hidden">
-                  <UserIcon className="h-5 w-5 text-amber-500" />
-                  <ShinyText variant="body" className="text-sm">
-                    {user.firstName}
+              {/* Desktop Navigation */}
+              <div className="hidden items-center gap-6 md:flex">
+                <Link to="/about">
+                  <ShinyText
+                    variant="body"
+                    className="text-xl uppercase tracking-wider transition-colors hover:text-gold"
+                  >
+                    About Us
                   </ShinyText>
-                  <ChevronDown className="h-4 w-4 text-amber-500/70 transition-transform group-open:rotate-180" />
-                </summary>
+                </Link>
+                <Link to="/team">
+                  <ShinyText
+                    variant="body"
+                    className="text-xl uppercase tracking-wider transition-colors hover:text-gold"
+                  >
+                    Team
+                  </ShinyText>
+                </Link>
+                <Link to="/pricing">
+                  <ShinyText
+                    variant="body"
+                    className="text-xl uppercase tracking-wider transition-colors hover:text-gold"
+                  >
+                    Pricing
+                  </ShinyText>
+                </Link>
+                <Link to="/schedule">
+                  <ShinyText
+                    variant="body"
+                    className="text-xl uppercase tracking-wider transition-colors hover:text-gold"
+                  >
+                    Schedule
+                  </ShinyText>
+                </Link>
+                <Link to="/contact">
+                  <ShinyText
+                    variant="body"
+                    className="text-xl uppercase tracking-wider transition-colors hover:text-gold"
+                  >
+                    Contact
+                  </ShinyText>
+                </Link>
+                <Link to="/gallery">
+                  <ShinyText
+                    variant="body"
+                    className="text-xl uppercase tracking-wider transition-colors hover:text-gold"
+                  >
+                    Gallery
+                  </ShinyText>
+                </Link>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              {user ? (
+                <details className="group relative">
+                  <summary className="flex cursor-pointer list-none items-center gap-2 transition-colors hover:text-amber-400 [&::webkit-details-marker]:hidden">
+                    <UserIcon className="h-5 w-5 text-amber-500" />
+                    <ShinyText variant="body" className="text-sm">
+                      {user.firstName}
+                    </ShinyText>
+                    <ChevronDown className="h-4 w-4 text-amber-500/70 transition-transform group-open:rotate-180" />
+                  </summary>
 
-                <div className="absolute top-full right-0 z-50 mt-2 flex w-56 flex-col gap-1 rounded-xl border border-amber-900/30 bg-gray-950 py-2 shadow-2xl backdrop-blur-md">
-                  {/* Dashboard Link */}
-                  {(user.role === 'DANCER' || user.role === 'TRAINER' || user.role === 'MANAGER') && (
+                  <div className="absolute top-full right-0 z-50 mt-2 flex w-56 flex-col gap-1 rounded-xl border border-amber-900/30 bg-gray-950 py-2 shadow-2xl backdrop-blur-md">
+                    {/* Dashboard Link */}
+                    {(user.role === 'DANCER' || user.role === 'TRAINER' || user.role === 'MANAGER') && (
+                      <Link
+                        to={
+                          user.role === 'MANAGER'
+                            ? '/admin/dashboard'
+                            : user.role === 'TRAINER'
+                              ? '/trainer/dashboard' // Updated to standard path
+                              : '/dancer/dashboard' // Updated to standard path
+                        }
+                        className="flex items-center gap-3 px-4 py-2 text-amber-50/80 text-sm transition-colors hover:bg-amber-900/20 hover:text-amber-100"
+                      >
+                        <LayoutDashboard className="h-4 w-4" />
+                        Dashboard
+                      </Link>
+                    )}
+
+                    {/* Settings / Profile */}
                     <Link
-                      to={
-                        user.role === 'MANAGER'
-                          ? '/admin/dashboard'
-                          : user.role === 'TRAINER'
-                            ? '/trainer/dashboard'
-                            : '/dashboard'
-                      }
+                      to="/profile"
                       className="flex items-center gap-3 px-4 py-2 text-amber-50/80 text-sm transition-colors hover:bg-amber-900/20 hover:text-amber-100"
                     >
-                      <LayoutDashboard className="h-4 w-4" />
-                      Dashboard
+                      <Settings className="h-4 w-4" />
+                      Settings
                     </Link>
-                  )}
 
-                  {/* Settings / Profile */}
-                  <Link
-                    to="/profile"
-                    className="flex items-center gap-3 px-4 py-2 text-amber-50/80 text-sm transition-colors hover:bg-amber-900/20 hover:text-amber-100"
-                  >
-                    <Settings className="h-4 w-4" />
-                    Settings
-                  </Link>
+                    <div className="my-1 border-amber-900/20 border-t" />
 
-                  <div className="my-1 border-amber-900/20 border-t" />
+                    {/* Logout */}
+                    <Form method="post" action="/api/auth/logout" className="w-full">
+                      <button
+                        type="submit"
+                        className="flex w-full items-center gap-3 px-4 py-2 text-left text-red-300 text-sm transition-colors hover:bg-red-900/20 hover:text-red-200"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        Logout
+                      </button>
+                    </Form>
+                  </div>
 
-                  {/* Logout */}
-                  <Form method="post" action="/api/auth/logout" className="w-full">
-                    <button
-                      type="submit"
-                      className="flex w-full items-center gap-3 px-4 py-2 text-left text-red-300 text-sm transition-colors hover:bg-red-900/20 hover:text-red-200"
-                    >
-                      <LogOut className="h-4 w-4" />
-                      Logout
-                    </button>
-                  </Form>
-                </div>
-
-                {/* Backdrop to close on click outside */}
-                <div
-                  className="fixed inset-0 z-40 hidden group-open:block"
-                  onClick={(e) => {
-                    const details = e.currentTarget.parentElement as HTMLDetailsElement
-                    details.removeAttribute('open')
-                  }}
-                />
-              </details>
-            ) : (
-              <>
-                <MetallicLink to="/login" className="rounded-md border-2 px-4 py-2 text-sm">
-                  Login
-                </MetallicLink>
-                <MetallicLink to="/register" className="rounded-md border-2 px-4 py-2 text-sm">
-                  Register
-                </MetallicLink>
-              </>
-            )}
-          </div>
-        </nav>
-      </header>
+                  {/* Backdrop to close on click outside */}
+                  <div
+                    className="fixed inset-0 z-40 hidden group-open:block"
+                    onClick={(e) => {
+                      const details = e.currentTarget.parentElement as HTMLDetailsElement
+                      details.removeAttribute('open')
+                    }}
+                  />
+                </details>
+              ) : (
+                <>
+                  <MetallicLink to="/login" className="rounded-md border-2 px-4 py-2 text-sm">
+                    Login
+                  </MetallicLink>
+                  <MetallicLink to="/register" className="rounded-md border-2 px-4 py-2 text-sm">
+                    Register
+                  </MetallicLink>
+                </>
+              )}
+            </div>
+          </nav>
+        </header>
+      )}
       <main className={`flex-1 bg-gray-950 ${isDashboard ? 'overflow-hidden relative' : 'overflow-y-auto'}`}>
         <Outlet />
       </main>

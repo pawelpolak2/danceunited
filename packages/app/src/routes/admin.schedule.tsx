@@ -6,7 +6,7 @@ import { EditTemplateModal } from '../components/configuration/EditTemplateModal
 import { DashboardCalendar } from '../components/dashboard/DashboardCalendar'
 import { EditClassModal } from '../components/dashboard/EditClassModal'
 import { ScheduleClassModal } from '../components/dashboard/ScheduleClassModal'
-import { MetallicButton, ShinyText } from '../components/ui'
+import { ConfirmModal, MetallicButton, ShinyText } from '../components/ui'
 import { getCurrentUser } from '../lib/auth.server'
 import type { Route } from './+types/admin.schedule'
 
@@ -286,6 +286,7 @@ export default function AdminSchedulePage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
   const [selectedClass, setSelectedClass] = useState<(typeof classes)[0] | null>(null)
+  const [moveConfirmation, setMoveConfirmation] = useState<EventDropArg | null>(null)
 
   // Close modals on success
   if (fetcher.data?.success) {
@@ -319,27 +320,9 @@ export default function AdminSchedulePage() {
     [classes]
   ) // `classes` might change, so this callback changes.
 
-  const handleEventDrop = useCallback(
-    (dropInfo: EventDropArg) => {
-      // Confirm? Or just save.
-      if (!confirm(`Move ${dropInfo.event.title} to ${dropInfo.event.start?.toLocaleString()}?`)) {
-        dropInfo.revert()
-        return
-      }
-
-      // Optimistic UI handled by fullcalendar, but we need to send data
-      const formData = new FormData()
-      formData.append('intent', 'moveClass')
-      formData.append('classInstanceId', dropInfo.event.id)
-      formData.append('startTime', dropInfo.event.start?.toISOString() || '')
-      // We don't have recurrence scope prompt here easily, assuming single instance move for Drag&Drop for simplicity
-      // Or we could trigger a modal. For now, SINGLE move.
-      formData.append('updateScope', 'single')
-
-      fetcher.submit(formData, { method: 'post' })
-    },
-    [fetcher]
-  )
+  const handleEventDrop = useCallback((dropInfo: EventDropArg) => {
+    setMoveConfirmation(dropInfo)
+  }, [])
 
   // Memoize events array for the calendar
   // Use `useMemo` on `events` from loaderData if it's passed directly?
@@ -409,6 +392,28 @@ export default function AdminSchedulePage() {
         onClose={() => setIsEditModalOpen(false)}
         classInstance={selectedClass}
         trainers={trainers}
+      />
+
+      <ConfirmModal
+        isOpen={!!moveConfirmation}
+        onClose={() => {
+          moveConfirmation?.revert()
+          setMoveConfirmation(null)
+        }}
+        onConfirm={() => {
+          if (moveConfirmation) {
+            const formData = new FormData()
+            formData.append('intent', 'moveClass')
+            formData.append('classInstanceId', moveConfirmation.event.id)
+            formData.append('startTime', moveConfirmation.event.start?.toISOString() || '')
+            formData.append('updateScope', 'single')
+            fetcher.submit(formData, { method: 'post' })
+            setMoveConfirmation(null)
+          }
+        }}
+        title="Reschedule Class"
+        description={`Are you sure you want to move "${moveConfirmation?.event.title}" to ${moveConfirmation?.event.start?.toLocaleString()}?`}
+        confirmLabel="Move Class"
       />
     </div>
   )

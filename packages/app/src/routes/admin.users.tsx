@@ -211,6 +211,7 @@ export default function AdminUsersPage() {
   const [query, setQuery] = useState(search)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingUser, setEditingUser] = useState<any>(null)
+  const [_deletingUserId, _setDeletingUserId] = useState<string | null>(null)
 
   // Close modal on success
   useEffect(() => {
@@ -315,7 +316,11 @@ export default function AdminUsersPage() {
               </tr>
             ) : (
               users.map((user) => (
-                <tr key={user.id} className="group transition-colors hover:bg-white/5">
+                <tr
+                  key={user.id}
+                  className="group cursor-pointer transition-colors hover:bg-white/5"
+                  onClick={() => handleEdit(user)}
+                >
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                       <div className="flex h-10 w-10 items-center justify-center rounded-full border border-amber-500/20 bg-gradient-to-br from-gray-800 to-gray-900 font-serif text-amber-500">
@@ -360,22 +365,26 @@ export default function AdminUsersPage() {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex w-full justify-end">
-                      <div className="flex justify-end gap-2">
+                      <div className="flex justify-end gap-2" onClick={(e) => e.stopPropagation()}>
                         <button
                           type="button"
-                          onClick={() => handleEdit(user)}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleEdit(user)
+                          }}
                           className="p-1 text-amber-500/80 transition-colors hover:text-amber-500"
                           title="Edit User"
                         >
                           <Pencil size={16} />
                         </button>
 
-                        <Form method="post" style={{ display: 'inline' }}>
+                        <Form method="post" style={{ display: 'inline' }} onSubmit={(e) => e.stopPropagation()}>
                           <input type="hidden" name="intent" value="toggle-user-active" />
                           <input type="hidden" name="userId" value={user.id} />
                           <input type="hidden" name="isActive" value={user.isActive ? 'false' : 'true'} />
                           <button
                             type="submit"
+                            onClick={(e) => e.stopPropagation()}
                             className={`p-1 transition-colors ${user.isActive ? 'text-amber-600 hover:text-amber-500' : 'text-green-600 hover:text-green-500'}`}
                             title={user.isActive ? 'Deactivate' : 'Activate'}
                           >
@@ -396,13 +405,20 @@ export default function AdminUsersPage() {
                             >
                               <Form
                                 method="post"
-                                onSubmit={(e) => !confirm('Permanently delete this user?') && e.preventDefault()}
+                                onSubmit={(e) => {
+                                  e.stopPropagation()
+                                  if (!confirm('Permanently delete this user?')) {
+                                    e.preventDefault()
+                                  }
+                                }}
                                 style={{ display: 'inline' }}
+                                onClick={(e) => e.stopPropagation()}
                               >
                                 <input type="hidden" name="intent" value="delete-user" />
                                 <input type="hidden" name="userId" value={user.id} />
                                 <button
                                   type="submit"
+                                  onClick={(e) => e.stopPropagation()}
                                   disabled={!canDelete}
                                   className={`p-1 transition-colors ${
                                     canDelete ? 'text-gray-400 hover:text-red-400' : 'cursor-not-allowed text-gray-600'
