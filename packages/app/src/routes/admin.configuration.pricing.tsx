@@ -5,6 +5,7 @@ import { EditPackageModal } from '../components/configuration/EditPackageModal'
 import { Checkbox } from '../components/ui/Checkbox'
 import { MetallicButton } from '../components/ui/MetallicButton'
 import { ShinyText } from '../components/ui/ShinyText'
+import { StatusBadge } from '../components/ui/StatusBadge'
 import type { Route } from './+types/admin.configuration.pricing'
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
@@ -268,15 +269,7 @@ export default function PricingConfiguration() {
                     <td className="px-4 py-3 text-gray-300 text-sm">{pkg.validityDays} days</td>
                     <td className="px-4 py-3 font-bold text-gold">{Number(pkg.price).toFixed(2)} zł</td>
                     <td className="px-4 py-3">
-                      {pkg.isActive ? (
-                        <span className="rounded border border-green-800 bg-green-900/40 px-2 py-1 text-green-400 text-xs">
-                          Active
-                        </span>
-                      ) : (
-                        <span className="rounded border border-red-800 bg-red-900/40 px-2 py-1 text-red-400 text-xs">
-                          Inactive
-                        </span>
-                      )}
+                      <StatusBadge isActive={pkg.isActive} />
                     </td>
                     <td className="px-4 py-3 text-right">
                       <div className="flex justify-end gap-2">
