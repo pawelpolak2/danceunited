@@ -5,6 +5,7 @@ import { ConfirmModal } from '../ui/ConfirmModal'
 import { MetallicButton } from '../ui/MetallicButton'
 import { MetallicDateTimePicker } from '../ui/MetallicDateTimePicker'
 import { Modal } from '../ui/Modal'
+import { Radio } from '../ui/Radio'
 
 interface ClassTemplate {
   name: string
@@ -159,32 +160,24 @@ export function EditClassModal({ isOpen, onClose, classInstance, trainers }: Edi
             <label className="block font-cinzel font-medium text-amber-100/80 text-sm">Update Scope</label>
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
-                <input
-                  type="radio"
+                <Radio
                   id="scope-single"
                   name="updateScope"
                   value="single"
                   checked={updateScope === 'single'}
                   onChange={() => setUpdateScope('single')}
-                  className="border-amber-900/30 bg-gray-900 text-amber-500"
+                  label="Only this class"
                 />
-                <label htmlFor="scope-single" className="text-gray-300 text-sm">
-                  Only this class
-                </label>
               </div>
               <div className="flex items-center gap-2">
-                <input
-                  type="radio"
+                <Radio
                   id="scope-series"
                   name="updateScope"
                   value="series"
                   checked={updateScope === 'series'}
                   onChange={() => setUpdateScope('series')}
-                  className="border-amber-900/30 bg-gray-900 text-amber-500"
+                  label="All classes in this series"
                 />
-                <label htmlFor="scope-series" className="text-gray-300 text-sm">
-                  All classes in this series
-                </label>
               </div>
             </div>
           </div>

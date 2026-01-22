@@ -3,13 +3,21 @@ import { useState } from 'react'
 import { Form, redirect, useActionData, useNavigation } from 'react-router'
 import { LegalConsents } from '../components/auth/LegalConsents'
 import { FormError, FormField, MetallicButton, ShinyText } from '../components/ui'
-import { createSessionCookie, hashPassword } from '../lib/auth.server'
+import { createSessionCookie, getCurrentUser, hashPassword } from '../lib/auth.server'
 import { validateRegistration } from '../lib/validation'
 import type { Route } from './+types/register'
 
 // biome-ignore lint/correctness/noEmptyPattern: this is boilerplate code!
 export function meta({}: Route.MetaArgs) {
   return [{ title: 'Register - Dance United' }, { name: 'description', content: 'Create a new Dance United account' }]
+}
+
+export async function loader({ request }: Route.LoaderArgs) {
+  const user = await getCurrentUser(request)
+  if (user) {
+    return redirect(user.role === 'MANAGER' ? '/admin/dashboard' : '/schedule')
+  }
+  return null
 }
 
 export async function action({ request }: Route.ActionArgs) {

@@ -1,13 +1,21 @@
 import { prisma } from 'db'
 import { Form, redirect, useActionData, useNavigation } from 'react-router'
 import { FormError, FormField, MetallicButton, ShinyText } from '../components/ui'
-import { createSessionCookie, verifyPassword } from '../lib/auth.server'
+import { createSessionCookie, getCurrentUser, verifyPassword } from '../lib/auth.server'
 import { validateLogin } from '../lib/validation'
 import type { Route } from './+types/login'
 
 // biome-ignore lint/correctness/noEmptyPattern: this is boilerplate code!
 export function meta({}: Route.MetaArgs) {
   return [{ title: 'Login - Dance United' }, { name: 'description', content: 'Login to your Dance United account' }]
+}
+
+export async function loader({ request }: Route.LoaderArgs) {
+  const user = await getCurrentUser(request)
+  if (user) {
+    return redirect(user.role === 'MANAGER' ? '/admin/dashboard' : '/schedule')
+  }
+  return null
 }
 
 export async function action({ request }: Route.ActionArgs) {
