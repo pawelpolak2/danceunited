@@ -5,6 +5,7 @@ import { Combobox } from '../ui/Combobox'
 import { MetallicButton } from '../ui/MetallicButton'
 import { MetallicDateTimePicker } from '../ui/MetallicDateTimePicker'
 import { Modal } from '../ui/Modal'
+import { Radio } from '../ui/Radio'
 
 interface ClassTemplate {
   id: string
@@ -134,17 +135,7 @@ export function ScheduleClassModal({ isOpen, onClose, templates, defaultDate }: 
               <label className="mb-1 block font-cinzel text-amber-100/60 text-sm">Ends</label>
 
               <div className="mb-2 flex items-center gap-2">
-                <input
-                  type="radio"
-                  id="end-count"
-                  name="recurrenceEndType"
-                  value="count"
-                  defaultChecked
-                  className="border-amber-900/30 bg-gray-900 text-amber-500"
-                />
-                <label htmlFor="end-count" className="text-gray-300 text-sm">
-                  After
-                </label>
+                <Radio id="end-count" name="recurrenceEndType" value="count" defaultChecked label="After" />
                 <input
                   type="number"
                   name="recurrenceCount"
@@ -157,16 +148,7 @@ export function ScheduleClassModal({ isOpen, onClose, templates, defaultDate }: 
               </div>
 
               <div className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  id="end-date"
-                  name="recurrenceEndType"
-                  value="date"
-                  className="border-amber-900/30 bg-gray-900 text-amber-500"
-                />
-                <label htmlFor="end-date" className="text-gray-300 text-sm">
-                  On
-                </label>
+                <Radio id="end-date" name="recurrenceEndType" value="date" label="On" />
                 <input
                   type="date"
                   name="recurrenceEndDate"
