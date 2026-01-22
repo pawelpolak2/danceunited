@@ -343,19 +343,19 @@ export default function AdminSchedulePage() {
           </ShinyText>
           <p className="text-gray-400 text-sm">Manage all classes (Drag & Drop to reschedule)</p>
         </div>
-        <div className="flex gap-3 w-full md:w-auto">
+        <div className="flex w-full gap-3 md:w-auto">
           <MetallicButton
             onClick={() => {
               setSelectedDate(new Date())
               setIsScheduleModalOpen(true)
             }}
-            className="rounded-md border-2 px-4 py-2 text-sm flex-1 md:flex-none"
+            className="flex-1 rounded-md border-2 px-4 py-2 text-sm md:flex-none"
           >
             + Schedule Class
           </MetallicButton>
           <MetallicButton
             onClick={() => setIsTemplateModalOpen(true)}
-            className="rounded-md border-2 px-4 py-2 text-sm flex-1 md:flex-none"
+            className="flex-1 rounded-md border-2 px-4 py-2 text-sm md:flex-none"
           >
             + New Template
           </MetallicButton>

@@ -83,7 +83,7 @@ export default function App() {
   return (
     <div className={`flex flex-col bg-gray-950 ${isDashboard ? 'h-screen overflow-hidden' : 'min-h-screen'}`}>
       {!isDashboard && (
-        <header className="border-amber-900/20 border-b bg-gray-950 flex-none z-50 relative">
+        <header className="relative z-50 flex-none border-amber-900/20 border-b bg-gray-950">
           <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
             <div className="flex items-center gap-8">
               <Link to="/" className="flex items-center gap-3">
@@ -220,10 +220,10 @@ export default function App() {
           </nav>
         </header>
       )}
-      <main className={`flex-1 bg-gray-950 ${isDashboard ? 'overflow-hidden relative' : 'overflow-y-auto'}`}>
+      <main className={`flex-1 bg-gray-950 ${isDashboard ? 'relative overflow-hidden' : 'overflow-y-auto'}`}>
         <Outlet />
       </main>
-      <footer className="border-amber-900/20 border-t bg-gray-950 py-8 flex-none">
+      <footer className="flex-none border-amber-900/20 border-t bg-gray-950 py-8">
         <div className="mx-auto max-w-7xl px-4 text-center text-sm">
           <ShinyText variant="body">&copy; {new Date().getFullYear()} dance united. All rights reserved.</ShinyText>
         </div>

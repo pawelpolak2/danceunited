@@ -16,7 +16,7 @@
 
 /* Make all calendar text shiny */
 .dashboard-calendar .fc-button,
-.dashboard-calendar .fc-button-group>.fc-button {
+.dashboard-calendar .fc-button-group > .fc-button {
   position: relative;
 }
 
@@ -117,24 +117,26 @@
 /* Style the icon buttons (prev/next arrows) */
 .dashboard-calendar .fc-button .fc-icon {
   color: transparent;
-  background: linear-gradient(135deg,
-      #ffffff 0%,
-      #fff9e6 3%,
-      #ffed4e 8%,
-      #ffd700 15%,
-      #ffc125 22%,
-      #daa520 28%,
-      #b8860b 35%,
-      #daa520 42%,
-      #ffc125 50%,
-      #ffd700 58%,
-      #ffc125 65%,
-      #daa520 72%,
-      #ffd700 78%,
-      #ffed4e 85%,
-      #fff9e6 92%,
-      #ffffff 97%,
-      #ffd700 100%);
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #fff9e6 3%,
+    #ffed4e 8%,
+    #ffd700 15%,
+    #ffc125 22%,
+    #daa520 28%,
+    #b8860b 35%,
+    #daa520 42%,
+    #ffc125 50%,
+    #ffd700 58%,
+    #ffc125 65%,
+    #daa520 72%,
+    #ffd700 78%,
+    #ffed4e 85%,
+    #fff9e6 92%,
+    #ffffff 97%,
+    #ffd700 100%
+  );
   background-size: 500% 500%;
   background-clip: text;
   -webkit-background-clip: text;
@@ -177,10 +179,7 @@
   position: relative;
   z-index: 1;
   /* Simpler Gold Gradient Text */
-  background: linear-gradient(135deg,
-      #ffd700 0%,
-      #ffc125 50%,
-      #daa520 100%);
+  background: linear-gradient(135deg, #ffd700 0%, #ffc125 50%, #daa520 100%);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -198,24 +197,26 @@
   font-weight: 500;
   position: relative;
   z-index: 1;
-  background: linear-gradient(135deg,
-      #ffffff 0%,
-      #fff9e6 3%,
-      #ffed4e 8%,
-      #ffd700 15%,
-      #ffc125 22%,
-      #daa520 28%,
-      #b8860b 35%,
-      #daa520 42%,
-      #ffc125 50%,
-      #ffd700 58%,
-      #ffc125 65%,
-      #daa520 72%,
-      #ffd700 78%,
-      #ffed4e 85%,
-      #fff9e6 92%,
-      #ffffff 97%,
-      #ffd700 100%);
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #fff9e6 3%,
+    #ffed4e 8%,
+    #ffd700 15%,
+    #ffc125 22%,
+    #daa520 28%,
+    #b8860b 35%,
+    #daa520 42%,
+    #ffc125 50%,
+    #ffd700 58%,
+    #ffc125 65%,
+    #daa520 72%,
+    #ffd700 78%,
+    #ffed4e 85%,
+    #fff9e6 92%,
+    #ffffff 97%,
+    #ffd700 100%
+  );
   background-size: 500% 500%;
   background-clip: text;
   -webkit-background-clip: text;
@@ -231,16 +232,18 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(90deg,
-      transparent 0%,
-      transparent 25%,
-      rgba(255, 255, 255, 0.3) 35%,
-      rgba(255, 255, 255, 0.8) 45%,
-      rgba(255, 255, 255, 1) 50%,
-      rgba(255, 255, 255, 0.8) 55%,
-      rgba(255, 255, 255, 0.3) 65%,
-      transparent 75%,
-      transparent 100%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 25%,
+    rgba(255, 255, 255, 0.3) 35%,
+    rgba(255, 255, 255, 0.8) 45%,
+    rgba(255, 255, 255, 1) 50%,
+    rgba(255, 255, 255, 0.8) 55%,
+    rgba(255, 255, 255, 0.3) 65%,
+    transparent 75%,
+    transparent 100%
+  );
   background-size: 500% 100%;
   background-clip: text;
   -webkit-background-clip: text;
@@ -282,24 +285,26 @@
 .dashboard-calendar .fc-timegrid-axis-cushion {
   position: relative;
   z-index: 1;
-  background: linear-gradient(135deg,
-      #ffffff 0%,
-      #fff9e6 3%,
-      #ffed4e 8%,
-      #ffd700 15%,
-      #ffc125 22%,
-      #daa520 28%,
-      #b8860b 35%,
-      #daa520 42%,
-      #ffc125 50%,
-      #ffd700 58%,
-      #ffc125 65%,
-      #daa520 72%,
-      #ffd700 78%,
-      #ffed4e 85%,
-      #fff9e6 92%,
-      #ffffff 97%,
-      #ffd700 100%);
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #fff9e6 3%,
+    #ffed4e 8%,
+    #ffd700 15%,
+    #ffc125 22%,
+    #daa520 28%,
+    #b8860b 35%,
+    #daa520 42%,
+    #ffc125 50%,
+    #ffd700 58%,
+    #ffc125 65%,
+    #daa520 72%,
+    #ffd700 78%,
+    #ffed4e 85%,
+    #fff9e6 92%,
+    #ffffff 97%,
+    #ffd700 100%
+  );
   background-size: 500% 500%;
   background-clip: text;
   -webkit-background-clip: text;
@@ -315,16 +320,18 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(90deg,
-      transparent 0%,
-      transparent 25%,
-      rgba(255, 255, 255, 0.3) 35%,
-      rgba(255, 255, 255, 0.8) 45%,
-      rgba(255, 255, 255, 1) 50%,
-      rgba(255, 255, 255, 0.8) 55%,
-      rgba(255, 255, 255, 0.3) 65%,
-      transparent 75%,
-      transparent 100%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 25%,
+    rgba(255, 255, 255, 0.3) 35%,
+    rgba(255, 255, 255, 0.8) 45%,
+    rgba(255, 255, 255, 1) 50%,
+    rgba(255, 255, 255, 0.8) 55%,
+    rgba(255, 255, 255, 0.3) 65%,
+    transparent 75%,
+    transparent 100%
+  );
   background-size: 500% 100%;
   background-clip: text;
   -webkit-background-clip: text;
@@ -337,24 +344,26 @@
 .dashboard-calendar .fc-toolbar-title {
   position: relative;
   z-index: 1;
-  background: linear-gradient(135deg,
-      #ffffff 0%,
-      #fff9e6 3%,
-      #ffed4e 8%,
-      #ffd700 15%,
-      #ffc125 22%,
-      #daa520 28%,
-      #b8860b 35%,
-      #daa520 42%,
-      #ffc125 50%,
-      #ffd700 58%,
-      #ffc125 65%,
-      #daa520 72%,
-      #ffd700 78%,
-      #ffed4e 85%,
-      #fff9e6 92%,
-      #ffffff 97%,
-      #ffd700 100%);
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #fff9e6 3%,
+    #ffed4e 8%,
+    #ffd700 15%,
+    #ffc125 22%,
+    #daa520 28%,
+    #b8860b 35%,
+    #daa520 42%,
+    #ffc125 50%,
+    #ffd700 58%,
+    #ffc125 65%,
+    #daa520 72%,
+    #ffd700 78%,
+    #ffed4e 85%,
+    #fff9e6 92%,
+    #ffffff 97%,
+    #ffd700 100%
+  );
   background-size: 500% 500%;
   background-clip: text;
   -webkit-background-clip: text;
@@ -371,16 +380,18 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(90deg,
-      transparent 0%,
-      transparent 25%,
-      rgba(255, 255, 255, 0.3) 35%,
-      rgba(255, 255, 255, 0.8) 45%,
-      rgba(255, 255, 255, 1) 50%,
-      rgba(255, 255, 255, 0.8) 55%,
-      rgba(255, 255, 255, 0.3) 65%,
-      transparent 75%,
-      transparent 100%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 25%,
+    rgba(255, 255, 255, 0.3) 35%,
+    rgba(255, 255, 255, 0.8) 45%,
+    rgba(255, 255, 255, 1) 50%,
+    rgba(255, 255, 255, 0.8) 55%,
+    rgba(255, 255, 255, 0.3) 65%,
+    transparent 75%,
+    transparent 100%
+  );
   background-size: 500% 100%;
   background-clip: text;
   -webkit-background-clip: text;
@@ -392,7 +403,7 @@
 
 /* Consistent Golden Borders */
 .dashboard-calendar .fc-scrollgrid,
-.dashboard-calendar .fc-scrollgrid-section-header>td,
+.dashboard-calendar .fc-scrollgrid-section-header > td,
 .dashboard-calendar .fc-scrollgrid td,
 .dashboard-calendar .fc-scrollgrid th,
 .dashboard-calendar .fc-col-header-cell,

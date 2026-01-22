@@ -6,7 +6,7 @@ import { validateLogin } from '../lib/validation'
 import type { Route } from './+types/login'
 
 // biome-ignore lint/correctness/noEmptyPattern: this is boilerplate code!
-export function meta({ }: Route.MetaArgs) {
+export function meta({}: Route.MetaArgs) {
   return [{ title: 'Login - Dance United' }, { name: 'description', content: 'Login to your Dance United account' }]
 }
 
