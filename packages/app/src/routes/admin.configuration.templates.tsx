@@ -282,7 +282,14 @@ export default function TemplatesConfiguration() {
                 </tr>
               ) : (
                 filteredTemplates.map((tpl) => (
-                  <tr key={tpl.id} className="border-white/5 border-b transition-colors hover:bg-white/5">
+                  <tr
+                    key={tpl.id}
+                    className="cursor-pointer border-white/5 border-b transition-colors hover:bg-white/5"
+                    onClick={() => {
+                      setSelectedTemplate(tpl)
+                      setIsModalOpen(true)
+                    }}
+                  >
                     <td className="px-4 py-3">
                       <div className="font-medium text-white">{tpl.name}</div>
                       {tpl.description && <div className="text-gray-500 text-xs">{tpl.description}</div>}
@@ -311,10 +318,11 @@ export default function TemplatesConfiguration() {
                       <StatusBadge isActive={tpl.isActive} />
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <div className="flex justify-end gap-2">
+                      <div className="flex justify-end gap-2" onClick={(e) => e.stopPropagation()}>
                         <button
                           type="button"
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation()
                             setSelectedTemplate(tpl)
                             setIsModalOpen(true)
                           }}
@@ -325,12 +333,13 @@ export default function TemplatesConfiguration() {
                         </button>
 
                         {/* Deactivate/Activate Toggle */}
-                        <Form method="post" style={{ display: 'inline' }}>
+                        <Form method="post" style={{ display: 'inline' }} onSubmit={(e) => e.stopPropagation()}>
                           <input type="hidden" name="intent" value="toggle_template_active" />
                           <input type="hidden" name="id" value={tpl.id} />
                           <input type="hidden" name="isActive" value={tpl.isActive ? 'false' : 'true'} />
                           <button
                             type="submit"
+                            onClick={(e) => e.stopPropagation()}
                             className={`p-1 transition-colors ${tpl.isActive ? 'text-amber-600 hover:text-amber-500' : 'text-green-600 hover:text-green-500'}`}
                             title={tpl.isActive ? 'Deactivate' : 'Activate'}
                           >
@@ -346,6 +355,7 @@ export default function TemplatesConfiguration() {
                           <Form
                             method="post"
                             onSubmit={(e) => {
+                              e.stopPropagation()
                               if (tpl._count.classInstances > 0) {
                                 e.preventDefault()
                                 return
@@ -353,11 +363,13 @@ export default function TemplatesConfiguration() {
                               if (!confirm('Permanently delete this template?')) e.preventDefault()
                             }}
                             style={{ display: 'inline' }}
+                            onClick={(e) => e.stopPropagation()}
                           >
                             <input type="hidden" name="intent" value="delete_template" />
                             <input type="hidden" name="id" value={tpl.id} />
                             <button
                               type="submit"
+                              onClick={(e) => e.stopPropagation()}
                               disabled={tpl._count.classInstances > 0}
                               className={`p-1 transition-colors ${
                                 tpl._count.classInstances > 0
