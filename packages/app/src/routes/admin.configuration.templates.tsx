@@ -74,7 +74,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
     const hallId = formData.get('hallId') as any
     const level = formData.get('level') as any
     const duration = parseInt(formData.get('duration') as string) * 60 // convert to seconds
-    const isActive = formData.get('isActive') === 'on'
+    const isActive = true // Default to active on creation
     const isIndividual = formData.get('isIndividual') === 'on'
     const isWhitelistEnabled = formData.get('isWhitelistEnabled') === 'on'
 
@@ -122,7 +122,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
     const level = formData.get('level') as any
     const duration = parseInt(formData.get('duration') as string) * 60
 
-    const isActive = formData.get('isActive') === 'on'
+    // isActive is NOT updated here - it's handled by a separate toggle action
     const isIndividual = formData.get('isIndividual') === 'on'
     const isWhitelistEnabled = formData.get('isWhitelistEnabled') === 'on'
 
@@ -136,7 +136,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
         hallId,
         level,
         duration,
-        isActive,
+        // isActive is preserved
         isIndividual,
         isWhitelistEnabled,
       },

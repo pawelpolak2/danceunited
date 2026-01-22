@@ -59,7 +59,6 @@ export function EditTemplateModal({ isOpen, onClose, template, styles, trainers,
   const [level, setLevel] = useState('OPEN')
   const [duration, setDuration] = useState(60) // minutes
   const [isIndividual, setIsIndividual] = useState(false)
-  const [isActive, setIsActive] = useState(true)
   const [isWhitelistEnabled, setIsWhitelistEnabled] = useState(false)
 
   // Create Mode Whitelist State
@@ -77,7 +76,6 @@ export function EditTemplateModal({ isOpen, onClose, template, styles, trainers,
         setLevel(template.level)
         setDuration(Math.round(template.duration / 60))
         setIsIndividual(template.isIndividual)
-        setIsActive(template.isActive)
         setIsWhitelistEnabled(template.isWhitelistEnabled)
       } else {
         // Defaults for Create
@@ -89,7 +87,6 @@ export function EditTemplateModal({ isOpen, onClose, template, styles, trainers,
         setLevel('OPEN')
         setDuration(60)
         setIsIndividual(false)
-        setIsActive(true)
         setIsWhitelistEnabled(false)
         setPendingWhitelist([])
       }
@@ -230,13 +227,6 @@ export function EditTemplateModal({ isOpen, onClose, template, styles, trainers,
             checked={isIndividual}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setIsIndividual(e.target.checked)}
             label="Individual Class"
-          />
-
-          <Checkbox
-            name="isActive"
-            checked={isActive}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setIsActive(e.target.checked)}
-            label="Active"
           />
 
           <Checkbox
