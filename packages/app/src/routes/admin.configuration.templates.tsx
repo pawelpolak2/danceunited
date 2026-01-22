@@ -6,6 +6,7 @@ import { Checkbox } from '../components/ui/Checkbox'
 import { MetallicButton } from '../components/ui/MetallicButton'
 import { MetallicTooltip } from '../components/ui/MetallicTooltip'
 import { ShinyText } from '../components/ui/ShinyText'
+import { StatusBadge } from '../components/ui/StatusBadge'
 import type { Route } from './+types/admin.configuration.templates'
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
@@ -307,15 +308,7 @@ export default function TemplatesConfiguration() {
                     </td>
                     <td className="px-4 py-3 text-center text-gray-400 text-sm">{tpl._count.classInstances}</td>
                     <td className="px-4 py-3 text-center">
-                      {tpl.isActive ? (
-                        <span className="rounded border border-green-900/40 bg-green-900/20 px-2 py-1 text-green-400 text-xs">
-                          Active
-                        </span>
-                      ) : (
-                        <span className="rounded border border-gray-700 bg-gray-800 px-2 py-1 text-gray-400 text-xs">
-                          Inactive
-                        </span>
-                      )}
+                      <StatusBadge isActive={tpl.isActive} />
                     </td>
                     <td className="px-4 py-3 text-right">
                       <div className="flex justify-end gap-2">
