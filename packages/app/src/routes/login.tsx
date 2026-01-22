@@ -6,7 +6,7 @@ import { validateLogin } from '../lib/validation'
 import type { Route } from './+types/login'
 
 // biome-ignore lint/correctness/noEmptyPattern: this is boilerplate code!
-export function meta({}: Route.MetaArgs) {
+export function meta({ }: Route.MetaArgs) {
   return [{ title: 'Login - Dance United' }, { name: 'description', content: 'Login to your Dance United account' }]
 }
 
@@ -63,8 +63,8 @@ export async function action({ request }: Route.ActionArgs) {
       role: user.role,
     })
 
-    // Redirect to home with session cookie
-    return redirect('/', {
+    // Redirect to dashboard with session cookie
+    return redirect('/dashboard', {
       headers: {
         'Set-Cookie': sessionCookie,
       },

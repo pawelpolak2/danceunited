@@ -20,6 +20,20 @@ export default [
     route('admin/configuration/templates', 'routes/admin.configuration.templates.tsx'),
   ]),
 
+  // Trainer Routes
+  layout('routes/trainer.layout.tsx', [
+    route('trainer/dashboard', 'routes/trainer.dashboard.tsx'),
+    route('trainer/schedule', 'routes/trainer.schedule.tsx'),
+    route('trainer/statistics', 'routes/trainer.statistics.tsx'),
+  ]),
+
+  // Dancer Routes
+  layout('routes/dancer.layout.tsx', [
+    route('dancer/dashboard', 'routes/dancer.dashboard.tsx'),
+    route('dancer/schedule', 'routes/dancer.schedule.tsx'),
+    route('dancer/packages', 'routes/dancer.packages.tsx'),
+  ]),
+
   // Resource Routes
   route('resources/gallery/:category/:filename', 'routes/resources.gallery.$category.$filename.ts'),
 

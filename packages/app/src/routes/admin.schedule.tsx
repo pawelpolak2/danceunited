@@ -353,26 +353,26 @@ export default function AdminSchedulePage() {
 
   return (
     <div className="flex h-full flex-col text-amber-50">
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <ShinyText as="h1" variant="title" className="mb-1 font-serif text-3xl text-amber-400 tracking-wide">
+      <div className="mb-6 flex flex-col items-start justify-between gap-4 md:flex-row md:items-end">
+        <div className="flex flex-col gap-1">
+          <ShinyText as="h1" variant="title" className="font-serif text-3xl text-amber-400 tracking-wide">
             Master Schedule
           </ShinyText>
           <p className="text-gray-400 text-sm">Manage all classes (Drag & Drop to reschedule)</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-3 w-full md:w-auto">
           <MetallicButton
             onClick={() => {
               setSelectedDate(new Date())
               setIsScheduleModalOpen(true)
             }}
-            className="rounded-md border-2 px-4 py-2 text-sm"
+            className="rounded-md border-2 px-4 py-2 text-sm flex-1 md:flex-none"
           >
             + Schedule Class
           </MetallicButton>
           <MetallicButton
             onClick={() => setIsTemplateModalOpen(true)}
-            className="rounded-md border-2 px-4 py-2 text-sm"
+            className="rounded-md border-2 px-4 py-2 text-sm flex-1 md:flex-none"
           >
             + New Template
           </MetallicButton>
