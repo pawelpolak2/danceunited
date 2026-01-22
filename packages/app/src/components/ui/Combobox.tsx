@@ -1,4 +1,4 @@
-import { ChevronDown, Search } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
 interface Option {
@@ -27,33 +27,65 @@ export function Combobox({
   disabled = false,
 }: ComboboxProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
+  const [inputValue, setInputValue] = useState('')
   const containerRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   // Find selected label for display
   const selectedOption = options.find((opt) => opt.value === value)
 
-  // Filter options based on search
-  const filteredOptions = options.filter((opt) => opt.label.toLowerCase().includes(searchQuery.toLowerCase()))
+  // Sync input value with selected option when options or value change, OR when closing
+  useEffect(() => {
+    if (selectedOption && !isOpen) {
+      setInputValue(selectedOption.label)
+    } else if (!value && !isOpen) {
+      setInputValue('')
+    }
+  }, [value, selectedOption, isOpen])
+
+  // Filter options based on input value when open
+  const filteredOptions = isOpen
+    ? options.filter((opt) => opt.label.toLowerCase().includes(inputValue.toLowerCase()))
+    : options
 
   // Close when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false)
-        setSearchQuery('') // Reset search on close
+        // Revert input to selected value on blur/close
+        if (selectedOption) {
+          setInputValue(selectedOption.label)
+        } else {
+          setInputValue('')
+        }
       }
     }
 
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+  }, [selectedOption])
 
   // Handle Selection
-  const handleSelect = (optionValue: string) => {
-    onChange(optionValue)
+  const handleSelect = (option: Option) => {
+    onChange(option.value)
+    setInputValue(option.label)
     setIsOpen(false)
-    setSearchQuery('')
+    inputRef.current?.blur() // Blur input to remove focus/cursor as requested
+  }
+
+  // Handle Input Change
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value)
+    if (!isOpen) setIsOpen(true)
+  }
+
+  // Handle Input Focus
+  const handleFocus = () => {
+    if (!disabled) {
+      setIsOpen(true)
+      setInputValue('') // Clear input for fresh search
+    }
   }
 
   return (
@@ -63,41 +95,32 @@ export function Combobox({
 
       {/* Main Display / Trigger */}
       <div
-        onClick={() => {
-          if (!disabled) {
-            setIsOpen(!isOpen)
-            // Focus search input when opening?
-            // Ideally yes, but we render it conditionally.
-          }
-        }}
-        className={`flex w-full cursor-pointer items-center justify-between rounded border border-white/10 bg-black/40 px-3 py-2 text-white transition-colors hover:border-white/20 ${
+        className={`relative flex w-full items-center rounded border border-white/10 bg-black/40 text-white transition-colors hover:border-white/20 ${
           disabled ? 'cursor-not-allowed opacity-60' : ''
         } ${isOpen ? 'border-gold ring-1 ring-gold/20' : ''}`}
       >
-        <span className={selectedOption ? 'text-white' : 'text-gray-500'}>
-          {selectedOption ? selectedOption.label : placeholder}
-        </span>
-        <ChevronDown size={14} className={`text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <input
+          ref={inputRef}
+          type="text"
+          value={inputValue}
+          onChange={handleInputChange}
+          onFocus={handleFocus}
+          placeholder={placeholder}
+          disabled={disabled}
+          className={`w-full bg-transparent px-3 py-2 pr-8 text-sm outline-none placeholder:text-gray-500 ${
+            disabled ? 'cursor-not-allowed' : ''
+          }`}
+          autoComplete="off"
+        />
+        <ChevronDown
+          size={14}
+          className={`pointer-events-none absolute right-3 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+        />
       </div>
 
       {/* Dropdown Menu */}
       {isOpen && (
         <div className="absolute left-0 z-50 mt-1 w-full overflow-hidden rounded-md border border-white/10 bg-gray-900 shadow-xl">
-          {/* Search Input */}
-          <div className="border-white/10 border-b p-2">
-            <div className="relative flex items-center">
-              <Search size={14} className="absolute left-2 text-gray-500" />
-              <input
-                type="text"
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded border border-white/5 bg-black/40 py-1.5 pr-2 pl-8 text-sm text-white outline-none focus:border-gold/50"
-                onClick={(e) => e.stopPropagation()} // Prevent closing when clicking input
-              />
-            </div>
-          </div>
-
           {/* Options List */}
           <div className="max-h-48 overflow-y-auto py-1">
             {filteredOptions.length === 0 ? (
@@ -107,9 +130,10 @@ export function Combobox({
                 <button
                   key={option.value}
                   type="button"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handleSelect(option.value)
+                  onMouseDown={(e) => {
+                    // Use onMouseDown to prevent input blur before click fires
+                    e.preventDefault()
+                    handleSelect(option)
                   }}
                   className={`flex w-full items-center justify-between px-4 py-2 text-left text-sm transition-colors hover:bg-white/5 ${
                     option.value === value ? 'bg-gold/10 text-gold' : 'text-gray-300'
