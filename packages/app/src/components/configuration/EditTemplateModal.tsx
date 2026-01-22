@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react'
 import { Form, useNavigation } from 'react-router'
 import { Checkbox } from '../ui/Checkbox'
 import { Combobox } from '../ui/Combobox'
-import { MultiCombobox } from '../ui/MultiCombobox'
 import { MetallicButton } from '../ui/MetallicButton'
 import { Modal } from '../ui/Modal'
+import { MultiCombobox } from '../ui/MultiCombobox'
 import { WhitelistManager } from './WhitelistManager'
 
 // These should match your Prism schema enums and relations
