@@ -1,7 +1,6 @@
 import { AlertTriangle, Trash2, Upload } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Form, useActionData, useLoaderData, useNavigation } from 'react-router'
-
 import { MetallicButton } from '../components/ui/MetallicButton'
 import { ShinyText } from '../components/ui/ShinyText'
 import type { Route } from './+types/admin.configuration.gallery'

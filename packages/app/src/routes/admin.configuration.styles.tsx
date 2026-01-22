@@ -1,7 +1,8 @@
 import { Pencil, Trash2 } from 'lucide-react'
 import { useState } from 'react'
-import { Form, useLoaderData } from 'react-router'
+import { Form, useLoaderData, useSubmit } from 'react-router'
 import { EditStyleModal } from '../components/configuration/EditStyleModal'
+import { ConfirmModal } from '../components/ui/ConfirmModal'
 import { MetallicButton } from '../components/ui/MetallicButton'
 import { MetallicTooltip } from '../components/ui/MetallicTooltip'
 import { ShinyText } from '../components/ui/ShinyText'
@@ -71,8 +72,10 @@ export const action = async ({ request }: Route.ActionArgs) => {
 
 export default function StylesConfiguration() {
   const { danceStyles: styles } = useLoaderData<typeof loader>()
+  const submit = useSubmit()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedStyle, setSelectedStyle] = useState<any | null>(null)
+  const [deletingStyleId, setDeletingStyleId] = useState<string | null>(null)
 
   return (
     <div className="space-y-6">
@@ -164,6 +167,21 @@ export default function StylesConfiguration() {
       </div>
 
       <EditStyleModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} style={selectedStyle} />
+
+      <ConfirmModal
+        isOpen={!!deletingStyleId}
+        onClose={() => setDeletingStyleId(null)}
+        onConfirm={() => {
+          if (deletingStyleId) {
+            submit({ intent: 'delete_style', id: deletingStyleId }, { method: 'post' })
+            setDeletingStyleId(null)
+          }
+        }}
+        title="Delete Dance Style"
+        description="Are you sure you want to delete this dance style? This cannot be undone."
+        confirmLabel="Delete"
+        isDestructive
+      />
     </div>
   )
 }
