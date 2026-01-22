@@ -1,7 +1,6 @@
 import {
   BarChart3,
   Calendar,
-  CreditCard,
   DollarSign,
   FileBox,
   Image,
@@ -44,20 +43,11 @@ export default function AdminLayout() {
       title: 'MANAGEMENT',
       items: [
         { label: 'Users', path: '/admin/users', icon: Users },
-        { label: 'Sales & Passes', path: '/admin/sales', icon: CreditCard },
-      ],
-    },
-    {
-      title: 'ANALYSIS',
-      items: [{ label: 'Statistics', path: '/admin/analytics', icon: BarChart3 }],
-    },
-    {
-      title: 'CONFIGURATION',
-      items: [
+        { label: 'Templates', path: '/admin/configuration/templates', icon: FileBox },
         { label: 'Pricing', path: '/admin/configuration/pricing', icon: DollarSign },
+        { label: 'Statistics', path: '/admin/analytics', icon: BarChart3 },
         { label: 'Gallery', path: '/admin/configuration/gallery', icon: Image },
         { label: 'Styles', path: '/admin/configuration/styles', icon: Palette },
-        { label: 'Templates', path: '/admin/configuration/templates', icon: FileBox },
       ],
     },
   ]
