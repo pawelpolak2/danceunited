@@ -259,7 +259,14 @@ export default function PricingConfiguration() {
                 </tr>
               ) : (
                 filteredPackages.map((pkg) => (
-                  <tr key={pkg.id} className="border-white/5 border-b transition-colors hover:bg-white/5">
+                  <tr
+                    key={pkg.id}
+                    className="cursor-pointer border-white/5 border-b transition-colors hover:bg-white/5"
+                    onClick={() => {
+                      setSelectedPackage(pkg)
+                      setIsModalOpen(true)
+                    }}
+                  >
                     <td className="px-4 py-3">
                       <div className="font-medium text-white">{pkg.name}</div>
                       {pkg.description && <div className="text-gray-500 text-xs">{pkg.description}</div>}
@@ -272,10 +279,11 @@ export default function PricingConfiguration() {
                       <StatusBadge isActive={pkg.isActive} />
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <div className="flex justify-end gap-2">
+                      <div className="flex justify-end gap-2" onClick={(e) => e.stopPropagation()}>
                         <button
                           type="button"
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation()
                             setSelectedPackage(pkg)
                             setIsModalOpen(true)
                           }}
@@ -284,12 +292,13 @@ export default function PricingConfiguration() {
                         >
                           <Pencil size={16} />
                         </button>
-                        <Form method="post" style={{ display: 'inline-block' }}>
+                        <Form method="post" style={{ display: 'inline-block' }} onSubmit={(e) => e.stopPropagation()}>
                           <input type="hidden" name="intent" value="toggle_package_active" />
                           <input type="hidden" name="id" value={pkg.id} />
                           <input type="hidden" name="isActive" value={pkg.isActive ? 'false' : 'true'} />
                           <button
                             type="submit"
+                            onClick={(e) => e.stopPropagation()}
                             className={`p-1 transition-colors ${pkg.isActive ? 'text-amber-600 hover:text-amber-500' : 'text-green-600 hover:text-green-500'}`}
                             title={pkg.isActive ? 'Deactivate' : 'Activate'}
                           >
@@ -298,12 +307,20 @@ export default function PricingConfiguration() {
                         </Form>
                         <Form
                           method="post"
-                          onSubmit={(e) => !confirm('Delete this package?') && e.preventDefault()}
+                          onSubmit={(e) => {
+                            e.stopPropagation()
+                            if (!confirm('Delete this package?')) e.preventDefault()
+                          }}
                           style={{ display: 'inline-block' }}
+                          onClick={(e) => e.stopPropagation()}
                         >
                           <input type="hidden" name="intent" value="delete_package" />
                           <input type="hidden" name="id" value={pkg.id} />
-                          <button type="submit" className="p-1 text-gray-400 transition-colors hover:text-red-400">
+                          <button
+                            type="submit"
+                            onClick={(e) => e.stopPropagation()}
+                            className="p-1 text-gray-400 transition-colors hover:text-red-400"
+                          >
                             <Trash2 size={16} />
                           </button>
                         </Form>
