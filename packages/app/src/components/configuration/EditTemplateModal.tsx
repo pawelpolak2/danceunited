@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Form, useNavigation } from 'react-router'
 import { Checkbox } from '../ui/Checkbox'
 import { Combobox } from '../ui/Combobox'
+import { MultiCombobox } from '../ui/MultiCombobox'
 import { MetallicButton } from '../ui/MetallicButton'
 import { Modal } from '../ui/Modal'
 import { WhitelistManager } from './WhitelistManager'
@@ -247,12 +248,23 @@ export function EditTemplateModal({ isOpen, onClose, template, styles, trainers,
                 mode="live"
               />
             ) : (
-              <WhitelistManager
-                initialWhitelist={pendingWhitelist.map((u) => ({ user: u }))}
-                allUsers={users}
-                mode="local"
-                onUpdate={setPendingWhitelist}
-              />
+              <div className="space-y-1">
+                <label className="block font-medium text-gray-400 text-xs">Whitelist Users</label>
+                <MultiCombobox
+                  options={users.map((u) => ({
+                    value: u.id,
+                    label: `${u.firstName} ${u.lastName} (${u.email})`,
+                  }))}
+                  value={pendingWhitelist.map((u) => u.id)}
+                  onChange={(selectedIds) => {
+                    const selectedUsers = selectedIds
+                      .map((id) => users.find((u) => u.id === id))
+                      .filter((u): u is User => !!u)
+                    setPendingWhitelist(selectedUsers)
+                  }}
+                  placeholder="Select users to whitelist..."
+                />
+              </div>
             )}
           </div>
         )}
