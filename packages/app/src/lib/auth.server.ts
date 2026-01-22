@@ -11,7 +11,7 @@ export interface UserSession {
 
 const _SESSION_SECRET = process.env.SESSION_SECRET || 'dev-secret-change-in-production'
 const SESSION_COOKIE_NAME = 'danceunited_session'
-const SESSION_MAX_AGE = 60 * 60 * 24 * 7 // 7 days
+const SESSION_MAX_AGE = 60 * 30 // 30 minutes
 
 /**
  * Hash a password using bcrypt
