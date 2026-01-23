@@ -1,18 +1,8 @@
-import {
-  BarChart3,
-  Calendar,
-  DollarSign,
-  FileBox,
-  Image,
-  LayoutDashboard,
-  Palette,
-  Settings,
-  Users,
-} from 'lucide-react'
+import { BarChart3, Calendar, LayoutDashboard, Settings } from 'lucide-react'
 import { Link, Outlet, redirect, useLocation } from 'react-router'
 import { ShinyText } from '../components/ui'
 import { getCurrentUser } from '../lib/auth.server'
-import type { Route } from './+types/admin.layout'
+import type { Route } from './+types/trainer.layout'
 
 export async function loader({ request }: Route.LoaderArgs) {
   const user = await getCurrentUser(request)
@@ -21,57 +11,44 @@ export async function loader({ request }: Route.LoaderArgs) {
     return redirect('/login')
   }
 
-  if (user.role !== 'MANAGER') {
+  if (user.role !== 'TRAINER') {
     return redirect('/')
   }
 
   return { user }
 }
 
-export default function AdminLayout() {
+export default function TrainerLayout() {
   const location = useLocation()
 
   const menuGroups = [
     {
       title: 'MAIN',
       items: [
-        { label: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
-        { label: 'Master Schedule', path: '/admin/schedule', icon: Calendar },
-      ],
-    },
-    {
-      title: 'MANAGEMENT',
-      items: [
-        { label: 'Users', path: '/admin/users', icon: Users },
-        { label: 'Templates', path: '/admin/configuration/templates', icon: FileBox },
-        { label: 'Pricing', path: '/admin/configuration/pricing', icon: DollarSign },
-        { label: 'Statistics', path: '/admin/analytics', icon: BarChart3 },
-        { label: 'Gallery', path: '/admin/configuration/gallery', icon: Image },
-        { label: 'Styles', path: '/admin/configuration/styles', icon: Palette },
+        { label: 'Dashboard', path: '/trainer/dashboard', icon: LayoutDashboard },
+        { label: 'Schedule', path: '/trainer/schedule', icon: Calendar },
+        { label: 'Statistics', path: '/trainer/statistics', icon: BarChart3 },
       ],
     },
   ]
 
   return (
     <div className="relative flex h-full w-full overflow-hidden bg-gray-950 text-amber-50">
-      {/* Background Gradient/Pattern (Optional context) */}
+      {/* Background Gradient */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-900/20 via-gray-950 to-gray-950" />
 
       {/* Sidebar */}
       <aside className="relative z-20 mt-4 mb-4 ml-4 flex h-[calc(100%-2rem)] w-64 flex-shrink-0 flex-col">
         <div className="flex flex-1 flex-col overflow-hidden rounded-2xl border border-amber-900/30 bg-gray-900/40 shadow-2xl shadow-black/50 backdrop-blur-md">
-          {/* Logo Header - Replaces Global Header for Admin */}
+          {/* Sidebar Header */}
           <div className="flex h-20 items-center justify-center border-amber-900/30 border-b bg-gray-900/50 px-6">
-            <Link to="/" className="flex items-center gap-2 transition-opacity hover:opacity-80">
-              <img src="/logos/logo-transparent.png" alt="Dance United" className="h-8 w-auto" />
-              <ShinyText
-                as="span"
-                variant="title"
-                className="glow-sm font-bold text-amber-500 text-lg uppercase tracking-widest"
-              >
-                Dance United
-              </ShinyText>
-            </Link>
+            <ShinyText
+              as="span"
+              variant="title"
+              className="glow-sm font-bold text-amber-500 text-xl uppercase tracking-[0.2em]"
+            >
+              Trainer
+            </ShinyText>
           </div>
 
           {/* Sidebar Navigation */}
@@ -119,9 +96,9 @@ export default function AdminLayout() {
           </nav>
 
           {/* Sidebar Footer */}
-          <div className="border-amber-900/30 border-t bg-gray-900/50 p-4">
+          <div className="border-amber-900/30 border-t bg-gray-900/50 p-2">
             <Link
-              to="/admin/settings"
+              to="/trainer/profile" // Assuming profile route or settings
               className="flex items-center gap-3 rounded-lg border border-transparent px-3 py-2 font-medium text-gray-400 text-sm transition-colors hover:border-amber-500/10 hover:bg-white/5 hover:text-amber-100"
             >
               <Settings className="h-4 w-4 text-gray-500 group-hover:text-amber-300" />

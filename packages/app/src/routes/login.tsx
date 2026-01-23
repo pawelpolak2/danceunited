@@ -71,8 +71,8 @@ export async function action({ request }: Route.ActionArgs) {
       role: user.role,
     })
 
-    // Redirect to home with session cookie
-    return redirect('/', {
+    // Redirect to dashboard with session cookie
+    return redirect('/dashboard', {
       headers: {
         'Set-Cookie': sessionCookie,
       },

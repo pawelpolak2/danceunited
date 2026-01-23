@@ -67,13 +67,23 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 export default function App() {
   const { user } = useLoaderData<typeof loader>()
+  // useLocation logic to handle global overflow
   const location = useLocation()
-  const isAdmin = location.pathname.startsWith('/admin')
+
+  // Dashboard routes (Admin, Trainer, Dancer) will handle their own scrolling
+  // This logic toggles the overflow of the main content area
+  // Checks for /admin, /trainer, /dancer, and /dashboard
+  const isDashboard =
+    location.pathname.startsWith('/admin') ||
+    location.pathname.startsWith('/trainer') ||
+    location.pathname.startsWith('/dancer') ||
+    location.pathname.startsWith('/dashboard') ||
+    location.pathname.startsWith('/trainer-dashboard') // specific check from other branch logic if needed
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-950">
-      {!isAdmin && (
-        <header className="border-amber-900/20 border-b bg-gray-950">
+    <div className={`flex flex-col bg-gray-950 ${isDashboard ? 'h-screen overflow-hidden' : 'min-h-screen'}`}>
+      {!isDashboard && (
+        <header className="relative z-50 flex-none border-amber-900/20 border-b bg-gray-950">
           <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
             <div className="flex items-center gap-8">
               <Link to="/" className="flex items-center gap-3">
@@ -154,8 +164,8 @@ export default function App() {
                           user.role === 'MANAGER'
                             ? '/admin/dashboard'
                             : user.role === 'TRAINER'
-                              ? '/trainer-dashboard'
-                              : '/dashboard'
+                              ? '/trainer/dashboard' // Updated to standard path
+                              : '/dancer/dashboard' // Updated to standard path
                         }
                         className="flex items-center gap-3 px-4 py-2 text-amber-50/80 text-sm transition-colors hover:bg-amber-900/20 hover:text-amber-100"
                       >
@@ -187,7 +197,7 @@ export default function App() {
                     </Form>
                   </div>
 
-                  {/* Backdrop to close on click outside (optional, simplified here) */}
+                  {/* Backdrop to close on click outside */}
                   <div
                     className="fixed inset-0 z-40 hidden group-open:block"
                     onClick={(e) => {
@@ -210,10 +220,10 @@ export default function App() {
           </nav>
         </header>
       )}
-      <main className="flex-1 bg-gray-950">
+      <main className={`flex-1 bg-gray-950 ${isDashboard ? 'relative overflow-hidden' : 'overflow-y-auto'}`}>
         <Outlet />
       </main>
-      <footer className="border-amber-900/20 border-t bg-gray-950 py-8">
+      <footer className="flex-none border-amber-900/20 border-t bg-gray-950 py-8">
         <div className="mx-auto max-w-7xl px-4 text-center text-sm">
           <ShinyText variant="body">&copy; {new Date().getFullYear()} dance united. All rights reserved.</ShinyText>
         </div>

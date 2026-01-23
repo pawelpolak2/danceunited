@@ -13,6 +13,7 @@ interface DashboardCalendarProps {
   onEventDrop?: (dropInfo: EventDropArg) => void
   readOnly?: boolean
   editable?: boolean
+  height?: string | number | 'auto'
 }
 
 // Move static config outside component to prevent re-creation
@@ -38,6 +39,7 @@ function DashboardCalendarComponent({
   onEventDrop,
   readOnly = false,
   editable = false,
+  height = 600,
 }: DashboardCalendarProps) {
   const [isClient, setIsClient] = useState(false)
   const calendarRef = useRef<FullCalendar>(null)
@@ -123,7 +125,7 @@ function DashboardCalendarComponent({
         eventClick={handleEventClick}
         editable={editable}
         eventDrop={onEventDrop}
-        height={600}
+        height={height}
         aspectRatio={1.8}
         eventClassNames="calendar-event"
         dayHeaderClassNames="calendar-day-header"

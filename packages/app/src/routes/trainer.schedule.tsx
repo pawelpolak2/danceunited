@@ -1,4 +1,4 @@
-import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core'
+import type { DateSelectArg, EventClickArg } from '@fullcalendar/core'
 import { prisma } from 'db'
 import { useCallback, useMemo, useState } from 'react'
 import { redirect, useFetcher, useLoaderData } from 'react-router'
@@ -6,18 +6,26 @@ import { EditTemplateModal } from '../components/configuration/EditTemplateModal
 import { DashboardCalendar } from '../components/dashboard/DashboardCalendar'
 import { EditClassModal } from '../components/dashboard/EditClassModal'
 import { ScheduleClassModal } from '../components/dashboard/ScheduleClassModal'
-import { ConfirmModal, MetallicButton, ShinyText } from '../components/ui'
+import { MetallicButton, ShinyText } from '../components/ui'
 import { getCurrentUser } from '../lib/auth.server'
-import type { Route } from './+types/admin.schedule'
+import type { Route } from './+types/trainer.schedule'
 
 export function meta(_args: Route.MetaArgs) {
-  return [{ title: 'Master Schedule - Dance United Admin' }, { name: 'description', content: 'Manage studio schedule' }]
+  return [
+    { title: 'Trainer Schedule - Dance United' },
+    { name: 'description', content: 'Manage your classes and schedule' },
+  ]
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
   const user = await getCurrentUser(request)
 
-  if (!user || user.role !== 'MANAGER') {
+  if (!user) {
+    return redirect('/login')
+  }
+
+  // Only trainers can access this dashboard
+  if (user.role !== 'TRAINER') {
     return redirect('/')
   }
 
@@ -27,21 +35,14 @@ export async function loader({ request }: Route.LoaderArgs) {
     select: { id: true, name: true },
   })
 
-  // Fetch class templates for scheduling
-  const classTemplates = await prisma.classTemplate.findMany({
-    where: { isActive: true },
-    orderBy: { name: 'asc' },
-    select: { id: true, name: true, duration: true, hallId: true, trainerId: true },
-  })
-
-  // Fetch potential trainers (Trainers & Managers)
+  // Trainers list for edit modal (user can only assign themselves but modal might need list if reused)
+  // Filtering to just the current user or all trainers?
+  // Ideally "EditClassModal" might allow changing trainer if admin, but here we just need options.
+  // We'll pass all trainers for compatibility with the component props, but logic restricts actions.
   const trainers = await prisma.user.findMany({
-    where: {
-      role: { in: ['TRAINER', 'MANAGER'] },
-      isActive: true,
-    },
-    orderBy: { firstName: 'asc' },
+    where: { role: 'TRAINER', isActive: true },
     select: { id: true, firstName: true, lastName: true, email: true },
+    orderBy: { firstName: 'asc' },
   })
 
   // Fetch Dancers for Whitelist
@@ -51,26 +52,37 @@ export async function loader({ request }: Route.LoaderArgs) {
     select: { id: true, firstName: true, lastName: true, email: true },
   })
 
+  // Fetch class templates for scheduling
+  // Filter by trainerId to only show their own templates? or all?
+  // Let's assume they can schedule any template for now, or maybe just theirs?
+  // Previous logic was "all active". Let's stick to that for flexibility unless requested otherwise.
+  const classTemplates = await prisma.classTemplate.findMany({
+    where: { isActive: true },
+    orderBy: { name: 'asc' },
+    select: { id: true, name: true, duration: true, hallId: true },
+  })
+
   // Limit history to last 3 months
   const threeMonthsAgo = new Date()
   threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3)
 
-  // Fetch ALL classes for the calendar (Admin sees everything)
   const classes = await prisma.classInstance.findMany({
     where: {
+      // Removed actualTrainerId filter to show all classes
       startTime: {
         gte: threeMonthsAgo,
       },
     },
     include: {
       classTemplate: true,
-      actualTrainer: true,
+      actualTrainer: true, // Include info to check ownership later/display name
     },
     orderBy: {
       startTime: 'asc',
     },
   })
 
+  // Serialize classes for the client side (convert Dates to ISO strings)
   const serializedClasses = classes.map((c) => ({
     ...c,
     startTime: c.startTime.toISOString(),
@@ -81,12 +93,15 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   const events = classes.map((c) => ({
     id: c.id,
-    title: `${c.classTemplate.name} (${c.actualTrainer.firstName})`,
+    title: c.classTemplate.name,
     start: c.startTime.toISOString(),
     end: c.endTime.toISOString(),
-    backgroundColor: c.actualHall === 'HALL1' ? '#d97706' : '#92400e',
+    backgroundColor: c.actualHall === 'HALL1' ? '#d97706' : '#78350f', // Amber-600 vs Amber-900
     borderColor: '#b45309',
-    editable: true, // Allow drag & drop for admin
+    extendedProps: {
+      actualTrainerId: c.actualTrainerId,
+      trainerName: c.actualTrainer?.firstName,
+    },
   }))
 
   return { user, danceStyles, classTemplates, events, classes: serializedClasses, trainers, users }
@@ -94,18 +109,13 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 export async function action({ request }: Route.ActionArgs) {
   const user = await getCurrentUser(request)
-  if (!user || user.role !== 'MANAGER') {
+  if (!user || user.role !== 'TRAINER') {
     return redirect('/')
   }
 
   const formData = await request.formData()
   const intent = formData.get('intent')
 
-  // --- REUSED TRAINER LOGIC (with adapted permissions if needed) ---
-  // In a real app, I'd extract this logic to a shared service/helper
-
-  // 1. Create Template
-  // 1. Create Template (Unified Intent)
   if (intent === 'create_template') {
     const name = formData.get('name') as string
     const description = formData.get('description') as string
@@ -115,9 +125,7 @@ export async function action({ request }: Route.ActionArgs) {
     const styleId = formData.get('styleId') as string
     const hallId = formData.get('hallId') as any
     const isWhitelistEnabled = formData.get('isWhitelistEnabled') === 'on'
-    const trainerId = formData.get('trainerId') as string
 
-    // Parse whitelist
     const whitelistUserIdsStr = formData.get('whitelistUserIds') as string
     let whitelistCreateData = {}
 
@@ -134,8 +142,8 @@ export async function action({ request }: Route.ActionArgs) {
       }
     }
 
-    if (!name || !styleId || !trainerId) {
-      return { error: 'Name, Style and Default Trainer are required' }
+    if (!name || !styleId) {
+      return { error: 'Name and Style are required' }
     }
 
     try {
@@ -148,7 +156,7 @@ export async function action({ request }: Route.ActionArgs) {
           styleId,
           hallId,
           isWhitelistEnabled,
-          trainerId,
+          trainerId: user.userId,
           whitelist: whitelistCreateData,
         },
       })
@@ -159,9 +167,7 @@ export async function action({ request }: Route.ActionArgs) {
     }
   }
 
-  // 2. Schedule Class (Single or Recurring)
   if (intent === 'scheduleClass') {
-    // ... (Same logic as trainer-dashboard, copy-paste adaptation)
     const classTemplateId = formData.get('classTemplateId') as string
     const startTimeStr = formData.get('startTime') as string
     const hall = formData.get('hall') as any
@@ -171,14 +177,19 @@ export async function action({ request }: Route.ActionArgs) {
     const recurrenceCount = parseInt(formData.get('recurrenceCount') as string) || 4
     const recurrenceEndDateStr = formData.get('recurrenceEndDate') as string
 
-    if (!classTemplateId || !startTimeStr) return { error: 'Missing required fields' }
+    if (!classTemplateId || !startTimeStr) {
+      return { error: 'Missing required fields' }
+    }
 
     try {
       const template = await prisma.classTemplate.findUnique({
         where: { id: classTemplateId },
-        select: { duration: true, trainerId: true },
+        select: { duration: true },
       })
-      if (!template) return { error: 'Template not found' }
+
+      if (!template) {
+        return { error: 'Class template not found' }
+      }
 
       const instancesData = []
       const baseStartTime = new Date(startTimeStr)
@@ -186,8 +197,11 @@ export async function action({ request }: Route.ActionArgs) {
       let maxCount = 1
 
       if (isRecurring) {
-        if (recurrenceEndType === 'count') maxCount = recurrenceCount
-        else if (recurrenceEndType === 'date' && recurrenceEndDateStr) maxCount = 52 // safety cap
+        if (recurrenceEndType === 'count') {
+          maxCount = recurrenceCount
+        } else if (recurrenceEndType === 'date' && recurrenceEndDateStr) {
+          maxCount = 52
+        }
       }
 
       for (let i = 0; i < maxCount; i++) {
@@ -207,35 +221,41 @@ export async function action({ request }: Route.ActionArgs) {
           startTime: instanceStartTime,
           endTime: instanceEndTime,
           actualHall: hall,
-          actualTrainerId: template.trainerId, // Default to template owner
+          actualTrainerId: user.userId,
         })
       }
 
       await prisma.$transaction(instancesData.map((data) => prisma.classInstance.create({ data })))
+
       return { success: true, intent: 'scheduleClass' }
     } catch (error) {
-      console.error('Schedule failed:', error)
-      return { error: 'Schedule failed' }
+      console.error('Failed to schedule class:', error)
+      return { error: 'Failed to schedule class' }
     }
   }
 
-  // 3. Update Class (Drag & Drop or Edit Modal)
-  if (intent === 'updateClass' || intent === 'moveClass') {
+  if (intent === 'updateClass') {
     const classInstanceId = formData.get('classInstanceId') as string
     const startTimeStr = formData.get('startTime') as string
-    // handle optional fields differently for 'moveClass' vs 'updateClass' full edit
     const hall = formData.get('hall') as any
 
-    const actualTrainerId = formData.get('actualTrainerId') as string
-
-    if (!classInstanceId || !startTimeStr) return { error: 'Missing required fields' }
+    if (!classInstanceId || !startTimeStr) {
+      return { error: 'Missing required fields' }
+    }
 
     try {
       const instance = await prisma.classInstance.findUnique({
         where: { id: classInstanceId },
         include: { classTemplate: { select: { duration: true } } },
       })
-      if (!instance) return { error: 'Instance not found' }
+
+      if (!instance) {
+        return { error: 'Class instance not found' }
+      }
+
+      if (instance.actualTrainerId !== user.userId) {
+        return { error: 'Unauthorized to edit this class' }
+      }
 
       const newStartTime = new Date(startTimeStr)
       const templateDuration = instance.classTemplate.duration
@@ -246,54 +266,70 @@ export async function action({ request }: Route.ActionArgs) {
         data: {
           startTime: newStartTime,
           endTime,
-          ...(hall && { actualHall: hall }),
-          ...(actualTrainerId && { actualTrainerId }),
+          actualHall: hall,
         },
       })
-      return { success: true, intent }
+
+      return { success: true, intent: 'updateClass' }
     } catch (error) {
-      console.error('Update failed:', error)
-      return { error: 'Update failed' }
+      console.error('Failed to update class:', error)
+      return { error: 'Failed to update class' }
     }
   }
 
-  // 4. Delete Class
   if (intent === 'deleteClass') {
     const classInstanceId = formData.get('classInstanceId') as string
 
-    if (!classInstanceId) return { error: 'Missing required fields' }
+    if (!classInstanceId) {
+      return { error: 'Missing required fields' }
+    }
 
     try {
-      const instance = await prisma.classInstance.findUnique({ where: { id: classInstanceId } })
-      if (!instance) return { error: 'Not found' }
+      const instance = await prisma.classInstance.findUnique({
+        where: { id: classInstanceId },
+      })
 
-      await prisma.classInstance.delete({ where: { id: classInstanceId } })
+      if (!instance) {
+        return { error: 'Class instance not found' }
+      }
+
+      if (instance.actualTrainerId !== user.userId) {
+        return { error: 'Unauthorized to delete this class' }
+      }
+
+      await prisma.classInstance.delete({
+        where: { id: classInstanceId },
+      })
+
       return { success: true, intent: 'deleteClass' }
-    } catch (_error) {
-      return { error: 'Delete failed' }
+    } catch (error) {
+      console.error('Failed to delete class:', error)
+      return { error: 'Failed to delete class' }
     }
   }
 
   return null
 }
 
-export default function AdminSchedulePage() {
-  const { danceStyles, classTemplates, events, classes, trainers, users } = useLoaderData<typeof loader>()
-  const fetcher = useFetcher()
+export default function TrainerSchedulePage() {
+  const { danceStyles, classTemplates, events, classes, trainers, users, user } = useLoaderData<typeof loader>()
 
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false)
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
   const [selectedClass, setSelectedClass] = useState<(typeof classes)[0] | null>(null)
-  const [moveConfirmation, setMoveConfirmation] = useState<EventDropArg | null>(null)
+  const [isMyClassesOnly, setIsMyClassesOnly] = useState(false)
+
+  const fetcher = useFetcher()
 
   // Close modals on success
   if (fetcher.data?.success) {
     if (fetcher.data.intent === 'create_template' && isTemplateModalOpen) setIsTemplateModalOpen(false)
     if (fetcher.data.intent === 'scheduleClass' && isScheduleModalOpen) setIsScheduleModalOpen(false)
-    if ((fetcher.data.intent === 'updateClass' || fetcher.data.intent === 'deleteClass') && isEditModalOpen)
+    if ((fetcher.data.intent === 'updateClass' || fetcher.data.intent === 'deleteClass') && isEditModalOpen) {
       setIsEditModalOpen(false)
+    }
   }
 
   const handleDateSelect = useCallback((selectInfo: DateSelectArg) => {
@@ -304,75 +340,87 @@ export default function AdminSchedulePage() {
   const handleEventClick = useCallback(
     (clickInfo: EventClickArg) => {
       const classId = clickInfo.event.id
-      // This looks up in `classes` array. If classes array is new every render (from loaderData),
-      // we need `classes` in dependency array.
-      // However, if we want `handleEventClick` to be stable, we should likely rely on `clickInfo` data
-      // OR ensure `classes` in `loaderData` is memoized? `useLoaderData` returns new object on nav?
-
-      // Actually, `clickInfo` has `event`. We can store `event.id` and let `EditClassModal` fetch details?
-      // Or just pass `classes` dependency.
       const foundClass = classes.find((c) => c.id === classId)
+
+      // Only allow editing if it's their own class
+      // But they can view details? For now sticking to existing behavior:
+      // If they click a class they don't own, maybe show a read-only modal or just do nothing?
+      // Requirement says: "Trainer... without checking this option should see all classes (same as manager)"
+      // Usually manager can edit everything. Trainer can probably only edit their own.
+      // Let's check ownership before opening edit modal.
+
       if (foundClass) {
-        setSelectedClass(foundClass)
-        setIsEditModalOpen(true)
+        if (foundClass.actualTrainerId === user.userId) {
+          setSelectedClass(foundClass)
+          setIsEditModalOpen(true)
+        } else {
+          // Ideally show a "Details" modal (read-only)
+          alert(
+            `Class: ${foundClass.classTemplate.name}\nTrainer: ${foundClass.actualTrainer?.firstName || 'Unknown'}\n(Read-only)`
+          )
+        }
       }
     },
-    [classes]
-  ) // `classes` might change, so this callback changes.
+    [classes, user.userId]
+  )
 
-  const handleEventDrop = useCallback((dropInfo: EventDropArg) => {
-    setMoveConfirmation(dropInfo)
-  }, [])
-
-  // Memoize events array for the calendar
-  // Use `useMemo` on `events` from loaderData if it's passed directly?
-  // No, `events` from loaderData is already an array. If `loaderData` changes, `events` changes.
-  // BUT `DashboardCalendar` checks `prevProps`.
-  // Ideally, we shouldn't pass `events` from loader directly if we want to avoid re-renders when other loader data changes?
-  // But loader data likely changes together.
-
-  // Actually, let's just memoize the array passed to component to be safe
-  const calendarEvents = useMemo(() => events, [events])
+  const filteredEvents = useMemo(() => {
+    if (!isMyClassesOnly) return events
+    return events.filter((e) => e.extendedProps?.actualTrainerId === user.userId)
+  }, [events, isMyClassesOnly, user.userId])
 
   return (
-    <div className="flex h-full flex-col text-amber-50">
-      <div className="mb-6 flex flex-col items-start justify-between gap-4 md:flex-row md:items-end">
-        <div className="flex flex-col gap-1">
-          <ShinyText as="h1" variant="title" className="font-serif text-3xl text-amber-400 tracking-wide">
-            Master Schedule
-          </ShinyText>
-          <p className="text-gray-400 text-sm">Manage all classes (Drag & Drop to reschedule)</p>
+    <div className="min-h-screen">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-8 flex flex-col items-start justify-between gap-4 md:flex-row md:items-end">
+          <div className="flex flex-col gap-1">
+            <ShinyText as="h1" variant="title" className="font-serif text-4xl text-amber-400">
+              Schedule & Classes
+            </ShinyText>
+            <ShinyText variant="body" className="text-lg opacity-80">
+              Manage your availability and templates
+            </ShinyText>
+          </div>
+
+          <div className="flex w-full flex-wrap items-center gap-3 md:w-auto">
+            <label className="mr-2 flex cursor-pointer items-center gap-2 rounded-md border border-amber-500/20 bg-gray-900/50 px-4 py-2 transition-colors hover:bg-gray-800">
+              <input
+                type="checkbox"
+                checked={isMyClassesOnly}
+                onChange={(e) => setIsMyClassesOnly(e.target.checked)}
+                className="h-4 w-4 rounded border-amber-500/50 bg-gray-900 text-amber-500 focus:ring-amber-500 focus:ring-offset-gray-900"
+              />
+              <span className="font-medium text-amber-100 text-sm">My Classes</span>
+            </label>
+
+            <MetallicButton
+              onClick={() => {
+                setSelectedDate(new Date())
+                setIsScheduleModalOpen(true)
+              }}
+              className="flex-1 rounded-md border-2 px-4 py-2 text-sm md:flex-none"
+            >
+              + Schedule Class
+            </MetallicButton>
+            <MetallicButton
+              onClick={() => setIsTemplateModalOpen(true)}
+              className="flex-1 rounded-md border-2 px-4 py-2 text-sm md:flex-none"
+            >
+              + New Template
+            </MetallicButton>
+          </div>
         </div>
-        <div className="flex w-full gap-3 md:w-auto">
-          <MetallicButton
-            onClick={() => {
-              setSelectedDate(new Date())
-              setIsScheduleModalOpen(true)
-            }}
-            className="flex-1 rounded-md border-2 px-4 py-2 text-sm md:flex-none"
-          >
-            + Schedule Class
-          </MetallicButton>
-          <MetallicButton
-            onClick={() => setIsTemplateModalOpen(true)}
-            className="flex-1 rounded-md border-2 px-4 py-2 text-sm md:flex-none"
-          >
-            + New Template
-          </MetallicButton>
+
+        <div className="rounded-lg border border-amber-900/20 bg-gray-900/30 p-1">
+          <DashboardCalendar
+            events={filteredEvents}
+            onDateSelect={handleDateSelect}
+            onEventClick={handleEventClick}
+            height="auto"
+          />
         </div>
       </div>
 
-      <div className="flex-1 rounded-lg border border-amber-900/20 bg-gray-900/20 p-4">
-        <DashboardCalendar
-          events={calendarEvents}
-          onDateSelect={handleDateSelect}
-          onEventClick={handleEventClick}
-          editable={true} // Enable Drag & Drop
-          onEventDrop={handleEventDrop}
-        />
-      </div>
-
-      {/* Modals reused from Trainer Dashboard components */}
       <EditTemplateModal
         isOpen={isTemplateModalOpen}
         onClose={() => setIsTemplateModalOpen(false)}
@@ -381,39 +429,19 @@ export default function AdminSchedulePage() {
         trainers={trainers}
         users={users}
       />
+
       <ScheduleClassModal
         isOpen={isScheduleModalOpen}
         onClose={() => setIsScheduleModalOpen(false)}
         templates={classTemplates}
         defaultDate={selectedDate}
       />
+
       <EditClassModal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         classInstance={selectedClass}
         trainers={trainers}
-      />
-
-      <ConfirmModal
-        isOpen={!!moveConfirmation}
-        onClose={() => {
-          moveConfirmation?.revert()
-          setMoveConfirmation(null)
-        }}
-        onConfirm={() => {
-          if (moveConfirmation) {
-            const formData = new FormData()
-            formData.append('intent', 'moveClass')
-            formData.append('classInstanceId', moveConfirmation.event.id)
-            formData.append('startTime', moveConfirmation.event.start?.toISOString() || '')
-            formData.append('updateScope', 'single')
-            fetcher.submit(formData, { method: 'post' })
-            setMoveConfirmation(null)
-          }
-        }}
-        title="Reschedule Class"
-        description={`Are you sure you want to move "${moveConfirmation?.event.title}" to ${moveConfirmation?.event.start?.toLocaleString()}?`}
-        confirmLabel="Move Class"
       />
     </div>
   )
