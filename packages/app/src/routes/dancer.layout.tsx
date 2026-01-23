@@ -66,11 +66,10 @@ export default function DancerLayout() {
                       <Link
                         key={item.path}
                         to={item.path}
-                        className={`group relative flex items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 font-medium text-sm transition-all duration-300 ${
-                          isActive
+                        className={`group relative flex items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 font-medium text-sm transition-all duration-300 ${isActive
                             ? 'border border-amber-500/30 bg-amber-500/10 text-amber-400 shadow-[0_0_15px_-3px_rgba(245,158,11,0.15)]'
                             : 'border border-transparent text-gray-400 hover:border-amber-500/10 hover:bg-white/5 hover:text-amber-200'
-                        }
+                          }
                                                 `}
                       >
                         <Icon
