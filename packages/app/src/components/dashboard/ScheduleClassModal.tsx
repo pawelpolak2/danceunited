@@ -3,7 +3,8 @@ import { Form, useNavigation } from 'react-router'
 import { Checkbox } from '../ui/Checkbox'
 import { Combobox } from '../ui/Combobox'
 import { MetallicButton } from '../ui/MetallicButton'
-import { MetallicDateTimePicker } from '../ui/MetallicDateTimePicker'
+
+import { MetallicDatePicker } from '../ui/MetallicDatePicker'
 import { Modal } from '../ui/Modal'
 import { Radio } from '../ui/Radio'
 
@@ -26,9 +27,12 @@ export function ScheduleClassModal({ isOpen, onClose, templates, defaultDate }: 
   const isSubmitting = navigation.state === 'submitting'
 
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('')
-  // State for MetallicDateTimePicker
+  // State for Date Selection
   const [startDate, setStartDate] = useState<Date | undefined>(defaultDate)
   const [endTime, setEndTime] = useState<string>('')
+
+  // State for Recurrence End Date
+  const [recurrenceEndDate, setRecurrenceEndDate] = useState<Date | null>(null)
 
   // Sync prop defaultDate to state
   useEffect(() => {
@@ -83,11 +87,17 @@ export function ScheduleClassModal({ isOpen, onClose, templates, defaultDate }: 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1">
             <input type="hidden" name="startTime" value={startDate ? toLocalISO(startDate) : ''} />
-            <MetallicDateTimePicker
-              date={startDate}
-              setDate={(d) => setStartDate(d)}
+            <MetallicDatePicker
+              selected={startDate}
+              onChange={(d: Date | null) => setStartDate(d || undefined)}
               label="Start Time"
               className="w-full"
+              showTimeSelect
+              timeFormat="HH:mm"
+              timeIntervals={15}
+              dateFormat="PPP HH:mm"
+              placeholderText="Select start time..."
+              popperPlacement="bottom-end"
             />
           </div>
 
@@ -149,11 +159,21 @@ export function ScheduleClassModal({ isOpen, onClose, templates, defaultDate }: 
 
               <div className="flex items-center gap-2">
                 <Radio id="end-date" name="recurrenceEndType" value="date" label="On" />
-                <input
-                  type="date"
-                  name="recurrenceEndDate"
-                  className="rounded border border-amber-900/30 bg-gray-900/50 px-2 py-1 text-gold text-sm focus:border-amber-500"
-                />
+                <div className="w-40">
+                  <input
+                    type="hidden"
+                    name="recurrenceEndDate"
+                    value={recurrenceEndDate ? toLocalISO(recurrenceEndDate).split('T')[0] : ''}
+                  />
+                  <MetallicDatePicker
+                    selected={recurrenceEndDate}
+                    onChange={setRecurrenceEndDate}
+                    dateFormat="yyyy-MM-dd"
+                    placeholderText="Select date..."
+                    popperPlacement="top-end"
+                    id="recurrenceEndDate"
+                  />
+                </div>
               </div>
             </div>
           </div>

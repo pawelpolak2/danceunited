@@ -167,6 +167,10 @@
   font-family: "EB Garamond", Georgia, serif;
   font-weight: 600;
   overflow: hidden;
+  color: #1a0f00;
+  /* Dark amber/black for contrast on gold */
+  text-transform: uppercase;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
 
   /* Base metallic gold gradient for background */
   background: linear-gradient(
@@ -251,40 +255,8 @@
 }
 
 /* Metallic text effect for button text - use span wrapper */
-.metallic-button span,
-.metallic-button {
-  position: relative;
-  z-index: 2;
-  color: transparent;
-  background: linear-gradient(
-    135deg,
-    #ffffff 0%,
-    #fff9e6 3%,
-    #ffed4e 8%,
-    #ffd700 15%,
-    #ffc125 22%,
-    #daa520 28%,
-    #b8860b 35%,
-    #daa520 42%,
-    #ffc125 50%,
-    #ffd700 58%,
-    #ffc125 65%,
-    #daa520 72%,
-    #ffd700 78%,
-    #ffed4e 85%,
-    #fff9e6 92%,
-    #ffffff 97%,
-    #ffd700 100%
-  );
-  background-size: 500% 500%;
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: metallic-shine 15s ease-in-out infinite;
-
-  /* Metallic depth with shadows for text - SHARPER VERSION */
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6), 0 -1px 0px rgba(255, 255, 255, 0.2);
-}
+/* Text clipping removed to allow full gold button background */
+/* .metallic-button span, .metallic-button ... */
 
 /* Brushed metal highlight sweep for buttons - background layer */
 .metallic-button::before {
@@ -315,33 +287,8 @@
 }
 
 /* Metallic text highlight sweep */
-.metallic-button span::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    transparent 25%,
-    rgba(255, 255, 255, 0.3) 35%,
-    rgba(255, 255, 255, 0.8) 45%,
-    rgba(255, 255, 255, 1) 50%,
-    rgba(255, 255, 255, 0.8) 55%,
-    rgba(255, 255, 255, 0.3) 65%,
-    transparent 75%,
-    transparent 100%
-  );
-  background-size: 500% 100%;
-  background-clip: text;
-  -webkit-background-clip: text;
-  animation: highlight-sweep 30s ease-in-out infinite;
-  pointer-events: none;
-  mix-blend-mode: overlay;
-  z-index: 3;
-}
+/* Text highlight removed */
+/* .metallic-button span::before ... */
 
 /* Per-button metallic reflection */
 .metallic-button::after {

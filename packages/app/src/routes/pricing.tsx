@@ -9,12 +9,28 @@ export async function loader() {
     where: {
       isActive: true,
     },
+    include: {
+      classLinks: {
+        include: {
+          classTemplate: true,
+        },
+      },
+    },
     orderBy: { price: 'asc' },
+  })
+
+  // Filter out restricted packages (where any linked class has whitelist enabled)
+  const publicPackages = packages.filter((pkg) => {
+    // If no links, it's universal so it's public
+    if (pkg.classLinks.length === 0) return true
+    // Check if any linked class is restricted
+    const isRestricted = pkg.classLinks.some((link) => link.classTemplate.isWhitelistEnabled)
+    return !isRestricted
   })
 
   // Group by category
   // We'll just do the simple serialization and grouping
-  const serializedPackages = packages.map((p) => ({
+  const serializedPackages = publicPackages.map((p) => ({
     ...p,
     price: p.price.toString(),
   }))
