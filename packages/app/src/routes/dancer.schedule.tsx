@@ -1,10 +1,11 @@
 import type { EventClickArg } from '@fullcalendar/core'
 import { prisma } from 'db'
-import { useCallback, useMemo, useState } from 'react'
+import { Check, X } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { redirect, useFetcher, useLoaderData } from 'react-router'
 import { ClassDetailsModal } from '../components/dashboard/ClassDetailsModal'
 import { DashboardCalendar } from '../components/dashboard/DashboardCalendar'
-import { ShinyText } from '../components/ui'
+import { ConfirmModal, ShinyText } from '../components/ui'
 import { getCurrentUser } from '../lib/auth.server'
 import type { Route } from './+types/dancer.schedule'
 
@@ -86,25 +87,128 @@ export async function action({ request }: Route.ActionArgs) {
 
       if (existing) return { success: true, message: 'Already signed up' }
 
-      await prisma.attendance.create({
-        data: {
-          userId: user.userId,
-          classId,
-        },
+      // Fetch Class Details to check template compatibility
+      const classInstance = await prisma.classInstance.findUnique({
+        where: { id: classId },
+        include: { classTemplate: true },
       })
+      if (!classInstance) return { error: 'Class not found' }
+
+      // Find valid package
+      const purchases = await prisma.userPurchase.findMany({
+        where: {
+          userId: user.userId,
+          status: 'ACTIVE',
+          classesRemaining: { gt: 0 },
+          OR: [{ expiryDate: null }, { expiryDate: { gte: new Date() } }],
+        },
+        include: {
+          package: {
+            include: { classLinks: true },
+          },
+        },
+        orderBy: { expiryDate: 'asc' }, // Use earliest expiring first
+      })
+
+      const validPurchase = purchases.find((p) => {
+        if (p.package.classLinks.length === 0) return true // Universal
+        return p.package.classLinks.some((link) => link.classTemplateId === classInstance.classTemplateId)
+      })
+
+      if (!validPurchase) return { error: 'No valid package found for this class' }
+
+      // Transaction: Create Attendance & Update Purchase
+      await prisma.$transaction([
+        prisma.attendance.create({
+          data: {
+            userId: user.userId,
+            classId,
+          },
+        }),
+        prisma.userPurchase.update({
+          where: { id: validPurchase.id },
+          data: {
+            classesRemaining: { decrement: 1 },
+            classesUsed: { increment: 1 },
+            status: validPurchase.classesRemaining === 1 ? 'USED' : undefined,
+          },
+        }),
+      ])
+
       return { success: true, intent: 'signup' }
     }
 
     if (intent === 'cancel') {
-      await prisma.attendance.delete({
-        where: {
-          userId_classId: {
-            userId: user.userId,
-            classId,
-          },
-        },
+      // Transaction: Delete Attendance & Credit Package
+      // Logic: Find the most relevant package to credit.
+      // Ideally we would know WHICH package was used, but for now we credit the first active or recently finished one.
+      // We look for a package that matches the class template.
+
+      const classInstance = await prisma.classInstance.findUnique({
+        where: { id: classId },
+        include: { classTemplate: true },
       })
-      return { success: true, intent: 'cancel' }
+
+      if (!classInstance) return { error: 'Class not found' }
+
+      // Find a package to credit.
+      // Priority:
+      // 1. Active package compatible with this class
+      // 2. "USED" package compatible with this class (re-activate it)
+
+      const purchaseToCredit = await prisma.userPurchase.findFirst({
+        where: {
+          userId: user.userId,
+          package: {
+            OR: [
+              { classLinks: { none: {} } }, // Universal
+              { classLinks: { some: { classTemplateId: classInstance.classTemplateId } } },
+            ],
+          },
+          OR: [
+            { status: 'ACTIVE' },
+            { status: 'USED' }, // If it was just used up, we can re-activate
+          ],
+        },
+        orderBy: { expiryDate: 'asc' }, // Credit the one expiring first (FIFO - likely the one used)
+        // Let's credit the one expiring last to be generous, OR the one expiring first to ensure they use it?
+        // Standard logic: Credit back where it likely came from. We don't have that link.
+        // Let's pick the first available one to effectively "undo" a decrement.
+      })
+
+      if (purchaseToCredit) {
+        await prisma.$transaction([
+          prisma.attendance.delete({
+            where: {
+              userId_classId: {
+                userId: user.userId,
+                classId,
+              },
+            },
+          }),
+          prisma.userPurchase.update({
+            where: { id: purchaseToCredit.id },
+            data: {
+              classesRemaining: { increment: 1 },
+              classesUsed: { decrement: 1 },
+              status: 'ACTIVE', // Ensure it is active if it was USED
+            },
+          }),
+        ])
+      } else {
+        // Fallback if no package found (shouldn't happen if they signed up with one, but maybe expired?)
+        // Just delete attendance
+        await prisma.attendance.delete({
+          where: {
+            userId_classId: {
+              userId: user.userId,
+              classId,
+            },
+          },
+        })
+      }
+
+      return { success: true, message: 'Reservation cancelled. Class credited back to your package.', intent: 'cancel' }
     }
   } catch (error) {
     console.error('Action failed:', error)
@@ -123,12 +227,20 @@ export default function DancerSchedulePage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   // Close modal on successful fetcher completion
-  if (fetcher.data?.success && isModalOpen && fetcher.state === 'idle') {
-    // Optional: Close modal automatically or keep it open to show status?
-    // Let's close it to feel responsive
-    setIsModalOpen(false)
-    setSelectedEvent(null)
-  }
+  const isSubmittingRef = useRef(false)
+
+  // Track submission state
+  useEffect(() => {
+    if (fetcher.state === 'submitting' || fetcher.state === 'loading') {
+      isSubmittingRef.current = true
+    } else if (fetcher.state === 'idle' && isSubmittingRef.current) {
+      if (fetcher.data?.success) {
+        setIsModalOpen(false)
+        setSelectedEvent(null)
+      }
+      isSubmittingRef.current = false
+    }
+  }, [fetcher.state, fetcher.data])
 
   const filteredEvents = useMemo(() => {
     if (!isMyClassesOnly) return events
@@ -146,6 +258,11 @@ export default function DancerSchedulePage() {
     [events]
   )
 
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
+  const [classToCancel, setClassToCancel] = useState<string | null>(null)
+
+  // ... (previous handles)
+
   const handleSignUp = (classId: string) => {
     const formData = new FormData()
     formData.append('intent', 'signup')
@@ -153,12 +270,20 @@ export default function DancerSchedulePage() {
     fetcher.submit(formData, { method: 'post' })
   }
 
-  const handleCancel = (classId: string) => {
-    if (!confirm('Are you sure you want to cancel your reservation?')) return
-    const formData = new FormData()
-    formData.append('intent', 'cancel')
-    formData.append('classId', classId)
-    fetcher.submit(formData, { method: 'post' })
+  const handleCancelClick = (classId: string) => {
+    setClassToCancel(classId)
+    setIsConfirmModalOpen(true)
+  }
+
+  const handleConfirmCancel = () => {
+    if (classToCancel) {
+      const formData = new FormData()
+      formData.append('intent', 'cancel')
+      formData.append('classId', classToCancel)
+      fetcher.submit(formData, { method: 'post' })
+    }
+    setIsConfirmModalOpen(false)
+    setClassToCancel(null)
   }
 
   return (
@@ -187,6 +312,17 @@ export default function DancerSchedulePage() {
           </div>
         </div>
 
+        {fetcher.data?.error && (
+          <div className="mb-6 flex items-center gap-2 rounded-lg border border-red-500/50 bg-red-900/20 p-4 text-red-200">
+            <X className="h-5 w-5" /> {fetcher.data.error}
+          </div>
+        )}
+        {fetcher.data?.success && fetcher.data?.message && (
+          <div className="mb-6 flex items-center gap-2 rounded-lg border border-green-500/50 bg-green-900/20 p-4 text-green-200">
+            <Check className="h-5 w-5" /> {fetcher.data.message}
+          </div>
+        )}
+
         <div className="rounded-lg border border-amber-900/20 bg-gray-900/30 p-1">
           <DashboardCalendar events={filteredEvents} onEventClick={handleEventClick} height="auto" />
         </div>
@@ -198,8 +334,20 @@ export default function DancerSchedulePage() {
         classInstance={selectedEvent}
         isAttending={selectedEvent?.extendedProps?.isAttending}
         onSignUp={handleSignUp}
-        onCancel={handleCancel}
+        onCancel={handleCancelClick}
         isProcessing={fetcher.state !== 'idle'}
+      />
+
+      <ConfirmModal
+        isOpen={isConfirmModalOpen}
+        onClose={() => setIsConfirmModalOpen(false)}
+        onConfirm={handleConfirmCancel}
+        title="Cancel Reservation"
+        description="Are you sure you want to cancel this reservation? The class will be credited back to your package."
+        confirmLabel="Yes, Cancel"
+        cancelLabel="No, Keep it"
+        isDestructive
+        isLoading={fetcher.state !== 'idle'}
       />
     </div>
   )

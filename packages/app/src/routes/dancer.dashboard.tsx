@@ -1,7 +1,9 @@
 import { prisma } from 'db'
-import { redirect, useLoaderData } from 'react-router'
+import { Check, Package, X } from 'lucide-react'
+import { useState } from 'react'
+import { Link, redirect, useFetcher, useLoaderData } from 'react-router'
 import { NextClassWidget } from '../components/dashboard/NextClassWidget'
-import { ShinyText } from '../components/ui'
+import { ConfirmModal, MetallicButton, MetallicTooltip, ShinyText } from '../components/ui'
 import { getCurrentUser } from '../lib/auth.server'
 import type { Route } from './+types/dancer.dashboard'
 
@@ -21,7 +23,6 @@ export async function loader({ request }: Route.LoaderArgs) {
   const endOfToday = new Date(today.setHours(23, 59, 59, 999))
 
   // Fetch Agenda (Classes Today where User is attending)
-  // We check if 'attendances' has a record for this user
   const agendaRaw = await prisma.classInstance.findMany({
     where: {
       startTime: { gte: startOfToday, lte: endOfToday },
@@ -32,24 +33,27 @@ export async function loader({ request }: Route.LoaderArgs) {
     },
     include: {
       classTemplate: true,
-      actualTrainer: true, // Need trainer name for dancer view
+      actualTrainer: true,
     },
     orderBy: { startTime: 'asc' },
   })
 
-  // Fetch Next Class (Immediate next one from ANY time in future where attending)
+  // Fetch Next Class (Immediate next one from ANY time in future)
+  // We want to show the next AVAILABLE class or the next ATTENDING class?
+  // User asked for "zapowiedzi następnych zajęć do zapisania się / odwołania rejestracji"
+  // So we should pick the absolute next class instance in the system, and check status.
   const nextClassRaw = await prisma.classInstance.findFirst({
     where: {
       startTime: { gt: new Date() },
-      attendances: {
-        some: { userId: user.userId },
-      },
       status: { not: 'CANCELLED' },
     },
     orderBy: { startTime: 'asc' },
     include: {
       classTemplate: true,
       actualTrainer: true,
+      attendances: {
+        where: { userId: user.userId },
+      },
     },
   })
 
@@ -61,8 +65,23 @@ export async function loader({ request }: Route.LoaderArgs) {
         endTime: nextClassRaw.endTime.toISOString(),
         hall: nextClassRaw.actualHall,
         trainerName: `${nextClassRaw.actualTrainer.firstName} ${nextClassRaw.actualTrainer.lastName}`,
+        isAttending: nextClassRaw.attendances.length > 0,
       }
     : null
+
+  // Fetch Active Packages
+  const activePackages = await prisma.userPurchase.findMany({
+    where: {
+      userId: user.userId,
+      status: 'ACTIVE',
+      classesRemaining: { gt: 0 },
+      OR: [{ expiryDate: null }, { expiryDate: { gte: new Date() } }],
+    },
+    include: {
+      package: true,
+    },
+    orderBy: { expiryDate: 'asc' },
+  })
 
   // Fetch upcoming classes count (next 7 days)
   const nextWeek = new Date(today)
@@ -78,13 +97,12 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   // Calculate Classes Attended This Month
   const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1)
-
   const classesMonthCount = await prisma.attendance.count({
     where: {
       userId: user.userId,
       class: {
         startTime: { gte: startOfMonth, lte: endOfToday },
-        status: { in: ['COMPLETED', 'SCHEDULED'] }, // Count scheduled too or just completed? usually both for "this month activity"
+        status: { in: ['COMPLETED', 'SCHEDULED'] },
       },
     },
   })
@@ -106,19 +124,140 @@ export async function loader({ request }: Route.LoaderArgs) {
     duration: c.classTemplate.duration,
   }))
 
-  return { user, kpi, nextClass, agenda }
+  return { user, kpi, nextClass, agenda, activePackages }
+}
+
+export async function action({ request }: Route.ActionArgs) {
+  // We reuse the logic from schedule action effectively, or we call the same services if we had them extracted.
+  // For now duplicating the core logic for safety and speed to ensuring specific dashboard behavior.
+  const user = await getCurrentUser(request)
+  if (!user || user.role !== 'DANCER') return redirect('/')
+
+  const formData = await request.formData()
+  const intent = formData.get('intent')
+  const classId = formData.get('classId') as string
+
+  if (!classId) return { error: 'Missing class ID' }
+
+  try {
+    if (intent === 'signup') {
+      // ... Copy of signup logic from schedule ... with package verification
+      const existing = await prisma.attendance.findUnique({
+        where: { userId_classId: { userId: user.userId, classId } },
+      })
+      if (existing) return { success: true, message: 'Already signed up' }
+
+      const classInstance = await prisma.classInstance.findUnique({
+        where: { id: classId },
+        include: { classTemplate: true },
+      })
+      if (!classInstance) return { error: 'Class not found' }
+
+      const purchases = await prisma.userPurchase.findMany({
+        where: {
+          userId: user.userId,
+          status: 'ACTIVE',
+          classesRemaining: { gt: 0 },
+          OR: [{ expiryDate: null }, { expiryDate: { gte: new Date() } }],
+        },
+        include: { package: { include: { classLinks: true } } },
+        orderBy: { expiryDate: 'asc' },
+      })
+
+      const validPurchase = purchases.find((p) => {
+        if (p.package.classLinks.length === 0) return true
+        return p.package.classLinks.some((link) => link.classTemplateId === classInstance.classTemplateId)
+      })
+
+      if (!validPurchase) return { error: 'No valid package found for this class' }
+
+      await prisma.$transaction([
+        prisma.attendance.create({ data: { userId: user.userId, classId } }),
+        prisma.userPurchase.update({
+          where: { id: validPurchase.id },
+          data: {
+            classesRemaining: { decrement: 1 },
+            classesUsed: { increment: 1 },
+            status: validPurchase.classesRemaining === 1 ? 'USED' : undefined,
+          },
+        }),
+      ])
+      return { success: true, message: 'Successfully signed up!' }
+    }
+
+    if (intent === 'cancel') {
+      const classInstance = await prisma.classInstance.findUnique({
+        where: { id: classId },
+        include: { classTemplate: true },
+      })
+      if (!classInstance) return { error: 'Class not found' }
+
+      const purchaseToCredit = await prisma.userPurchase.findFirst({
+        where: {
+          userId: user.userId,
+          package: {
+            OR: [
+              { classLinks: { none: {} } },
+              { classLinks: { some: { classTemplateId: classInstance.classTemplateId } } },
+            ],
+          },
+          OR: [{ status: 'ACTIVE' }, { status: 'USED' }],
+        },
+        orderBy: { expiryDate: 'asc' },
+      })
+
+      if (purchaseToCredit) {
+        await prisma.$transaction([
+          prisma.attendance.delete({ where: { userId_classId: { userId: user.userId, classId } } }),
+          prisma.userPurchase.update({
+            where: { id: purchaseToCredit.id },
+            data: {
+              classesRemaining: { increment: 1 },
+              classesUsed: { decrement: 1 },
+              status: 'ACTIVE',
+            },
+          }),
+        ])
+      } else {
+        await prisma.attendance.delete({ where: { userId_classId: { userId: user.userId, classId } } })
+      }
+      return { success: true, message: 'Reservation cancelled.' }
+    }
+  } catch (error) {
+    console.error(error)
+    return { error: 'Action failed' }
+  }
+  return null
 }
 
 export default function DancerDashboard() {
-  const { user, kpi, nextClass, agenda } = useLoaderData<typeof loader>()
+  const { user, kpi, nextClass, agenda, activePackages } = useLoaderData<typeof loader>()
+  // We use fetcher for interacting with the widget without full page reload feels
+  const fetcher = useFetcher()
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
 
   const formatDate = (isoString: string) => {
     return new Date(isoString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   }
 
+  const handleConfirmCancel = () => {
+    if (nextClass) {
+      const fd = new FormData()
+      fd.append('intent', 'cancel')
+      fd.append('classId', nextClass.id)
+      fetcher.submit(fd, { method: 'post' })
+    }
+    setIsConfirmModalOpen(false)
+  }
+
   return (
     <div className="text-amber-50">
       <div className="mx-auto max-w-7xl">
+        {/* ... Header ... */}
+        {/* ... Global Alerts ... */}
+
+        {/* ... Packages ... */}
+
         {/* Header */}
         <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
           <div className="flex flex-col gap-1">
@@ -131,13 +270,89 @@ export default function DancerDashboard() {
           </div>
         </div>
 
+        {/* Global Alerts */}
+        {fetcher.data?.error && (
+          <div className="mb-6 flex items-center gap-2 rounded-lg border border-red-500/50 bg-red-900/20 p-4 text-red-200">
+            <X className="h-5 w-5" /> {fetcher.data.error}
+          </div>
+        )}
+        {fetcher.data?.message && (
+          <div className="mb-6 flex items-center gap-2 rounded-lg border border-green-500/50 bg-green-900/20 p-4 text-green-200">
+            <Check className="h-5 w-5" /> {fetcher.data.message}
+          </div>
+        )}
+
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           {/* Main Content (2/3) */}
           <div className="space-y-8 lg:col-span-2">
             {/* Next Class Widget */}
             <section>
               <h2 className="mb-4 font-serif text-amber-400 text-xl tracking-wide">Next Class</h2>
-              <NextClassWidget nextClass={nextClass} userRole="DANCER" />
+              <NextClassWidget nextClass={nextClass} userRole="DANCER">
+                {nextClass && (
+                  <div className="flex gap-4">
+                    {(() => {
+                      const today = new Date()
+                      today.setHours(0, 0, 0, 0)
+                      const classDate = new Date(nextClass.startTime)
+                      classDate.setHours(0, 0, 0, 0)
+
+                      const isTooLate = today.getTime() >= classDate.getTime()
+                      const tooltipText = 'Changes are allowed only until the day before the class.'
+
+                      return nextClass.isAttending ? (
+                        <MetallicTooltip content={tooltipText} shouldShow={isTooLate}>
+                          <div className="w-full">
+                            <button
+                              type="button"
+                              onClick={() => !isTooLate && setIsConfirmModalOpen(true)}
+                              disabled={fetcher.state !== 'idle' || isTooLate}
+                              className={`w-full rounded-md border px-4 py-2 transition-colors ${
+                                isTooLate
+                                  ? 'cursor-not-allowed border-gray-700 bg-gray-800 text-gray-500'
+                                  : 'border-red-500/30 bg-red-500/10 text-red-400 hover:bg-red-500/20 disabled:opacity-50'
+                              }`}
+                            >
+                              {fetcher.state !== 'idle' ? 'Processing...' : 'Cancel Reservation'}
+                            </button>
+                          </div>
+                        </MetallicTooltip>
+                      ) : (
+                        <MetallicTooltip content={tooltipText} shouldShow={isTooLate}>
+                          <div className="w-full">
+                            <MetallicButton
+                              className={`w-full justify-center ${isTooLate ? '!opacity-50 cursor-not-allowed' : ''}`}
+                              onClick={() => {
+                                if (!isTooLate) {
+                                  const fd = new FormData()
+                                  fd.append('intent', 'signup')
+                                  fd.append('classId', nextClass.id)
+                                  fetcher.submit(fd, { method: 'post' })
+                                }
+                              }}
+                              disabled={fetcher.state !== 'idle' || isTooLate}
+                            >
+                              {fetcher.state !== 'idle' ? 'Processing...' : 'Sign Up for Class'}
+                            </MetallicButton>
+                          </div>
+                        </MetallicTooltip>
+                      )
+                    })()}
+                  </div>
+                )}
+              </NextClassWidget>
+
+              <ConfirmModal
+                isOpen={isConfirmModalOpen}
+                onClose={() => setIsConfirmModalOpen(false)}
+                onConfirm={handleConfirmCancel}
+                title="Cancel Reservation"
+                description="Are you sure you want to cancel this reservation? The class will be returned to your package."
+                confirmLabel="Yes, Cancel"
+                cancelLabel="No, Keep it"
+                isDestructive
+                isLoading={fetcher.state !== 'idle'}
+              />
             </section>
 
             {/* Agenda */}
@@ -171,6 +386,60 @@ export default function DancerDashboard() {
                   ))}
                 </div>
               )}
+            </section>
+
+            {/* Packages Summary */}
+            <section>
+              <h2 className="mb-4 font-serif text-amber-400 text-xl tracking-wide">My Active Packages</h2>
+
+              <div className="group relative overflow-hidden rounded-xl border border-amber-500/30 bg-gradient-to-br from-gray-900/80 to-gray-950/80 p-6 shadow-lg backdrop-blur-md transition-all hover:border-amber-500/50">
+                {/* Background Glow */}
+                <div className="-right-20 -top-20 absolute h-64 w-64 rounded-full bg-amber-500/10 blur-3xl transition-opacity group-hover:opacity-100" />
+
+                <div className="relative z-10">
+                  <div className="mb-4 flex items-center justify-between">
+                    <div className="rounded-full border border-amber-500/20 bg-amber-500/10 px-3 py-1 font-medium text-amber-400 text-xs uppercase tracking-wider">
+                      Active • {activePackages.length}
+                    </div>
+                    <Link to="/dancer/packages" title="Refill">
+                      <Package className="h-5 w-5 text-gray-400 transition-colors hover:text-amber-400" />
+                    </Link>
+                  </div>
+
+                  {activePackages.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-8 text-center text-gray-500">
+                      <Package className="mb-2 h-8 w-8 opacity-20" />
+                      <p className="italic">You don't have any active packages.</p>
+                      <Link to="/dancer/packages" className="mt-4 text-amber-400 text-sm hover:underline">
+                        Purchase a package
+                      </Link>
+                    </div>
+                  ) : (
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      {activePackages.map((p) => (
+                        <div
+                          key={p.id}
+                          className="relative overflow-hidden rounded-md border border-amber-500/10 bg-black/40 p-4 transition-colors hover:bg-black/60"
+                        >
+                          <div className="-mt-2 -mr-2 absolute top-0 right-0 select-none p-2 font-bold text-6xl text-amber-500/10 leading-none">
+                            {p.classesRemaining}
+                          </div>
+                          <div className="relative z-10">
+                            <div className="truncate font-bold text-amber-100">{p.package.name}</div>
+                            <div className="mb-2 text-amber-400/80 text-xs">
+                              Expires: {p.expiryDate ? new Date(p.expiryDate).toLocaleDateString() : 'Never'}
+                            </div>
+                            <div className="flex items-end gap-1">
+                              <span className="font-bold text-2xl text-amber-400">{p.classesRemaining}</span>
+                              <span className="mb-1 text-gray-400 text-sm">classes left</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
             </section>
           </div>
 
