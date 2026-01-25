@@ -250,7 +250,6 @@ export default function PricingConfiguration() {
           <table className="w-full border-collapse text-left">
             <thead>
               <tr className="border-white/10 border-b text-gray-500 text-xs uppercase">
-<<<<<<< HEAD
                 <th className="px-4 py-3">{t('ADMIN_TABLE_NAME')}</th>
                 <th className="px-4 py-3">{t('ADMIN_TABLE_CATEGORY')}</th>
                 <th className="px-4 py-3">{t('ADMIN_TABLE_CLASSES')}</th>
@@ -258,15 +257,6 @@ export default function PricingConfiguration() {
                 <th className="px-4 py-3">{t('ADMIN_TABLE_PRICE')}</th>
                 <th className="px-4 py-3">{t('ADMIN_TABLE_STATUS')}</th>
                 <th className="px-4 py-3 text-right">{t('ADMIN_TABLE_ACTIONS')}</th>
-=======
-                <th className="px-4 py-3">Name</th>
-                <th className="hidden px-4 py-3 md:table-cell">Category</th>
-                <th className="hidden px-4 py-3 md:table-cell">Classes</th>
-                <th className="hidden px-4 py-3 md:table-cell">Validity</th>
-                <th className="px-4 py-3 font-semibold">Price</th>
-                <th className="hidden px-4 py-3 text-center md:table-cell">Status</th>
-                <th className="px-4 py-3 text-right">Actions</th>
->>>>>>> origin/main
               </tr>
             </thead>
             <tbody>

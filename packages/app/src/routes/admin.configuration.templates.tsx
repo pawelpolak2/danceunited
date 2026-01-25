@@ -273,7 +273,6 @@ export default function TemplatesConfiguration() {
           <table className="w-full border-collapse text-left">
             <thead>
               <tr className="border-white/10 border-b text-gray-500 text-xs uppercase">
-<<<<<<< HEAD
                 <th className="px-4 py-3">{t('ADMIN_TABLE_NAME')}</th>
                 <th className="px-4 py-3">{t('ADMIN_TABLE_STYLE')}</th>
                 <th className="px-4 py-3 text-center">{t('ADMIN_TABLE_WHITELIST')}</th>
@@ -281,15 +280,6 @@ export default function TemplatesConfiguration() {
                 <th className="px-4 py-3 text-center">{t('ADMIN_TABLE_IN_USE')}</th>
                 <th className="px-4 py-3 text-center">{t('ADMIN_TABLE_STATUS')}</th>
                 <th className="px-4 py-3 text-right">{t('ADMIN_TABLE_ACTIONS')}</th>
-=======
-                <th className="px-4 py-3">Name</th>
-                <th className="hidden px-4 py-3 md:table-cell">Style</th>
-                <th className="hidden px-4 py-3 text-center md:table-cell">Whitelist</th>
-                <th className="hidden px-4 py-3 md:table-cell">Defaults</th>
-                <th className="hidden px-4 py-3 text-center md:table-cell">In Use</th>
-                <th className="px-4 py-3 text-center">Status</th>
-                <th className="px-4 py-3 text-right">Actions</th>
->>>>>>> origin/main
               </tr>
             </thead>
             <tbody>

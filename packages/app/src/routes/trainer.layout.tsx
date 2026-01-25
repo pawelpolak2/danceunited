@@ -3,8 +3,8 @@ import { Outlet, redirect, useLocation } from 'react-router'
 import { Footer } from '../components/Footer'
 import { DashboardMobileNav } from '../components/dashboard/DashboardMobileNav'
 import { DashboardSidebar } from '../components/dashboard/DashboardSidebar'
-import { getCurrentUser } from '../lib/auth.server'
 import { useTranslation } from '../contexts/LanguageContext'
+import { getCurrentUser } from '../lib/auth.server'
 import type { Route } from './+types/trainer.layout'
 
 export async function loader({ request }: Route.LoaderArgs) {
@@ -22,7 +22,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export default function TrainerLayout() {
-  const location = useLocation()
+  const _location = useLocation()
   const { t } = useTranslation()
 
   const menuGroups = [

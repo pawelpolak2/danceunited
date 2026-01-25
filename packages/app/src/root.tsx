@@ -14,13 +14,9 @@ import {
 
 import type { Route } from './+types/root'
 import { Footer } from './components/Footer'
-<<<<<<< HEAD
 import { LanguageSwitcher } from './components/LanguageSwitcher'
-import { MetallicLink, ShinyText } from './components/ui'
-import { LanguageProvider, useTranslation } from './contexts/LanguageContext'
-=======
 import { MetallicLink, MobileNav, ShinyText } from './components/ui'
->>>>>>> origin/main
+import { LanguageProvider, useTranslation } from './contexts/LanguageContext'
 import { getCurrentUser } from './lib/auth.server'
 import './app.css'
 
