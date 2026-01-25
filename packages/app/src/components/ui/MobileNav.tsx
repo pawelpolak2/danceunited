@@ -30,15 +30,17 @@ export function MobileNav() {
 
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 z-40 bg-black/80 backdrop-blur-sm transition-opacity duration-300 ${isOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
-          }`}
+        className={`fixed inset-0 z-40 bg-black/80 backdrop-blur-sm transition-opacity duration-300 ${
+          isOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
+        }`}
         onClick={toggle}
       />
 
       {/* Drawer */}
       <div
-        className={`fixed top-0 right-0 z-40 h-full w-64 transform border-l border-amber-900/30 bg-gray-950 px-6 py-20 shadow-2xl transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'
-          }`}
+        className={`fixed top-0 right-0 z-40 h-full w-64 transform border-amber-900/30 border-l bg-gray-950 px-6 py-20 shadow-2xl transition-transform duration-300 ease-in-out ${
+          isOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
       >
         <div className="flex flex-col gap-6">
           {menuItems.map((item) => (

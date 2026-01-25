@@ -40,7 +40,7 @@ const buttonTextConfig = {
 
 const calendarPlugins = [dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]
 
-const eventTimeFormatConfig = {
+const _eventTimeFormatConfig = {
   hour: '2-digit',
   minute: '2-digit',
   meridiem: false,
@@ -157,7 +157,9 @@ function DashboardCalendarComponent({
         slotLabelFormat={slotLabelFormatConfig}
         dayHeaderFormat={isMobile ? { weekday: 'narrow' } : { weekday: 'short' }}
         titleFormat={isMobile ? { month: 'short', year: 'numeric' } : { month: 'long', year: 'numeric' }}
-        listDayFormat={isMobile ? { weekday: 'short', day: 'numeric' } : { weekday: 'long', month: 'long', day: 'numeric' }}
+        listDayFormat={
+          isMobile ? { weekday: 'short', day: 'numeric' } : { weekday: 'long', month: 'long', day: 'numeric' }
+        }
         listDaySideFormat={isMobile ? false : { year: 'numeric' }}
       />
     </div>

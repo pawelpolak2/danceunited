@@ -1,45 +1,26 @@
-import {
-  BarChart3,
-  Calendar,
-  DollarSign,
-  FileBox,
-  Image,
-  LayoutDashboard,
-  LogOut,
-  Palette,
-  Settings,
-  Users,
-} from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
+import { LogOut, Settings } from 'lucide-react'
 import { Form, Link, useLocation } from 'react-router'
 import { ShinyText } from '../ui'
 
-interface AdminSidebarProps {
+export interface MenuItem {
+  label: string
+  path: string
+  icon: LucideIcon
+}
+
+export interface MenuGroup {
+  title: string
+  items: MenuItem[]
+}
+
+interface DashboardSidebarProps {
+  groups: MenuGroup[]
   onNavigate?: () => void
 }
 
-export function AdminSidebar({ onNavigate }: AdminSidebarProps) {
+export function DashboardSidebar({ groups, onNavigate }: DashboardSidebarProps) {
   const location = useLocation()
-
-  const menuGroups = [
-    {
-      title: 'MAIN',
-      items: [
-        { label: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
-        { label: 'Master Schedule', path: '/admin/schedule', icon: Calendar },
-      ],
-    },
-    {
-      title: 'MANAGEMENT',
-      items: [
-        { label: 'Users', path: '/admin/users', icon: Users },
-        { label: 'Templates', path: '/admin/configuration/templates', icon: FileBox },
-        { label: 'Pricing', path: '/admin/configuration/pricing', icon: DollarSign },
-        { label: 'Statistics', path: '/admin/analytics', icon: BarChart3 },
-        { label: 'Gallery', path: '/admin/configuration/gallery', icon: Image },
-        { label: 'Styles', path: '/admin/configuration/styles', icon: Palette },
-      ],
-    },
-  ]
 
   return (
     <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-amber-900/30 bg-gray-900/40 shadow-2xl shadow-black/50 backdrop-blur-md">
@@ -59,7 +40,7 @@ export function AdminSidebar({ onNavigate }: AdminSidebarProps) {
 
       {/* Sidebar Navigation */}
       <nav className="scrollbar-thin scrollbar-thumb-amber-900/20 scrollbar-track-transparent flex-1 space-y-6 overflow-y-auto px-4 py-6">
-        {menuGroups.map((group) => (
+        {groups.map((group) => (
           <div key={group.title}>
             <h3 className="mb-3 px-3 font-bold font-sans text-[10px] text-gray-500 uppercase tracking-widest opacity-70">
               {group.title}
@@ -73,10 +54,11 @@ export function AdminSidebar({ onNavigate }: AdminSidebarProps) {
                     key={item.path}
                     to={item.path}
                     onClick={onNavigate}
-                    className={`group relative flex items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 font-medium text-sm transition-all duration-300 ${isActive
+                    className={`group relative flex items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 font-medium text-sm transition-all duration-300 ${
+                      isActive
                         ? 'border border-amber-500/30 bg-amber-500/10 text-amber-400 shadow-[0_0_15px_-3px_rgba(245,158,11,0.15)]'
                         : 'border border-transparent text-gray-400 hover:border-amber-500/10 hover:bg-white/5 hover:text-amber-200'
-                      }
+                    }
                                             `}
                   >
                     <Icon

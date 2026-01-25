@@ -3,9 +3,13 @@ import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Link } from 'react-router'
 import { ShinyText } from '../ui'
-import { AdminSidebar } from './AdminSidebar'
 
-export function AdminMobileNav() {
+interface DashboardMobileNavProps {
+  title: string
+  renderSidebar: (onNavigate: () => void) => React.ReactNode
+}
+
+export function DashboardMobileNav({ title, renderSidebar }: DashboardMobileNavProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
 
@@ -21,7 +25,7 @@ export function AdminMobileNav() {
         type="button"
         onClick={() => setIsOpen(true)}
         className="flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-amber-400 transition-colors hover:bg-amber-500/20"
-        aria-label="Open Admin Sidebar"
+        aria-label="Open Sidebar"
       >
         <PanelLeft size={20} />
         <span className="font-medium text-xs uppercase tracking-wider">Menu</span>
@@ -34,7 +38,7 @@ export function AdminMobileNav() {
           variant="title"
           className="glow-sm font-bold text-amber-500 text-lg uppercase tracking-widest"
         >
-          DU Admin
+          {title}
         </ShinyText>
         <img src="/logos/logo-transparent.png" alt="Dance United" className="h-8 w-auto" />
       </Link>
@@ -45,15 +49,17 @@ export function AdminMobileNav() {
           <>
             {/* Backdrop */}
             <div
-              className={`fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm transition-opacity duration-300 ${isOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
-                }`}
+              className={`fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm transition-opacity duration-300 ${
+                isOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
+              }`}
               onClick={() => setIsOpen(false)}
             />
 
             {/* Slide-out Panel */}
             <div
-              className={`fixed top-0 left-0 z-[101] h-full w-72 transform border-r border-amber-900/30 bg-gray-950 shadow-2xl transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'
-                }`}
+              className={`fixed top-0 left-0 z-[101] h-full w-72 transform border-amber-900/30 border-r bg-gray-950 shadow-2xl transition-transform duration-300 ease-in-out ${
+                isOpen ? 'translate-x-0' : '-translate-x-full'
+              }`}
             >
               <div className="relative h-full">
                 {/* Close Button inside Drawer */}
@@ -65,7 +71,7 @@ export function AdminMobileNav() {
                   <X size={20} />
                 </button>
 
-                <AdminSidebar onNavigate={() => setIsOpen(false)} />
+                {renderSidebar(() => setIsOpen(false))}
               </div>
             </div>
           </>,
