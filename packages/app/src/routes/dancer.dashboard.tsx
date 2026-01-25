@@ -46,6 +46,9 @@ export async function loader({ request }: Route.LoaderArgs) {
     where: {
       startTime: { gt: new Date() },
       status: { not: 'CANCELLED' },
+      attendances: {
+        some: { userId: user.userId },
+      },
     },
     orderBy: { startTime: 'asc' },
     include: {

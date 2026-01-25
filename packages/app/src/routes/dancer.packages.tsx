@@ -1,5 +1,5 @@
 import { prisma } from 'db'
-import { Check, Package as PackageIcon, ShieldCheck } from 'lucide-react'
+import { Package as PackageIcon } from 'lucide-react'
 import { Form, redirect, useLoaderData } from 'react-router'
 import { MetallicButton, ShinyText } from '../components/ui'
 import { getCurrentUser } from '../lib/auth.server'
@@ -11,6 +11,14 @@ export function meta(_args: Route.MetaArgs) {
 
 // ... imports ...
 
+import { AnimatePresence, motion } from 'framer-motion'
+import { X } from 'lucide-react'
+// ... imports ...
+import { useState } from 'react'
+import { p24Service } from '../services/p24.server'
+
+// ... meta ...
+
 export async function action({ request }: Route.ActionArgs) {
   const user = await getCurrentUser(request)
   if (!user || user.role !== 'DANCER') return redirect('/')
@@ -20,32 +28,60 @@ export async function action({ request }: Route.ActionArgs) {
 
   if (intent === 'purchase') {
     const packageId = formData.get('packageId') as string
+    const autoSignIn = formData.get('autoSignIn') === 'true'
+
     if (!packageId) return { error: 'Package ID is required' }
 
     const pkg = await prisma.package.findUnique({ where: { id: packageId } })
     if (!pkg) return { error: 'Package not found' }
 
-    const expiryDate = new Date()
-    expiryDate.setDate(expiryDate.getDate() + pkg.validityDays)
+    try {
+      // Create Payment Record (Pending)
+      const payment = await prisma.payment.create({
+        data: {
+          userId: user.userId,
+          amount: pkg.price,
+          paymentMethod: 'TRANSFER', // P24 creates transfer/card etc.
+          paymentStatus: 'PENDING',
+          metadata: {
+            packageId: pkg.id,
+            autoSignIn: autoSignIn,
+          },
+        },
+      })
 
-    await prisma.userPurchase.create({
-      data: {
-        userId: user.userId,
-        packageId: pkg.id,
-        classesRemaining: pkg.classCount,
-        expiryDate: expiryDate,
-        status: 'ACTIVE',
-        classesUsed: 0,
-      },
-    })
+      // Register Transaction with P24
+      // Amount must be in grosze
+      const amountInGrosz = Number(pkg.price) * 100
+      const sessionId = payment.id // Use payment UUID as session ID
 
-    return redirect('/dancer/my-packages')
+      const returnUrl = `${process.env.APP_URL || 'http://localhost:5173'}/dancer/my-packages?payment=success`
+
+      // We use p24Service from server
+      const tokenUrl = await p24Service.registerTransaction({
+        sessionId: sessionId,
+        amount: amountInGrosz,
+        currency: 'PLN',
+        description: `Payment for package: ${pkg.name}`,
+        email: user.email,
+        urlReturn: returnUrl,
+        urlStatus: `${process.env.APP_URL || 'http://localhost:5173'}/api/p24/notify`,
+        client: `${user.firstName} ${user.lastName}`,
+        waitForResult: true, // Wait for immediate result if possible
+      })
+
+      return redirect(tokenUrl)
+    } catch (error) {
+      console.error('Payment initiation failed', error)
+      return { error: 'Payment initiation failed. Please try again.' }
+    }
   }
 
   return null
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
+  // ... existing loader code ...
   const user = await getCurrentUser(request)
   if (!user || user.role !== 'DANCER') return redirect('/')
 
@@ -68,21 +104,14 @@ export async function loader({ request }: Route.LoaderArgs) {
     orderBy: { price: 'asc' },
   })
 
-  // Filter packages:
-  // Show if:
-  // 1. It has NO linked classes (assumed Universal)
-  // 2. OR It has linked classes, and User has access to AT LEAST ONE of them.
-  //    Access means: !isWhitelistEnabled OR (isWhitelistEnabled AND whitelist.length > 0)
-
+  // Filter packages logic (same as before)
   const visiblePackages = packagesRaw.filter((pkg) => {
     if (pkg.classLinks.length === 0) return true
-
     const hasAccessibleTemplate = pkg.classLinks.some((link) => {
       const tmpl = link.classTemplate
       if (!tmpl.isWhitelistEnabled) return true
-      return tmpl.whitelist.length > 0 // User is in whitelist (filtered in query)
+      return tmpl.whitelist.length > 0
     })
-
     return hasAccessibleTemplate
   })
 
@@ -93,6 +122,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     price: p.price.toString(),
     classCount: p.classCount,
     validityDays: p.validityDays,
+    category: p.category,
     isUniversal: p.classLinks.length === 0,
     linkedClassesCount: p.classLinks.length,
   }))
@@ -102,10 +132,32 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 export default function DancerPackagesPage() {
   const { packages } = useLoaderData<typeof loader>()
+  const [selectedPackage, setSelectedPackage] = useState<(typeof packages)[0] | null>(null)
+
+  // Group by category
+  const groupedHelper = packages.reduce(
+    (acc, pkg) => {
+      const cat = pkg.category || 'OTHER'
+      if (!acc[cat]) acc[cat] = []
+      acc[cat].push(pkg)
+      return acc
+    },
+    {} as Record<string, typeof packages>
+  )
+
+  const categoryOrder = ['UNIVERSAL', 'ADULTS', 'YOUTH', 'KIDS', 'SPORT']
+  const sortedCategories = Object.keys(groupedHelper).sort((a, b) => {
+    const idxA = categoryOrder.indexOf(a)
+    const idxB = categoryOrder.indexOf(b)
+    if (idxA !== -1 && idxB !== -1) return idxA - idxB
+    if (idxA !== -1) return -1
+    if (idxB !== -1) return 1
+    return a.localeCompare(b)
+  })
 
   return (
     <div className="min-h-screen text-amber-50">
-      <div className="mx-auto max-w-7xl">
+      <div className="mx-auto max-w-7xl px-4 py-8">
         {/* Header */}
         <div className="mb-12 flex flex-col items-center text-center">
           <ShinyText as="h1" variant="title" className="mb-4 font-serif text-5xl text-amber-400">
@@ -122,75 +174,162 @@ export default function DancerPackagesPage() {
             <p className="text-xl">No packages currently available for you.</p>
           </div>
         ) : (
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {packages.map((pkg) => (
-              <PackageCard key={pkg.id} pkg={pkg} />
+          <div className="space-y-16">
+            {sortedCategories.map((category) => (
+              <div key={category} className="space-y-6">
+                {/* Category Header */}
+                <div className="relative border-amber-500/20 border-b pb-2">
+                  <h2 className="font-serif text-3xl text-amber-400/90 tracking-wider">{category}</h2>
+                  <div className="-bottom-px absolute left-0 h-px w-24 bg-amber-400" />
+                </div>
+
+                {/* Table */}
+                <div className="overflow-hidden rounded-xl border border-white/5 bg-gray-900/40 backdrop-blur-md">
+                  <table className="w-full text-left">
+                    <thead>
+                      <tr className="border-white/10 border-b text-gray-400 text-sm uppercase tracking-wider">
+                        <th className="px-6 py-4 font-medium">Package Name</th>
+                        <th className="px-6 py-4 text-center font-medium">Classes</th>
+                        <th className="px-6 py-4 text-center font-medium">Validity</th>
+                        <th className="px-6 py-4 text-right font-medium">Price</th>
+                        <th className="px-6 py-4 text-right font-medium">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      {groupedHelper[category].map((pkg) => (
+                        <tr key={pkg.id} className="group transition-colors hover:bg-white/5">
+                          <td className="px-6 py-4">
+                            <div className="flex flex-col">
+                              <span className="font-medium text-amber-100 text-lg transition-colors group-hover:text-amber-400">
+                                {pkg.name}
+                              </span>
+                              {pkg.description && (
+                                <span className="line-clamp-1 text-gray-500 text-sm">{pkg.description}</span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-center">
+                            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-gray-300 text-sm">
+                              <span>{pkg.classCount}</span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-center">
+                            <span className="text-gray-400 text-sm">{pkg.validityDays} days</span>
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <span className="font-bold text-white text-xl">{pkg.price} zł</span>
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <button
+                              type="button"
+                              onClick={() => setSelectedPackage(pkg)}
+                              className="inline-flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-2 font-medium text-amber-400 text-sm transition-all hover:border-amber-500/60 hover:bg-amber-500/20 active:scale-95"
+                            >
+                              Purchase
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             ))}
           </div>
         )}
       </div>
+
+      <AnimatePresence>
+        {selectedPackage && <PurchaseModal pkg={selectedPackage} onClose={() => setSelectedPackage(null)} />}
+      </AnimatePresence>
     </div>
   )
 }
 
-function PackageCard({ pkg }: { pkg: any }) {
+function PurchaseModal({ pkg, onClose }: { pkg: any; onClose: () => void }) {
+  const [autoSignIn, setAutoSignIn] = useState(false)
+
   return (
-    <div className="group hover:-translate-y-1 relative flex flex-col overflow-hidden rounded-2xl border border-amber-500/20 bg-gray-900/60 p-8 backdrop-blur-md transition-all duration-300 hover:border-amber-500/40 hover:shadow-2xl hover:shadow-amber-900/20">
-      {/* Background Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+      />
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.95, opacity: 0 }}
+        className="relative w-full max-w-md overflow-hidden rounded-2xl border border-amber-500/30 bg-gray-900 p-8 shadow-2xl"
+      >
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute top-4 right-4 rounded-full p-2 text-gray-400 transition-colors hover:bg-white/10 hover:text-white"
+        >
+          <X className="h-5 w-5" />
+        </button>
 
-      <div className="relative z-10 flex flex-1 flex-col">
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="font-bold font-serif text-2xl text-amber-100">{pkg.name}</h3>
-          {pkg.isUniversal && (
-            <span className="flex items-center gap-1 rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-1 font-medium text-amber-400 text-xs">
-              <ShieldCheck className="h-3 w-3" /> Universal
-            </span>
-          )}
+        <h2 className="mb-6 font-serif text-3xl text-amber-400">Confirm Purchase</h2>
+
+        <div className="mb-8 space-y-4">
+          <div className="flex justify-between border-white/10 border-b pb-4">
+            <span className="text-gray-400">Package</span>
+            <span className="font-bold text-white">{pkg.name}</span>
+          </div>
+          <div className="flex justify-between border-white/10 border-b pb-4">
+            <span className="text-gray-400">Price</span>
+            <span className="font-bold text-amber-400 text-xl">{pkg.price} zł</span>
+          </div>
+          <div className="flex justify-between border-white/10 border-b pb-4">
+            <span className="text-gray-400">Classes</span>
+            <span className="text-white">{pkg.classCount}</span>
+          </div>
         </div>
-
-        <div className="mb-6 flex items-baseline text-white">
-          <span className="font-bold text-4xl tracking-tight">${pkg.price}</span>
-          {/* <span className="ml-1 text-xl text-gray-400">/mo</span> */}
-        </div>
-
-        <p className="mb-8 flex-1 text-gray-400 leading-relaxed">
-          {pkg.description || `Includes ${pkg.classCount} classes valid for ${pkg.validityDays} days.`}
-        </p>
-
-        <ul className="mb-8 space-y-4 text-gray-300 text-sm">
-          <li className="flex items-center gap-3">
-            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-500/20 text-amber-400">
-              <Check className="h-4 w-4" />
-            </div>
-            <span className="font-medium text-amber-100">{pkg.classCount} Classes</span>
-          </li>
-          <li className="flex items-center gap-3">
-            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-500/20 text-amber-400">
-              <Check className="h-4 w-4" />
-            </div>
-            <span>Valid for {pkg.validityDays} days</span>
-          </li>
-          <li className="flex items-center gap-3">
-            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-500/20 text-amber-400">
-              <Check className="h-4 w-4" />
-            </div>
-            <span>
-              {pkg.isUniversal
-                ? 'Access to all standard classes'
-                : `Valid for ${pkg.linkedClassesCount} specific class types`}
-            </span>
-          </li>
-        </ul>
 
         <Form method="post">
           <input type="hidden" name="packageId" value={pkg.id} />
           <input type="hidden" name="intent" value="purchase" />
-          <MetallicButton type="submit" className="w-full justify-center py-4 text-lg">
-            Purchase Package
-          </MetallicButton>
+
+          <div className="mb-8 flex items-start gap-3 rounded-lg border border-amber-500/20 bg-amber-500/5 p-4">
+            <div className="flex h-6 items-center">
+              <input
+                id="autoSignIn"
+                name="autoSignIn"
+                type="checkbox"
+                value="true"
+                checked={autoSignIn}
+                onChange={(e) => setAutoSignIn(e.target.checked)}
+                className="h-5 w-5 rounded border-gray-600 bg-gray-800 text-amber-500 focus:ring-amber-500 focus:ring-offset-gray-900"
+              />
+            </div>
+            <div className="text-sm">
+              <label htmlFor="autoSignIn" className="font-medium text-amber-200">
+                Auto-sign in for next classes
+              </label>
+              <p className="mt-1 text-gray-400">
+                Automatically register for the next upcoming class instance for each style in this package immediately
+                after payment.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <MetallicButton type="submit" className="w-full justify-center py-4 text-lg">
+              Pay with Przelewy24
+            </MetallicButton>
+            <button
+              type="button"
+              onClick={onClose}
+              className="w-full rounded-lg border border-white/10 py-3 font-medium text-gray-400 transition-colors hover:bg-white/5 hover:text-white"
+            >
+              Cancel
+            </button>
+          </div>
         </Form>
-      </div>
+      </motion.div>
     </div>
   )
 }

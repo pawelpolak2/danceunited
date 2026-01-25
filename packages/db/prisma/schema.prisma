@@ -226,6 +226,7 @@ model Payment {
   paymentMethod PaymentMethod @default(CARD) @map("payment_method")
   paymentStatus PaymentStatus @default(PENDING) @map("payment_status")
   transactionId String?       @map("transaction_id") @db.VarChar(255)
+  metadata      Json?         @map("metadata")
   paymentDate   DateTime      @default(now()) @map("payment_date") @db.Timestamptz(6)
   updatedAt     DateTime      @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
