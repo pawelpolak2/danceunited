@@ -30,7 +30,6 @@ export function Carousel({ images, className = '', autoPlayInterval = 5000 }: Ca
       role="region"
       aria-label="Image Carousel"
     >
-      {/* Images */}
       <div className="relative h-full w-full overflow-hidden">
         {images.map((src, index) => (
           <div
@@ -39,7 +38,14 @@ export function Carousel({ images, className = '', autoPlayInterval = 5000 }: Ca
               index === currentIndex ? 'opacity-100' : 'opacity-0'
             }`}
           >
-            <img src={src} alt={`Slide ${index + 1}`} className="h-full w-full object-cover" />
+            <img
+              src={src}
+              alt={`Slide ${index + 1}`}
+              className="h-full w-full object-cover"
+              loading={index === 0 ? 'eager' : 'lazy'}
+              fetchPriority={index === 0 ? 'high' : 'auto'}
+              decoding="async"
+            />
             {/* Overlay gradient for better text readability if needed */}
             <div className="absolute inset-0 bg-gradient-to-t from-gray-950/80 via-transparent to-gray-950/30" />
           </div>

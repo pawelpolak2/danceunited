@@ -17,6 +17,12 @@ export function meta(_args: Route.MetaArgs) {
   ]
 }
 
+export const links: Route.LinksFunction = () => [
+  { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.15/index.global.min.css' },
+  { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.15/index.global.min.css' },
+  { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@6.1.15/index.global.min.css' },
+]
+
 export async function loader({ request }: Route.LoaderArgs) {
   const user = await getCurrentUser(request)
 
@@ -66,11 +72,16 @@ export async function loader({ request }: Route.LoaderArgs) {
   const threeMonthsAgo = new Date()
   threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3)
 
+  // Limit future to 6 months
+  const sixMonthsAhead = new Date()
+  sixMonthsAhead.setMonth(sixMonthsAhead.getMonth() + 6)
+
   const classes = await prisma.classInstance.findMany({
     where: {
       // Removed actualTrainerId filter to show all classes
       startTime: {
         gte: threeMonthsAgo,
+        lte: sixMonthsAhead,
       },
     },
     include: {

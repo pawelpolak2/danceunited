@@ -6,12 +6,22 @@ import { ShinyText } from '../components/ui'
 import { getCurrentUser } from '../lib/auth.server'
 import type { Route } from './+types/schedule'
 
+export const links: Route.LinksFunction = () => [
+  { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.15/index.global.min.css' },
+  { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.15/index.global.min.css' },
+  { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@6.1.15/index.global.min.css' },
+]
+
 export async function loader({ request }: Route.LoaderArgs) {
   const user = await getCurrentUser(request)
 
   // Calculate date 3 months ago to limit history
   const threeMonthsAgo = new Date()
-  threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3)
+  threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 2)
+
+  // Calculate limit 6 months ahead
+  const sixMonthsAhead = new Date()
+  sixMonthsAhead.setMonth(sixMonthsAhead.getMonth() + 6)
 
   const rawClasses = await prisma.classInstance.findMany({
     where: {
@@ -20,6 +30,7 @@ export async function loader({ request }: Route.LoaderArgs) {
       },
       startTime: {
         gte: threeMonthsAgo,
+        lte: sixMonthsAhead,
       },
     },
     select: {

@@ -32,6 +32,20 @@ const buttonTextConfig = {
 
 const calendarPlugins = [dayGridPlugin, timeGridPlugin, interactionPlugin]
 
+const eventTimeFormatConfig = {
+  hour: '2-digit',
+  minute: '2-digit',
+  meridiem: false,
+  hour12: false,
+} as const
+
+const slotLabelFormatConfig = {
+  hour: '2-digit',
+  minute: '2-digit',
+  meridiem: false,
+  hour12: false,
+} as const
+
 function DashboardCalendarComponent({
   events = [],
   onDateSelect,
@@ -119,7 +133,7 @@ function DashboardCalendarComponent({
         events={calendarEvents}
         selectable={!readOnly}
         selectMirror={!readOnly}
-        dayMaxEvents={false}
+        dayMaxEvents={true}
         weekends={true}
         select={handleDateSelect}
         eventClick={handleEventClick}
@@ -130,18 +144,8 @@ function DashboardCalendarComponent({
         eventClassNames="calendar-event"
         dayHeaderClassNames="calendar-day-header"
         buttonText={buttonTextConfig}
-        eventTimeFormat={{
-          hour: '2-digit',
-          minute: '2-digit',
-          meridiem: false,
-          hour12: false,
-        }}
-        slotLabelFormat={{
-          hour: '2-digit',
-          minute: '2-digit',
-          meridiem: false,
-          hour12: false,
-        }}
+        eventTimeFormat={eventTimeFormatConfig}
+        slotLabelFormat={slotLabelFormatConfig}
       />
     </div>
   )

@@ -25,7 +25,7 @@ export function GoldDust() {
 
     let animationFrameId: number
     const particles: Particle[] = []
-    const particleCount = 150 // Refined count for elegance
+    const particleCount = 80 // Reduced for performance
 
     const resizeCanvas = () => {
       canvas.width = window.innerWidth

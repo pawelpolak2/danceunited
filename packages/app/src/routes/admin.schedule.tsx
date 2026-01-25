@@ -14,6 +14,12 @@ export function meta(_args: Route.MetaArgs) {
   return [{ title: 'Master Schedule - Dance United Admin' }, { name: 'description', content: 'Manage studio schedule' }]
 }
 
+export const links: Route.LinksFunction = () => [
+  { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.15/index.global.min.css' },
+  { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.15/index.global.min.css' },
+  { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@6.1.15/index.global.min.css' },
+]
+
 export async function loader({ request }: Route.LoaderArgs) {
   const user = await getCurrentUser(request)
 
@@ -55,11 +61,16 @@ export async function loader({ request }: Route.LoaderArgs) {
   const threeMonthsAgo = new Date()
   threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3)
 
+  // Limit future to 6 months
+  const sixMonthsAhead = new Date()
+  sixMonthsAhead.setMonth(sixMonthsAhead.getMonth() + 6)
+
   // Fetch ALL classes for the calendar (Admin sees everything)
   const classes = await prisma.classInstance.findMany({
     where: {
       startTime: {
         gte: threeMonthsAgo,
+        lte: sixMonthsAhead,
       },
     },
     include: {
