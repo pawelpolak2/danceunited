@@ -11,6 +11,10 @@ export function meta({}: Route.MetaArgs) {
   ]
 }
 
+export const links: Route.LinksFunction = () => [
+  { rel: 'preload', href: '/img/hero-1.webp', as: 'image' }, // Preload LCP candidate
+]
+
 export async function loader({ request }: Route.LoaderArgs) {
   const user = await getCurrentUser(request)
   return { user }
@@ -26,7 +30,7 @@ export default function HomePage() {
         {/* Background Carousel */}
         <div className="absolute inset-0 z-0">
           <Carousel
-            images={['/img/hero-1.png', '/img/hero-2.png', '/img/hero-3.png']}
+            images={['/img/hero-1.webp', '/img/hero-2.webp', '/img/hero-3.webp']}
             className="h-full w-full opacity-60"
             autoPlayInterval={5000}
           />

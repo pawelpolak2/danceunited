@@ -18,7 +18,7 @@ export const loader = async () => {
       if (!fs.existsSync(dir)) return []
       return fs
         .readdirSync(dir)
-        .filter((file) => /\.(png|jpg|jpeg|webp)$/i.test(file))
+        .filter((file) => /\.webp$/i.test(file))
         .map((file) => ({
           src: `/resources/gallery/${category}/${file}`,
           alt: `${category} photo`,

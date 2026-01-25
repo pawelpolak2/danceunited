@@ -57,14 +57,24 @@ export const action = async ({ request }: Route.ActionArgs) => {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer())
-    const safeFilename = file.name.replace(/[^a-zA-Z0-9.-]/g, '_')
+
+    // Auto-convert to WebP
+    const sharp = (await import('sharp')).default
+    const webpBuffer = await sharp(buffer)
+      .webp({ quality: 80 }) // 80 is a good balance
+      .toBuffer()
+
+    // Force extension to .webp
+    const originalName = file.name.replace(/\.[^/.]+$/, '')
+    const safeFilename = `${originalName.replace(/[^a-zA-Z0-9.-]/g, '_')}.webp`
+
     const targetDir = path.join(process.cwd(), 'public', 'gallery', category)
 
     if (!fs.existsSync(targetDir)) {
       fs.mkdirSync(targetDir, { recursive: true })
     }
 
-    fs.writeFileSync(path.join(targetDir, safeFilename), buffer)
+    fs.writeFileSync(path.join(targetDir, safeFilename), webpBuffer)
   }
 
   if (intent === 'delete_image') {
@@ -145,7 +155,7 @@ export default function GalleryConfiguration() {
             </div>
 
             <div className="w-full flex-[2] space-y-1">
-              <label className="text-gray-400 text-xs">Image File (PNG, JPG, Max 5MB)</label>
+              <label className="text-gray-400 text-xs">Image File (Auto-converted to WebP)</label>
               <div className="relative">
                 <input
                   type="file"

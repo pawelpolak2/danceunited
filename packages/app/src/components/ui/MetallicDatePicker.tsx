@@ -21,9 +21,7 @@ export const MetallicDatePicker: React.FC<MetallicDatePickerProps> = ({
   id,
   dateFormat = 'PPP',
   // Exclude props that conflict with single-date mode
-  // biome-ignore lint/correctness/noUnusedVariables: Excluded from spread
   selectsMultiple,
-  // biome-ignore lint/correctness/noUnusedVariables: Excluded from spread
   selectsRange,
   ...props
 }) => {
