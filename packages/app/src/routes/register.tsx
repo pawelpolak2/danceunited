@@ -78,6 +78,11 @@ export async function action({ request }: Route.ActionArgs) {
       },
     })
 
+    // Send Welcome Email
+    const { sendWelcomeEmail } = await import('../lib/email.server')
+    // Don't await to keep registration fast
+    sendWelcomeEmail(user.email, user.firstName).catch((err) => console.error('Failed to send welcome email:', err))
+
     // Create session
     const sessionCookie = createSessionCookie({
       userId: user.id,

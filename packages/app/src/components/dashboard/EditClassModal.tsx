@@ -196,6 +196,21 @@ export function EditClassModal({ isOpen, onClose, classInstance, trainers }: Edi
           </div>
         )}
 
+        <div className="space-y-2 border-amber-900/10 border-t pt-2">
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              name="notifyUsers"
+              defaultChecked={true}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') e.preventDefault()
+              }}
+              className="h-4 w-4 rounded border-gray-600 bg-gray-800 text-amber-500 focus:ring-amber-500"
+            />
+            <span className="text-amber-100/80 text-sm">Notify enrolled students via email</span>
+          </label>
+        </div>
+
         <div className="mt-6 flex justify-between gap-3 border-amber-900/30 border-t pt-4">
           <div className="flex gap-2">
             <button
