@@ -13,6 +13,7 @@ import {
 } from 'react-router'
 
 import type { Route } from './+types/root'
+import { Footer } from './components/Footer'
 import { MetallicLink, ShinyText } from './components/ui'
 import { getCurrentUser } from './lib/auth.server'
 import './app.css'
@@ -211,11 +212,8 @@ export default function App() {
       <main className={`flex-1 bg-gray-950 ${isDashboard ? 'relative overflow-hidden' : 'overflow-y-auto'}`}>
         <Outlet />
       </main>
-      <footer className="flex-none border-amber-900/20 border-t bg-gray-950 py-8">
-        <div className="mx-auto max-w-7xl px-4 text-center text-sm">
-          <ShinyText variant="body">&copy; {new Date().getFullYear()} dance united. All rights reserved.</ShinyText>
-        </div>
-      </footer>
+
+      {!isDashboard && <Footer />}
     </div>
   )
 }

@@ -1,6 +1,6 @@
 import { prisma } from 'db'
 import { Package as PackageIcon } from 'lucide-react'
-import { Form, redirect, useLoaderData } from 'react-router'
+import { Form, Link, redirect, useLoaderData } from 'react-router'
 import { MetallicButton, ShinyText } from '../components/ui'
 import { getCurrentUser } from '../lib/auth.server'
 import type { Route } from './+types/dancer.packages'
@@ -314,6 +314,27 @@ function PurchaseModal({ pkg, onClose }: { pkg: any; onClose: () => void }) {
                 after payment.
               </p>
             </div>
+          </div>
+
+          <div className="mb-6 flex items-start gap-3">
+            <input
+              id="termsAccept"
+              type="checkbox"
+              required
+              className="mt-1 h-4 w-4 rounded border-gray-600 bg-gray-800 text-amber-500 focus:ring-amber-500 focus:ring-offset-gray-900"
+            />
+            <label htmlFor="termsAccept" className="text-gray-400 text-sm">
+              I accept the{' '}
+              <Link to="/terms" target="_blank" className="text-amber-400 hover:underline">
+                Terms of Service
+              </Link>{' '}
+              and{' '}
+              <Link to="/privacy" target="_blank" className="text-amber-400 hover:underline">
+                Privacy Policy
+              </Link>
+              . I understand that I lose the right of withdrawal once the service has been fully performed (attending
+              the class).
+            </label>
           </div>
 
           <div className="flex flex-col gap-3">
