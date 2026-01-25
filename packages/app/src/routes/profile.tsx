@@ -96,35 +96,44 @@ export default function ProfilePage() {
           <button
             type="button"
             onClick={() => setActiveTab('details')}
-            className={`flex items-center gap-2 rounded-t-lg px-4 py-2 transition-colors ${
+            className={`flex items-center gap-2 rounded-t-lg px-4 py-2 font-medium transition-all duration-300 ${
               activeTab === 'details'
-                ? 'border-amber-500 border-b-2 bg-amber-500/20 text-amber-300'
-                : 'text-amber-50/70 hover:bg-amber-900/10 hover:text-amber-100'
+                ? 'border-amber-500 border-b-2 bg-gradient-to-t from-amber-500/20 via-amber-900/10 to-transparent text-amber-300 shadow-[0_4px_12px_-2px_rgba(245,158,11,0.3)]'
+                : 'text-amber-50/70 hover:bg-amber-900/10 hover:text-amber-100 hover:shadow-[0_2px_8px_-2px_rgba(245,158,11,0.1)]'
             }`}
           >
-            <User className="h-4 w-4" /> Details
+            <User
+              className={`h-4 w-4 ${activeTab === 'details' ? 'drop-shadow-[0_0_3px_rgba(253,224,71,0.6)]' : ''}`}
+            />{' '}
+            Details
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('security')}
-            className={`flex items-center gap-2 rounded-t-lg px-4 py-2 transition-colors ${
+            className={`flex items-center gap-2 rounded-t-lg px-4 py-2 font-medium transition-all duration-300 ${
               activeTab === 'security'
-                ? 'border-amber-500 border-b-2 bg-amber-500/20 text-amber-300'
-                : 'text-amber-50/70 hover:bg-amber-900/10 hover:text-amber-100'
+                ? 'border-amber-500 border-b-2 bg-gradient-to-t from-amber-500/20 via-amber-900/10 to-transparent text-amber-300 shadow-[0_4px_12px_-2px_rgba(245,158,11,0.3)]'
+                : 'text-amber-50/70 hover:bg-amber-900/10 hover:text-amber-100 hover:shadow-[0_2px_8px_-2px_rgba(245,158,11,0.1)]'
             }`}
           >
-            <Lock className="h-4 w-4" /> Security
+            <Lock
+              className={`h-4 w-4 ${activeTab === 'security' ? 'drop-shadow-[0_0_3px_rgba(253,224,71,0.6)]' : ''}`}
+            />{' '}
+            Security
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('packages')}
-            className={`flex items-center gap-2 rounded-t-lg px-4 py-2 transition-colors ${
+            className={`flex items-center gap-2 rounded-t-lg px-4 py-2 font-medium transition-all duration-300 ${
               activeTab === 'packages'
-                ? 'border-amber-500 border-b-2 bg-amber-500/20 text-amber-300'
-                : 'text-amber-50/70 hover:bg-amber-900/10 hover:text-amber-100'
+                ? 'border-amber-500 border-b-2 bg-gradient-to-t from-amber-500/20 via-amber-900/10 to-transparent text-amber-300 shadow-[0_4px_12px_-2px_rgba(245,158,11,0.3)]'
+                : 'text-amber-50/70 hover:bg-amber-900/10 hover:text-amber-100 hover:shadow-[0_2px_8px_-2px_rgba(245,158,11,0.1)]'
             }`}
           >
-            <Package className="h-4 w-4" /> My Packages
+            <Package
+              className={`h-4 w-4 ${activeTab === 'packages' ? 'drop-shadow-[0_0_3px_rgba(253,224,71,0.6)]' : ''}`}
+            />{' '}
+            My Packages
           </button>
         </div>
 

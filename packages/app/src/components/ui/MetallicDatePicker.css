@@ -1,0 +1,186 @@
+/* MetallicDatePicker.css */
+
+.metallic-datepicker-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.metallic-datepicker-input {
+  width: 100%;
+  padding: 0.625rem 2.5rem 0.625rem 1rem;
+  /* Right padding for icon */
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(120, 53, 15, 0.3);
+  /* amber-900/30 */
+  border-radius: 0.5rem;
+  color: #ffd700;
+  /* gold */
+  font-family: var(--font-serif);
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.metallic-datepicker-input:hover {
+  border-color: rgba(255, 215, 0, 0.5);
+  /* gold/50 */
+}
+
+.metallic-datepicker-input:focus {
+  outline: none;
+  border-color: #ffd700;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.1);
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.metallic-calendar-icon {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 215, 0, 0.7);
+  pointer-events: none;
+  width: 1rem;
+  height: 1rem;
+}
+
+/* React Datepicker Overrides */
+.react-datepicker {
+  background-color: #09090b !important;
+  /* zinc-950 */
+  border: 1px solid rgba(255, 215, 0, 0.3) !important;
+  border-radius: 0.75rem !important;
+  font-family: var(--font-serif) !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8) !important;
+  color: #ffd700 !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  /* Prevent infinite stretching */
+  /* Ensure side-by-side layout */
+}
+
+.react-datepicker__header {
+  background-color: #18181b !important;
+  /* zinc-900 */
+  border-bottom: 1px solid rgba(255, 215, 0, 0.1) !important;
+  border-top-left-radius: 0.75rem !important;
+  /* Only round top-left if time is shown, but usually fine */
+  /* If time container is present, we might want to un-round top-right of header? 
+       React-datepicker handles structure but we can force it. */
+}
+
+.react-datepicker__current-month,
+.react-datepicker-time__header,
+.react-datepicker-year-header {
+  color: #ffd700 !important;
+  font-weight: bold !important;
+  font-size: 1rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.react-datepicker__day-name {
+  color: rgba(255, 215, 0, 0.6) !important;
+  text-transform: uppercase;
+  font-size: 0.75rem !important;
+  font-weight: 500 !important;
+}
+
+.react-datepicker__day {
+  color: #e5e5e5 !important;
+  border-radius: 50% !important;
+  transition: all 0.2s;
+}
+
+.react-datepicker__day:hover {
+  background-color: rgba(255, 215, 0, 0.15) !important;
+  color: #ffd700 !important;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  background-color: transparent !important;
+  border: 2px solid #ffd700 !important;
+  color: #ffd700 !important;
+  font-weight: bold !important;
+}
+
+.react-datepicker__day--today {
+  color: #ffd700 !important;
+  font-weight: bold !important;
+  position: relative;
+}
+
+.react-datepicker__day--today::after {
+  content: "";
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: #ffd700;
+}
+
+/* Time Container */
+.react-datepicker__time-container {
+  border-left: 1px solid rgba(255, 215, 0, 0.3) !important;
+  width: 100px !important;
+  /* Fixed width for better layout */
+  border-top-right-radius: 0.75rem !important;
+  border-bottom-right-radius: 0.75rem !important;
+  background-color: #09090b !important;
+  overflow: hidden;
+  /* contain border radius */
+}
+
+/* Ensure the time header doesn't break styling */
+.react-datepicker__time-container .react-datepicker__header {
+  border-top-left-radius: 0 !important;
+  background-color: #18181b !important;
+}
+
+.react-datepicker__time-container .react-datepicker__time {
+  background: #09090b !important;
+  border-bottom-right-radius: 0.75rem !important;
+  height: 250px !important;
+  /* Fix height to match approximate calendar height */
+  overflow-y: auto !important;
+  /* Ensure scrollability */
+}
+
+.react-datepicker__time-list-item {
+  height: 30px !important;
+  line-height: 30px !important;
+}
+
+.react-datepicker__time-list-item:hover {
+  background-color: rgba(255, 215, 0, 0.15) !important;
+  color: #ffd700 !important;
+}
+
+.react-datepicker__time-list-item--selected {
+  background-color: #ffd700 !important;
+  color: #000 !important;
+  font-weight: bold !important;
+}
+
+/* Fix rounding when time container is present */
+.react-datepicker--time-only .react-datepicker__time-container {
+  border-left: 0 !important;
+  border-radius: 0.75rem !important;
+}
+
+/* If both are present, remove right rounding from main container children if needed */
+.react-datepicker-wrapper {
+  /* ... */
+}
+
+/* Unset triangle */
+.react-datepicker__triangle {
+  display: none !important;
+}
+
+/* Navigation Arrows - Disabled/Replaced by Custom Header */
+.react-datepicker__navigation {
+  display: none !important;
+}

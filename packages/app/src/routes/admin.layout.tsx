@@ -5,11 +5,12 @@ import {
   FileBox,
   Image,
   LayoutDashboard,
+  LogOut,
   Palette,
   Settings,
   Users,
 } from 'lucide-react'
-import { Link, Outlet, redirect, useLocation } from 'react-router'
+import { Form, Link, Outlet, redirect, useLocation } from 'react-router'
 import { ShinyText } from '../components/ui'
 import { getCurrentUser } from '../lib/auth.server'
 import type { Route } from './+types/admin.layout'
@@ -121,12 +122,21 @@ export default function AdminLayout() {
           {/* Sidebar Footer */}
           <div className="border-amber-900/30 border-t bg-gray-900/50 p-4">
             <Link
-              to="/admin/settings"
+              to="/profile"
               className="flex items-center gap-3 rounded-lg border border-transparent px-3 py-2 font-medium text-gray-400 text-sm transition-colors hover:border-amber-500/10 hover:bg-white/5 hover:text-amber-100"
             >
               <Settings className="h-4 w-4 text-gray-500 group-hover:text-amber-300" />
-              Settings
+              Profile Settings
             </Link>
+            <Form method="post" action="/api/auth/logout">
+              <button
+                type="submit"
+                className="flex w-full items-center gap-3 rounded-lg border border-transparent px-3 py-2 font-medium text-gray-400 text-sm transition-colors hover:border-red-500/10 hover:bg-red-500/5 hover:text-red-200"
+              >
+                <LogOut className="h-4 w-4 text-gray-500 group-hover:text-red-300" />
+                Logout
+              </button>
+            </Form>
           </div>
         </div>
       </aside>

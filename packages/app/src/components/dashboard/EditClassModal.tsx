@@ -3,7 +3,7 @@ import { Form, useNavigation } from 'react-router'
 import { Combobox } from '../ui/Combobox'
 import { ConfirmModal } from '../ui/ConfirmModal'
 import { MetallicButton } from '../ui/MetallicButton'
-import { MetallicDateTimePicker } from '../ui/MetallicDateTimePicker'
+import { MetallicDatePicker } from '../ui/MetallicDatePicker'
 import { Modal } from '../ui/Modal'
 import { Radio } from '../ui/Radio'
 
@@ -34,7 +34,7 @@ export function EditClassModal({ isOpen, onClose, classInstance, trainers }: Edi
   const navigation = useNavigation()
   const isSubmitting = navigation.state === 'submitting'
 
-  // State for MetallicDateTimePicker
+  // State for Date Selection
   const [startDate, setStartDate] = useState<Date | undefined>(undefined)
 
   const [endTime, setEndTime] = useState<string>('')
@@ -109,11 +109,17 @@ export function EditClassModal({ isOpen, onClose, classInstance, trainers }: Edi
             <input type="hidden" name="startTime" value={startDate && !Number.isNaN(startDate.getTime()) ? toLocalISO(startDate) : ''} />
             {/* Hidden submit button for delete confirmation */}
             <button type="submit" name="intent" value="deleteClass" id="hidden-delete-btn" className="hidden" />
-            <MetallicDateTimePicker
-              date={startDate}
-              setDate={(d) => setStartDate(d)}
+            <MetallicDatePicker
+              selected={startDate}
+              onChange={(d: Date | null) => setStartDate(d || undefined)}
               label="Start Time"
               className="w-full"
+              showTimeSelect
+              timeFormat="HH:mm"
+              timeIntervals={15}
+              dateFormat="PPP HH:mm"
+              placeholderText="Select start time..."
+              popperPlacement="bottom-end"
             />
           </div>
 
