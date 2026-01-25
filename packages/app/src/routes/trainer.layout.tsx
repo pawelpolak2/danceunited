@@ -1,5 +1,6 @@
 import { BarChart3, Calendar, LayoutDashboard, LogOut, Settings } from 'lucide-react'
 import { Form, Link, Outlet, redirect, useLocation } from 'react-router'
+import { Footer } from '../components/Footer'
 import { ShinyText } from '../components/ui'
 import { getCurrentUser } from '../lib/auth.server'
 import type { Route } from './+types/trainer.layout'
@@ -123,8 +124,11 @@ export default function TrainerLayout() {
 
       {/* Main Content Area */}
       <main className="relative z-10 flex min-w-0 flex-1 flex-col overflow-hidden">
-        <div className="scrollbar-metallic flex-1 overflow-y-auto scroll-smooth p-4 pt-24 md:p-8">
-          <Outlet />
+        <div className="scrollbar-metallic flex-1 overflow-y-auto scroll-smooth">
+          <div className="p-4 pt-24 md:p-8">
+            <Outlet />
+          </div>
+          <Footer />
         </div>
       </main>
     </div>

@@ -44,6 +44,8 @@ export default [
   route('schedule', 'routes/schedule.tsx'),
   route('contact', 'routes/contact.tsx'),
   route('gallery', 'routes/gallery.tsx'),
+  route('terms', 'routes/terms.tsx'),
+  route('privacy', 'routes/privacy.tsx'),
   route('api/health', 'routes/api.health.tsx'),
   route('api/auth/login', 'routes/api.auth.login.tsx'),
   route('api/auth/register', 'routes/api.auth.register.tsx'),
