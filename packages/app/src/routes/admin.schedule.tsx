@@ -276,13 +276,15 @@ export async function action({ request }: Route.ActionArgs) {
         if (updatedInstance && updatedInstance.attendances.length > 0) {
           const { sendClassUpdateEmail } = await import('../lib/email.server')
 
-          const oldDate = new Date(instance.startTime).toLocaleString('en-US', {
-            month: 'short',
+          const oldDate = new Date(instance.startTime).toLocaleString('pl-PL', {
+            timeZone: 'Europe/Warsaw',
+            month: 'long',
             day: 'numeric',
             hour: '2-digit',
             minute: '2-digit',
           })
-          const newDate = newStartTime.toLocaleString('en-US', {
+          const newDate = newStartTime.toLocaleString('pl-PL', {
+            timeZone: 'Europe/Warsaw',
             weekday: 'long',
             month: 'long',
             day: 'numeric',
@@ -367,7 +369,8 @@ export async function action({ request }: Route.ActionArgs) {
 
       if (notifyUsers) {
         const { sendClassCancellationEmail } = await import('../lib/email.server')
-        const dateStr = new Date(instance.startTime).toLocaleString('en-US', {
+        const dateStr = new Date(instance.startTime).toLocaleString('pl-PL', {
+          timeZone: 'Europe/Warsaw',
           weekday: 'long',
           year: 'numeric',
           month: 'long',

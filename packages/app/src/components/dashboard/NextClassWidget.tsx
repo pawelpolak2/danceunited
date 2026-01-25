@@ -1,4 +1,5 @@
 import { Calendar, Clock, MapPin } from 'lucide-react'
+import React from 'react'
 import { Link } from 'react-router'
 import { MetallicButton, ShinyText } from '../ui'
 
@@ -29,26 +30,56 @@ export function NextClassWidget({ nextClass, userRole, children }: NextClassProp
     )
   }
 
-  const startDate = new Date(nextClass.startTime)
-  const timeString = startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-  const dateString = startDate.toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' })
+  const [timeState, setTimeState] = React.useState<{
+    dateString: string
+    timeString: string
+    timeUntil: string
+  } | null>(null)
 
-  // Calculate time until class
-  const now = new Date()
-  const diffMs = startDate.getTime() - now.getTime()
-  const diffHrs = Math.floor(diffMs / (1000 * 60 * 60))
-  const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60))
+  React.useEffect(() => {
+    if (!nextClass) return
 
-  let timeUntil = ''
-  if (diffMs < 0) {
-    timeUntil = 'Now / In Progress'
-  } else if (diffHrs > 24) {
-    timeUntil = `In ${Math.floor(diffHrs / 24)} days`
-  } else if (diffHrs > 0) {
-    timeUntil = `In ${diffHrs}h ${diffMins}m`
-  } else {
-    timeUntil = `In ${diffMins}m`
+    const startDate = new Date(nextClass.startTime)
+    const timeString = startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    const dateString = startDate.toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' })
+
+    const now = new Date()
+    const diffMs = startDate.getTime() - now.getTime()
+    const diffHrs = Math.floor(diffMs / (1000 * 60 * 60))
+    const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60))
+
+    let timeUntil = ''
+    if (diffMs < 0) {
+      timeUntil = 'Now / In Progress'
+    } else if (diffHrs > 24) {
+      timeUntil = `In ${Math.floor(diffHrs / 24)} days`
+    } else if (diffHrs > 0) {
+      timeUntil = `In ${diffHrs}h ${diffMins}m`
+    } else {
+      timeUntil = `In ${diffMins}m`
+    }
+
+    setTimeState({ dateString, timeString, timeUntil })
+  }, [nextClass])
+
+  if (!timeState) {
+    // Skeleton loader for hydration
+    return (
+      <div className="group relative overflow-hidden rounded-xl border border-amber-500/30 bg-gradient-to-br from-gray-900/80 to-gray-950/80 p-6 shadow-lg backdrop-blur-md">
+        <div className="flex animate-pulse space-x-4">
+          <div className="flex-1 space-y-4 py-1">
+            <div className="h-4 w-3/4 rounded bg-gray-700" />
+            <div className="space-y-2">
+              <div className="h-4 rounded bg-gray-700" />
+              <div className="h-4 w-5/6 rounded bg-gray-700" />
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
+
+  const { dateString, timeString, timeUntil } = timeState
 
   return (
     <div className="group relative overflow-hidden rounded-xl border border-amber-500/30 bg-gradient-to-br from-gray-900/80 to-gray-950/80 p-6 shadow-lg backdrop-blur-md transition-all hover:border-amber-500/50">
@@ -61,11 +92,11 @@ export function NextClassWidget({ nextClass, userRole, children }: NextClassProp
             Next Class • {timeUntil}
           </div>
           {userRole === 'TRAINER' ? (
-            <Link to={`/trainer/schedule?date=${startDate.toISOString().split('T')[0]}`}>
+            <Link to={`/trainer/schedule?date=${nextClass.startTime.split('T')[0]}`}>
               <Calendar className="h-5 w-5 text-gray-400 transition-colors hover:text-amber-400" />
             </Link>
           ) : (
-            <Link to={`/dancer/schedule?date=${startDate.toISOString().split('T')[0]}`}>
+            <Link to={`/dancer/schedule?date=${nextClass.startTime.split('T')[0]}`}>
               <Calendar className="h-5 w-5 text-gray-400 transition-colors hover:text-amber-400" />
             </Link>
           )}
