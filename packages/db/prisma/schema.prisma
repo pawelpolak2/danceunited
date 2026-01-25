@@ -27,8 +27,7 @@ enum DanceHall {
 }
 
 enum ClassStatus {
-  SCHEDULED
-  COMPLETED
+  ACTIVE
   CANCELLED
 }
 
@@ -137,7 +136,7 @@ model ClassInstance {
   endTime         DateTime    @map("end_time") @db.Timestamptz(6)
   actualHall      DanceHall   @default(HALL1) @map("actual_hall")
   actualTrainerId String      @map("actual_trainer_id") @db.Uuid
-  status          ClassStatus @default(SCHEDULED)
+  status          ClassStatus @default(ACTIVE)
   createdAt       DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt       DateTime    @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 

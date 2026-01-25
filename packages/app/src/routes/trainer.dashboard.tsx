@@ -73,6 +73,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     where: {
       actualTrainerId: user.userId,
       startTime: { gte: startOfMonth, lte: endOfToday },
+      status: { not: 'CANCELLED' },
     },
     include: {
       classTemplate: { select: { duration: true } },

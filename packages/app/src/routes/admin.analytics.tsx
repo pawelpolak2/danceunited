@@ -83,7 +83,10 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   // 3. Trainer Ranking (By Attendance)
   const trainerStats = await prisma.classInstance.findMany({
-    where: { startTime: { gte: thirtyDaysAgo } },
+    where: {
+      startTime: { gte: thirtyDaysAgo },
+      status: { not: 'CANCELLED' },
+    },
     include: {
       actualTrainer: true,
       _count: { select: { attendances: true } },

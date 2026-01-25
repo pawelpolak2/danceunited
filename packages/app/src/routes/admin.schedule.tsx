@@ -95,9 +95,9 @@ export async function loader({ request }: Route.LoaderArgs) {
     title: `${c.classTemplate.name} (${c.actualTrainer.firstName})`,
     start: c.startTime.toISOString(),
     end: c.endTime.toISOString(),
-    backgroundColor: c.actualHall === 'HALL1' ? '#d97706' : '#92400e',
-    borderColor: '#b45309',
-    editable: true, // Allow drag & drop for admin
+    backgroundColor: c.status === 'CANCELLED' ? '#ef4444' : c.actualHall === 'HALL1' ? '#d97706' : '#92400e',
+    borderColor: c.status === 'CANCELLED' ? '#b91c1c' : '#b45309',
+    editable: c.status !== 'CANCELLED', // Prevent dragging cancelled classes
   }))
 
   return { user, danceStyles, classTemplates, events, classes: serializedClasses, trainers, users }
@@ -282,6 +282,22 @@ export async function action({ request }: Route.ActionArgs) {
       return { success: true, intent: 'deleteClass' }
     } catch (_error) {
       return { error: 'Delete failed' }
+    }
+  }
+
+  // 5. Cancel Class
+  if (intent === 'cancelClass') {
+    const classInstanceId = formData.get('classInstanceId') as string
+    if (!classInstanceId) return { error: 'Missing required fields' }
+
+    try {
+      await prisma.classInstance.update({
+        where: { id: classInstanceId },
+        data: { status: 'CANCELLED' },
+      })
+      return { success: true, intent: 'cancelClass' }
+    } catch (_error) {
+      return { error: 'Cancel failed' }
     }
   }
 

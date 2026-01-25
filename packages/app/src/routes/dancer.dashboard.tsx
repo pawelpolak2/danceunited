@@ -102,7 +102,7 @@ export async function loader({ request }: Route.LoaderArgs) {
       userId: user.userId,
       class: {
         startTime: { gte: startOfMonth, lte: endOfToday },
-        status: { in: ['COMPLETED', 'SCHEDULED'] },
+        status: { in: ['ACTIVE'] },
       },
     },
   })

@@ -43,6 +43,7 @@ export function EditClassModal({ isOpen, onClose, classInstance, trainers }: Edi
   const [notes, setNotes] = useState<string>('')
   const [updateScope, setUpdateScope] = useState<string>('single')
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false)
+  const [isCancelConfirmOpen, setIsCancelConfirmOpen] = useState(false)
 
   // Initialize form from classInstance
   useEffect(() => {
@@ -204,6 +205,16 @@ export function EditClassModal({ isOpen, onClose, classInstance, trainers }: Edi
             >
               Delete
             </button>
+            {/* Hidden submit button for cancel class */}
+            <button type="submit" name="intent" value="cancelClass" id="hidden-cancel-btn" className="hidden" />
+
+            <button
+              type="button"
+              className="rounded-md border border-orange-900/30 bg-orange-950/20 px-4 py-2 text-orange-400 text-sm transition-colors hover:text-orange-300"
+              onClick={() => setIsCancelConfirmOpen(true)}
+            >
+              Cancel Class
+            </button>
             <button
               type="button"
               onClick={onClose}
@@ -249,6 +260,20 @@ export function EditClassModal({ isOpen, onClose, classInstance, trainers }: Edi
               : 'Are you sure you want to delete this class?'
         }
         confirmLabel="Delete"
+        isDestructive
+      />
+
+      <ConfirmModal
+        isOpen={isCancelConfirmOpen}
+        onClose={() => setIsCancelConfirmOpen(false)}
+        onConfirm={() => {
+          const cancelBtn = document.getElementById('hidden-cancel-btn')
+          if (cancelBtn) cancelBtn.click()
+          setIsCancelConfirmOpen(false)
+        }}
+        title="Cancel Class"
+        description="Are you sure you want to CANCEL this class? It will remain in history as cancelled."
+        confirmLabel="Yes, Cancel Class"
         isDestructive
       />
     </Modal>

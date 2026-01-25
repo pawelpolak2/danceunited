@@ -117,6 +117,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   const agendaRaw = await prisma.classInstance.findMany({
     where: {
       startTime: { gte: startOfToday, lt: endOfToday },
+      status: { not: 'CANCELLED' },
     },
     include: {
       classTemplate: true,
