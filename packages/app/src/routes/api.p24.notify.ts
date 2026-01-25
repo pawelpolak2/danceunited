@@ -1,4 +1,4 @@
-import { PaymentStatus, PurchaseStatus } from 'db'
+import { ClassStatus, PaymentStatus, PurchaseStatus } from 'db'
 import { prisma } from 'db'
 import type { ActionFunctionArgs } from 'react-router'
 import { p24Service } from '../services/p24.server'
@@ -177,7 +177,7 @@ async function handleAutoSignIn(userId: string, purchaseId: string, pkg: any, au
       where: {
         classTemplateId: template.id,
         startTime: { gt: new Date() },
-        status: 'SCHEDULED',
+        status: ClassStatus.ACTIVE,
       },
       orderBy: { startTime: 'asc' },
     })
