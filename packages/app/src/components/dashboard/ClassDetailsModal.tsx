@@ -22,10 +22,16 @@ export function ClassDetailsModal({
 }: ClassDetailsModalProps) {
   if (!isOpen || !classInstance) return null
 
-  const startDate = new Date(classInstance.startTime)
-  const endDate = new Date(classInstance.endTime)
-  const dateStr = startDate.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' })
-  const timeStr = `${startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+  const startDate = new Date(classInstance.startTime || classInstance.start)
+  const endDate = new Date(classInstance.endTime || classInstance.end)
+
+  let dateStr = ''
+  let timeStr = ''
+
+  if (!Number.isNaN(startDate.getTime()) && !Number.isNaN(endDate.getTime())) {
+    dateStr = startDate.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' })
+    timeStr = `${startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">

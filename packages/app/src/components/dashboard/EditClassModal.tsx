@@ -57,7 +57,7 @@ export function EditClassModal({ isOpen, onClose, classInstance, trainers }: Edi
 
   // Update calculated endTime when startDate changes
   useEffect(() => {
-    if (startDate && classInstance) {
+    if (startDate && !Number.isNaN(startDate.getTime()) && classInstance) {
       const duration = classInstance.classTemplate.duration
       const end = new Date(startDate.getTime() + duration * 1000)
 
@@ -65,6 +65,8 @@ export function EditClassModal({ isOpen, onClose, classInstance, trainers }: Edi
         return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }
       setEndTime(`${formatTime(startDate)} - ${formatTime(end)} (${Math.round(duration / 60)} mins)`)
+    } else {
+      setEndTime('')
     }
   }, [startDate, classInstance])
 
@@ -104,7 +106,7 @@ export function EditClassModal({ isOpen, onClose, classInstance, trainers }: Edi
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1">
-            <input type="hidden" name="startTime" value={startDate ? toLocalISO(startDate) : ''} />
+            <input type="hidden" name="startTime" value={startDate && !Number.isNaN(startDate.getTime()) ? toLocalISO(startDate) : ''} />
             {/* Hidden submit button for delete confirmation */}
             <button type="submit" name="intent" value="deleteClass" id="hidden-delete-btn" className="hidden" />
             <MetallicDateTimePicker
@@ -232,7 +234,7 @@ export function EditClassModal({ isOpen, onClose, classInstance, trainers }: Edi
           classInstance.attendances && classInstance.attendances.length > 0
             ? 'Warning: This class has enrolled students. Deleting it will cancel their attendance.' // Simplified check as attendances prop wasn't in interface but used in code? Wait, interface says ClassInstance has `classTemplate`.
             : // The original code used `classInstance.attendances`. Let's check interface map.
-              updateScope === 'series'
+            updateScope === 'series'
               ? 'Are you sure you want to delete ALL classes in this series?'
               : 'Are you sure you want to delete this class?'
         }
