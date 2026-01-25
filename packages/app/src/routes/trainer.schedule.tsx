@@ -322,8 +322,15 @@ export async function action({ request }: Route.ActionArgs) {
   return null
 }
 
+// ... imports ...
+import { useTranslation } from '../contexts/LanguageContext'
+
+// ... meta/loader/action ...
+
 export default function TrainerSchedulePage() {
   const { danceStyles, classTemplates, events, classes, trainers, users, user } = useLoaderData<typeof loader>()
+  // ... state ...
+  const { t } = useTranslation()
 
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false)
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false)
@@ -334,7 +341,7 @@ export default function TrainerSchedulePage() {
 
   const fetcher = useFetcher()
 
-  // Close modals on success
+  // ... useEffects for closing modals ...
   if (fetcher.data?.success) {
     if (fetcher.data.intent === 'create_template' && isTemplateModalOpen) setIsTemplateModalOpen(false)
     if (fetcher.data.intent === 'scheduleClass' && isScheduleModalOpen) setIsScheduleModalOpen(false)
@@ -350,22 +357,15 @@ export default function TrainerSchedulePage() {
 
   const handleEventClick = useCallback(
     (clickInfo: EventClickArg) => {
+      // ... same logic ...
       const classId = clickInfo.event.id
       const foundClass = classes.find((c) => c.id === classId)
-
-      // Only allow editing if it's their own class
-      // But they can view details? For now sticking to existing behavior:
-      // If they click a class they don't own, maybe show a read-only modal or just do nothing?
-      // Requirement says: "Trainer... without checking this option should see all classes (same as manager)"
-      // Usually manager can edit everything. Trainer can probably only edit their own.
-      // Let's check ownership before opening edit modal.
 
       if (foundClass) {
         if (foundClass.actualTrainerId === user.userId) {
           setSelectedClass(foundClass)
           setIsEditModalOpen(true)
         } else {
-          // Ideally show a "Details" modal (read-only)
           alert(
             `Class: ${foundClass.classTemplate.name}\nTrainer: ${foundClass.actualTrainer?.firstName || 'Unknown'}\n(Read-only)`
           )
@@ -386,10 +386,10 @@ export default function TrainerSchedulePage() {
         <div className="mb-8 flex flex-col items-start justify-between gap-4 md:flex-row md:items-end">
           <div className="flex flex-col gap-1">
             <ShinyText as="h1" variant="title" className="font-serif text-4xl text-amber-400">
-              Schedule & Classes
+              {t('TRAINER_SCHEDULE_TITLE')}
             </ShinyText>
             <ShinyText variant="body" className="text-lg opacity-80">
-              Manage your availability and templates
+              {t('TRAINER_SCHEDULE_SUBTITLE')}
             </ShinyText>
           </div>
 
@@ -401,7 +401,7 @@ export default function TrainerSchedulePage() {
                 onChange={(e) => setIsMyClassesOnly(e.target.checked)}
                 className="h-4 w-4 rounded border-amber-500/50 bg-gray-900 text-amber-500 focus:ring-amber-500 focus:ring-offset-gray-900"
               />
-              <span className="font-medium text-amber-100 text-sm">My Classes</span>
+              <span className="font-medium text-amber-100 text-sm">{t('TRAINER_SCHEDULE_MY_CLASSES')}</span>
             </label>
 
             <MetallicButton
@@ -411,13 +411,13 @@ export default function TrainerSchedulePage() {
               }}
               className="flex-1 rounded-md border-2 px-4 py-2 text-sm md:flex-none"
             >
-              + Schedule Class
+              {t('TRAINER_BTN_SCHEDULE')}
             </MetallicButton>
             <MetallicButton
               onClick={() => setIsTemplateModalOpen(true)}
               className="flex-1 rounded-md border-2 px-4 py-2 text-sm md:flex-none"
             >
-              + New Template
+              {t('TRAINER_BTN_NEW_TEMPLATE')}
             </MetallicButton>
           </div>
         </div>
@@ -431,6 +431,7 @@ export default function TrainerSchedulePage() {
           />
         </div>
       </div>
+      {/* ... modals ... */}
 
       <EditTemplateModal
         isOpen={isTemplateModalOpen}

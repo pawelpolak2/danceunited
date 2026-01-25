@@ -70,25 +70,31 @@ export const action = async ({ request }: Route.ActionArgs) => {
   return { success: true }
 }
 
+// ... imports ...
+import { useTranslation } from '../contexts/LanguageContext'
+
+// ... existing code ...
+
 export default function StylesConfiguration() {
   const { danceStyles: styles } = useLoaderData<typeof loader>()
   const submit = useSubmit()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedStyle, setSelectedStyle] = useState<any | null>(null)
   const [deletingStyleId, setDeletingStyleId] = useState<string | null>(null)
+  const { t } = useTranslation()
 
   return (
     <div className="space-y-6">
       <div>
         <ShinyText as="h1" variant="title" className="mb-2 font-bold text-3xl text-white">
-          Dance Styles
+          {t('ADMIN_STYLES_TITLE')}
         </ShinyText>
-        <p className="text-gray-400">Manage available dance styles.</p>
+        <p className="text-gray-400">{t('ADMIN_STYLES_SUBTITLE')}</p>
       </div>
 
       <div className="rounded-xl border border-white/10 bg-black/20 p-6">
         <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <h3 className="font-bold text-gold text-xl">Existing Styles</h3>
+          <h3 className="font-bold text-gold text-xl">{t('ADMIN_STYLES_LIST_TITLE')}</h3>
           <MetallicButton
             type="button"
             onClick={() => {
@@ -97,13 +103,13 @@ export default function StylesConfiguration() {
             }}
             className="rounded-md border-2 border-gold/50 px-4 py-2"
           >
-            + Add New Style
+            {t('ADMIN_STYLES_BTN_CREATE')}
           </MetallicButton>
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {styles.length === 0 ? (
-            <div className="col-span-full py-8 text-center text-gray-500 italic">No dance styles defined.</div>
+            <div className="col-span-full py-8 text-center text-gray-500 italic">{t('ADMIN_STYLES_NO_STYLES')}</div>
           ) : (
             styles.map((style) => (
               <div
@@ -114,7 +120,9 @@ export default function StylesConfiguration() {
                   <h4 className="font-bold text-lg text-white">{style.name}</h4>
                   {style.description && <p className="mt-1 text-gray-400 text-sm">{style.description}</p>}
                   {style._count.classTemplates > 0 && (
-                    <p className="mt-2 text-amber-500/80 text-xs">Used in {style._count.classTemplates} template(s)</p>
+                    <p className="mt-2 text-amber-500/80 text-xs">
+                      {t('ADMIN_STYLES_USED_IN', { count: style._count.classTemplates })}
+                    </p>
                   )}
                 </div>
                 <div className="flex gap-2">
@@ -130,7 +138,7 @@ export default function StylesConfiguration() {
                   </button>
 
                   <MetallicTooltip
-                    content="Cannot delete style that is in use."
+                    content={t('ADMIN_STYLES_DELETE_BLOCKED')}
                     shouldShow={style._count.classTemplates > 0}
                     align="end"
                   >
@@ -141,7 +149,7 @@ export default function StylesConfiguration() {
                           e.preventDefault()
                           return
                         }
-                        if (!confirm(`Delete ${style.name}?`)) e.preventDefault()
+                        if (!confirm(t('CONFIRM_DELETE_MSG_GENERIC'))) e.preventDefault()
                       }}
                     >
                       <input type="hidden" name="intent" value="delete_style" />
@@ -177,9 +185,9 @@ export default function StylesConfiguration() {
             setDeletingStyleId(null)
           }
         }}
-        title="Delete Dance Style"
-        description="Are you sure you want to delete this dance style? This cannot be undone."
-        confirmLabel="Delete"
+        title={t('ADMIN_STYLES_DELETE_TITLE')}
+        description={t('ADMIN_STYLES_DELETE_DESC')}
+        confirmLabel={t('CONFIRM_DELETE')}
         isDestructive
       />
     </div>

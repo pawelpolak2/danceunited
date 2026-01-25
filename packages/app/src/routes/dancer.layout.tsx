@@ -2,6 +2,7 @@ import { Calendar, LayoutDashboard, LogOut, Package, Settings } from 'lucide-rea
 import { Form, Link, Outlet, redirect, useLocation } from 'react-router'
 import { Footer } from '../components/Footer'
 import { ShinyText } from '../components/ui'
+import { useTranslation } from '../contexts/LanguageContext'
 import { getCurrentUser } from '../lib/auth.server'
 import type { Route } from './+types/dancer.layout'
 
@@ -21,15 +22,16 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 export default function DancerLayout() {
   const location = useLocation()
+  const { t } = useTranslation()
 
   const menuGroups = [
     {
-      title: 'MAIN',
+      title: t('DANCER_MENU_MAIN'),
       items: [
-        { label: 'Dashboard', path: '/dancer/dashboard', icon: LayoutDashboard },
-        { label: 'Schedule', path: '/dancer/schedule', icon: Calendar },
-        { label: 'My packages', path: '/dancer/my-packages', icon: Package },
-        { label: 'Buy packages', path: '/dancer/packages', icon: Package },
+        { label: t('DANCER_MENU_DASHBOARD'), path: '/dancer/dashboard', icon: LayoutDashboard },
+        { label: t('DANCER_MENU_SCHEDULE'), path: '/dancer/schedule', icon: Calendar },
+        { label: t('DANCER_MENU_MY_PACKAGES'), path: '/dancer/my-packages', icon: Package },
+        { label: t('DANCER_MENU_BUY_PACKAGES'), path: '/dancer/packages', icon: Package },
       ],
     },
   ]
@@ -52,7 +54,7 @@ export default function DancerLayout() {
                 variant="title"
                 className="glow-sm font-bold text-amber-500 text-lg uppercase tracking-widest"
               >
-                Dance United
+                {t('BRAND_NAME')}
               </ShinyText>
             </Link>
           </div>
@@ -108,7 +110,7 @@ export default function DancerLayout() {
               className="flex items-center gap-3 rounded-lg border border-transparent px-3 py-2 font-medium text-gray-400 text-sm transition-colors hover:border-amber-500/10 hover:bg-white/5 hover:text-amber-100"
             >
               <Settings className="h-4 w-4 text-gray-500 group-hover:text-amber-300" />
-              Profile Settings
+              {t('NAV_SETTINGS')}
             </Link>
             <Form method="post" action="/api/auth/logout">
               <button
@@ -116,7 +118,7 @@ export default function DancerLayout() {
                 className="flex w-full items-center gap-3 rounded-lg border border-transparent px-3 py-2 font-medium text-gray-400 text-sm transition-colors hover:border-red-500/10 hover:bg-red-500/5 hover:text-red-200"
               >
                 <LogOut className="h-4 w-4 text-gray-500 group-hover:text-red-300" />
-                Logout
+                {t('NAV_LOGOUT')}
               </button>
             </Form>
           </div>

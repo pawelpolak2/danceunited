@@ -90,34 +90,41 @@ export async function loader({ request }: Route.LoaderArgs) {
   return { user, attendanceData, popularityData, summary: { totalStudents, totalClasses, avgAttendance } }
 }
 
+// ... imports ...
+import { useTranslation } from '../contexts/LanguageContext'
+
+// ... meta/loader ...
+
 export default function TrainerStatisticsPage() {
   const { attendanceData, popularityData, summary } = useLoaderData<typeof loader>()
+  const { t } = useTranslation()
 
   return (
     <div className="text-amber-50">
       <div className="mx-auto max-w-7xl">
         <div className="mb-8">
           <ShinyText as="h1" variant="title" className="mb-2 font-serif text-4xl text-amber-400 tracking-wide">
-            Performance Statistics
+            {t('TRAINER_STATS_PAGE_TITLE')}
           </ShinyText>
           <ShinyText variant="body" className="font-light text-lg opacity-80">
-            Analytics for the last 30 days
+            {t('TRAINER_STATS_PAGE_SUBTITLE')}
           </ShinyText>
         </div>
 
         {/* Summary Cards */}
         <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
-          <StatCard title="Total Students" value={summary.totalStudents} />
-          <StatCard title="Classes Taught" value={summary.totalClasses} />
-          <StatCard title="Avg Class Size" value={summary.avgAttendance} />
+          <StatCard title={t('TRAINER_STAT_TOTAL_STUDENTS')} value={summary.totalStudents} />
+          <StatCard title={t('TRAINER_STAT_CLASSES_TAUGHT')} value={summary.totalClasses} />
+          <StatCard title={t('TRAINER_STAT_AVG_SIZE')} value={summary.avgAttendance} />
         </div>
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
           {/* Attendance Trend */}
           <div className="h-[400px] rounded-lg border border-amber-900/30 bg-gray-900/40 p-6 backdrop-blur-sm">
-            <h2 className="mb-6 font-serif text-amber-400 text-xl tracking-wide">Attendance Trend</h2>
+            <h2 className="mb-6 font-serif text-amber-400 text-xl tracking-wide">{t('TRAINER_CHART_ATTENDANCE')}</h2>
             <ResponsiveContainer width="100%" height="85%">
               <AreaChart data={attendanceData}>
+                {/* ... chart details ... */}
                 <defs>
                   <linearGradient id="colorStudents" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#d97706" stopOpacity={0.8} />
@@ -144,7 +151,8 @@ export default function TrainerStatisticsPage() {
 
           {/* Style Popularity */}
           <div className="h-[400px] rounded-lg border border-amber-900/30 bg-gray-900/40 p-6 backdrop-blur-sm">
-            <h2 className="mb-6 font-serif text-amber-400 text-xl tracking-wide">Style Popularity</h2>
+            <h2 className="mb-6 font-serif text-amber-400 text-xl tracking-wide">{t('TRAINER_CHART_POPULARITY')}</h2>
+            {/* ... rest ... */}
             <ResponsiveContainer width="100%" height="85%">
               <BarChart data={popularityData} layout="vertical" margin={{ left: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#333" horizontal={false} />

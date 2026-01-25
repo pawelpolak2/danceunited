@@ -203,17 +203,24 @@ export async function action({ request }: Route.ActionArgs) {
   return null
 }
 
+import { useTranslation } from '../contexts/LanguageContext'
+
+// ... imports ...
+
 export default function AdminUsersPage() {
   const { users, search, roleFilter } = useLoaderData<typeof loader>()
   const actionData = useActionData<typeof action>()
   const submit = useSubmit()
+  const { t } = useTranslation()
 
   // UI State
   const [query, setQuery] = useState(search)
+  // ... state ...
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingUser, setEditingUser] = useState<any>(null)
   const [_deletingUserId, _setDeletingUserId] = useState<string | null>(null)
 
+  // ... effects ...
   // Close modal on success
   useEffect(() => {
     if (actionData?.success) {
@@ -250,15 +257,15 @@ export default function AdminUsersPage() {
       <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <ShinyText as="h1" variant="title" className="mb-1 font-serif text-3xl text-amber-400 tracking-wide">
-            User Management
+            {t('ADMIN_USERS_TITLE')}
           </ShinyText>
-          <p className="text-gray-400 text-sm">Manage dancers, trainers and staff members</p>
+          <p className="text-gray-400 text-sm">{t('ADMIN_USERS_SUBTITLE')}</p>
         </div>
         <MetallicButton
           className="group flex items-center gap-2 rounded-md border-2 px-4 py-2 text-sm"
           onClick={handleCreate}
         >
-          <span className="transition-colors group-hover:text-amber-200">+</span> Add User
+          <span className="transition-colors group-hover:text-amber-200">+</span> {t('ADMIN_BTN_ADD_USER')}
         </MetallicButton>
       </div>
 
@@ -270,7 +277,7 @@ export default function AdminUsersPage() {
             <input
               type="text"
               name="q"
-              placeholder="Search by name or email..."
+              placeholder={t('ADMIN_SEARCH_PLACEHOLDER')}
               className="w-full rounded border border-amber-900/50 bg-gray-950 px-4 py-2 text-amber-100 placeholder-gray-600 focus:border-amber-500/50 focus:outline-none"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -281,17 +288,24 @@ export default function AdminUsersPage() {
 
           {/* Tabs */}
           <div className="flex gap-1 rounded border border-amber-900/30 bg-gray-950 p-1">
-            {['ALL', 'DANCER', 'TRAINER', 'MANAGER'].map((role) => (
-              <Link
-                key={role}
-                to={`?q=${query}&role=${role}`}
-                className={`rounded px-4 py-1.5 font-medium text-xs transition-colors ${
-                  roleFilter === role ? 'bg-amber-500/20 text-amber-400' : 'text-gray-500 hover:text-gray-300'
-                }`}
-              >
-                {role === 'ALL' ? 'All Users' : `${role.charAt(0) + role.slice(1).toLowerCase()}s`}
-              </Link>
-            ))}
+            {['ALL', 'DANCER', 'TRAINER', 'MANAGER'].map((role) => {
+              let label = t('ADMIN_TAB_ALL')
+              if (role === 'DANCER') label = t('ADMIN_TAB_DANCERS')
+              if (role === 'TRAINER') label = t('ADMIN_TAB_TRAINERS')
+              if (role === 'MANAGER') label = t('ADMIN_TAB_MANAGERS')
+
+              return (
+                <Link
+                  key={role}
+                  to={`?q=${query}&role=${role}`}
+                  className={`rounded px-4 py-1.5 font-medium text-xs transition-colors ${
+                    roleFilter === role ? 'bg-amber-500/20 text-amber-400' : 'text-gray-500 hover:text-gray-300'
+                  }`}
+                >
+                  {label}
+                </Link>
+              )
+            })}
           </div>
         </div>
       </div>
@@ -301,11 +315,11 @@ export default function AdminUsersPage() {
         <table className="w-full border-collapse text-left">
           <thead>
             <tr className="border-amber-900/30 border-b bg-gray-900/80 text-amber-500/60 text-xs uppercase tracking-wider">
-              <th className="px-6 py-4 font-semibold">User Info</th>
-              <th className="px-6 py-4 font-semibold">Role</th>
-              <th className="px-6 py-4 font-semibold">Pass Status</th>
-              <th className="px-6 py-4 font-semibold">Joined / Active</th>
-              <th className="px-6 py-4 text-right font-semibold">Actions</th>
+              <th className="px-6 py-4 font-semibold">{t('ADMIN_TABLE_USER_INFO')}</th>
+              <th className="px-6 py-4 font-semibold">{t('ADMIN_TABLE_ROLE')}</th>
+              <th className="px-6 py-4 font-semibold">{t('ADMIN_TABLE_PASS_STATUS')}</th>
+              <th className="px-6 py-4 font-semibold">{t('ADMIN_TABLE_JOINED')}</th>
+              <th className="px-6 py-4 text-right font-semibold">{t('ADMIN_TABLE_ACTIONS')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5">

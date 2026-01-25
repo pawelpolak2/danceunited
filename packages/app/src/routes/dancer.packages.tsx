@@ -130,11 +130,17 @@ export async function loader({ request }: Route.LoaderArgs) {
   return { user, packages }
 }
 
+// ... imports ...
+import { useTranslation } from '../contexts/LanguageContext'
+
+// ... meta/loader/action ...
+
 export default function DancerPackagesPage() {
   const { packages } = useLoaderData<typeof loader>()
+  const { t } = useTranslation()
   const [selectedPackage, setSelectedPackage] = useState<(typeof packages)[0] | null>(null)
 
-  // Group by category
+  // ... grouping logic ...
   const groupedHelper = packages.reduce(
     (acc, pkg) => {
       const cat = pkg.category || 'OTHER'
@@ -161,17 +167,17 @@ export default function DancerPackagesPage() {
         {/* Header */}
         <div className="mb-12 flex flex-col items-center text-center">
           <ShinyText as="h1" variant="title" className="mb-4 font-serif text-5xl text-amber-400">
-            Class Packages
+            {t('PACKAGES_PAGE_TITLE')}
           </ShinyText>
           <ShinyText variant="body" className="max-w-2xl text-xl opacity-80">
-            Choose the perfect package for your dance journey. Valid for all your eligible classes.
+            {t('PACKAGES_PAGE_SUBTITLE')}
           </ShinyText>
         </div>
 
         {packages.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 opacity-50">
             <PackageIcon className="mb-4 h-16 w-16 text-gray-600" />
-            <p className="text-xl">No packages currently available for you.</p>
+            <p className="text-xl">{t('PACKAGES_NO_PACKAGES')}</p>
           </div>
         ) : (
           <div className="space-y-16">
@@ -188,11 +194,11 @@ export default function DancerPackagesPage() {
                   <table className="w-full text-left">
                     <thead>
                       <tr className="border-white/10 border-b text-gray-400 text-sm uppercase tracking-wider">
-                        <th className="px-6 py-4 font-medium">Package Name</th>
-                        <th className="px-6 py-4 text-center font-medium">Classes</th>
-                        <th className="px-6 py-4 text-center font-medium">Validity</th>
-                        <th className="px-6 py-4 text-right font-medium">Price</th>
-                        <th className="px-6 py-4 text-right font-medium">Action</th>
+                        <th className="px-6 py-4 font-medium">{t('PACKAGES_TABLE_NAME')}</th>
+                        <th className="px-6 py-4 text-center font-medium">{t('PACKAGES_TABLE_CLASSES')}</th>
+                        <th className="px-6 py-4 text-center font-medium">{t('PACKAGES_TABLE_VALIDITY')}</th>
+                        <th className="px-6 py-4 text-right font-medium">{t('PACKAGES_TABLE_PRICE')}</th>
+                        <th className="px-6 py-4 text-right font-medium">{t('PACKAGES_TABLE_ACTION')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-white/5">
@@ -225,7 +231,7 @@ export default function DancerPackagesPage() {
                               onClick={() => setSelectedPackage(pkg)}
                               className="inline-flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-2 font-medium text-amber-400 text-sm transition-all hover:border-amber-500/60 hover:bg-amber-500/20 active:scale-95"
                             >
-                              Purchase
+                              {t('PACKAGES_BTN_PURCHASE')}
                             </button>
                           </td>
                         </tr>
@@ -248,6 +254,7 @@ export default function DancerPackagesPage() {
 
 function PurchaseModal({ pkg, onClose }: { pkg: any; onClose: () => void }) {
   const [autoSignIn, setAutoSignIn] = useState(false)
+  const { t } = useTranslation()
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -272,19 +279,19 @@ function PurchaseModal({ pkg, onClose }: { pkg: any; onClose: () => void }) {
           <X className="h-5 w-5" />
         </button>
 
-        <h2 className="mb-6 font-serif text-3xl text-amber-400">Confirm Purchase</h2>
+        <h2 className="mb-6 font-serif text-3xl text-amber-400">{t('MODAL_CONFIRM_TITLE')}</h2>
 
         <div className="mb-8 space-y-4">
           <div className="flex justify-between border-white/10 border-b pb-4">
-            <span className="text-gray-400">Package</span>
+            <span className="text-gray-400">{t('MODAL_LABEL_PACKAGE')}</span>
             <span className="font-bold text-white">{pkg.name}</span>
           </div>
           <div className="flex justify-between border-white/10 border-b pb-4">
-            <span className="text-gray-400">Price</span>
+            <span className="text-gray-400">{t('MODAL_LABEL_PRICE')}</span>
             <span className="font-bold text-amber-400 text-xl">{pkg.price} zł</span>
           </div>
           <div className="flex justify-between border-white/10 border-b pb-4">
-            <span className="text-gray-400">Classes</span>
+            <span className="text-gray-400">{t('MODAL_LABEL_CLASSES')}</span>
             <span className="text-white">{pkg.classCount}</span>
           </div>
         </div>
@@ -307,12 +314,9 @@ function PurchaseModal({ pkg, onClose }: { pkg: any; onClose: () => void }) {
             </div>
             <div className="text-sm">
               <label htmlFor="autoSignIn" className="font-medium text-amber-200">
-                Auto-sign in for next classes
+                {t('MODAL_AUTO_SIGNIN_LABEL')}
               </label>
-              <p className="mt-1 text-gray-400">
-                Automatically register for the next upcoming class instance for each style in this package immediately
-                after payment.
-              </p>
+              <p className="mt-1 text-gray-400">{t('MODAL_AUTO_SIGNIN_DESC')}</p>
             </div>
           </div>
 
@@ -324,29 +328,28 @@ function PurchaseModal({ pkg, onClose }: { pkg: any; onClose: () => void }) {
               className="mt-1 h-4 w-4 rounded border-gray-600 bg-gray-800 text-amber-500 focus:ring-amber-500 focus:ring-offset-gray-900"
             />
             <label htmlFor="termsAccept" className="text-gray-400 text-sm">
-              I accept the{' '}
+              {t('LEGAL_CONSENT_PREFIX')}
               <Link to="/terms" target="_blank" className="text-amber-400 hover:underline">
-                Terms of Service
+                {t('LEGAL_TERMS_LINK')}
               </Link>{' '}
-              and{' '}
+              &amp;{' '}
               <Link to="/privacy" target="_blank" className="text-amber-400 hover:underline">
-                Privacy Policy
+                {t('LEGAL_PRIVACY_LINK')}
               </Link>
-              . I understand that I lose the right of withdrawal once the service has been fully performed (attending
-              the class).
+              {t('MODAL_PURCHASE_TERMS_SUFFIX')}
             </label>
           </div>
 
           <div className="flex flex-col gap-3">
             <MetallicButton type="submit" className="w-full justify-center py-4 text-lg">
-              Pay with Przelewy24
+              {t('MODAL_PAY_BTN')}
             </MetallicButton>
             <button
               type="button"
               onClick={onClose}
               className="w-full rounded-lg border border-white/10 py-3 font-medium text-gray-400 transition-colors hover:bg-white/5 hover:text-white"
             >
-              Cancel
+              {t('MODAL_CANCEL_BTN')}
             </button>
           </div>
         </Form>

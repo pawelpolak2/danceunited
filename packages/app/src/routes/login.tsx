@@ -1,6 +1,7 @@
 import { prisma } from 'db'
 import { Form, redirect, useActionData, useNavigation } from 'react-router'
 import { FormError, FormField, MetallicButton, ShinyText } from '../components/ui'
+import { useTranslation } from '../contexts/LanguageContext'
 import { createSessionCookie, getCurrentUser, verifyPassword } from '../lib/auth.server'
 import { validateLogin } from '../lib/validation'
 import type { Route } from './+types/login'
@@ -92,6 +93,7 @@ type ActionData =
 export default function LoginPage() {
   const actionData = useActionData<ActionData>()
   const navigation = useNavigation()
+  const { t } = useTranslation()
   const isSubmitting = navigation.state === 'submitting'
 
   return (
@@ -99,13 +101,13 @@ export default function LoginPage() {
       <div className="form-container">
         <div>
           <ShinyText as="h2" variant="title" className="text-center text-3xl">
-            sign in to your account
+            {t('LOGIN_TITLE')}
           </ShinyText>
           <p className="mt-2 text-center text-sm">
             <ShinyText variant="body" className="text-sm">
-              Or{' '}
+              {t('LOGIN_OR')}{' '}
               <a href="/register" className="shiny-text font-medium hover:opacity-80">
-                create a new account
+                {t('LOGIN_CREATE_ACCOUNT')}
               </a>
             </ShinyText>
           </p>
@@ -114,21 +116,21 @@ export default function LoginPage() {
           {actionData && !actionData.success && <FormError message={actionData.message} errors={actionData.errors} />}
           <div className="form-field">
             <FormField
-              label="Email address"
+              label={t('LOGIN_EMAIL_LABEL')}
               name="email"
               type="email"
               autoComplete="email"
               required
-              placeholder="you@example.com"
+              placeholder={t('LOGIN_EMAIL_PLACEHOLDER')}
               error={actionData?.errors?.email}
             />
             <FormField
-              label="Password"
+              label={t('LOGIN_PASSWORD_LABEL')}
               name="password"
               type="password"
               autoComplete="current-password"
               required
-              placeholder="••••••••"
+              placeholder={t('LOGIN_PASSWORD_PLACEHOLDER')}
               error={actionData?.errors?.password}
             />
           </div>
@@ -139,7 +141,7 @@ export default function LoginPage() {
               disabled={isSubmitting}
               className="w-full rounded-md border-2 px-4 py-2 text-sm"
             >
-              {isSubmitting ? 'Signing in...' : 'Sign in'}
+              {isSubmitting ? t('LOGIN_SUBMIT_LOADING') : t('LOGIN_SUBMIT_INITIAL')}
             </MetallicButton>
           </div>
         </Form>

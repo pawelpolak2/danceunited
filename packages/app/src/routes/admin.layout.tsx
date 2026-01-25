@@ -30,39 +30,44 @@ export async function loader({ request }: Route.LoaderArgs) {
   return { user }
 }
 
+// ... imports ...
+import { useTranslation } from '../contexts/LanguageContext'
+
+// ... loader ...
+
 export default function AdminLayout() {
   const location = useLocation()
+  const { t } = useTranslation()
 
   const menuGroups = [
     {
-      title: 'MAIN',
+      title: t('ADMIN_MENU_MAIN'),
       items: [
-        { label: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
-        { label: 'Master Schedule', path: '/admin/schedule', icon: Calendar },
+        { label: t('ADMIN_MENU_DASHBOARD'), path: '/admin/dashboard', icon: LayoutDashboard },
+        { label: t('ADMIN_MENU_SCHEDULE'), path: '/admin/schedule', icon: Calendar },
       ],
     },
     {
-      title: 'MANAGEMENT',
+      title: t('ADMIN_MENU_MANAGEMENT'),
       items: [
-        { label: 'Users', path: '/admin/users', icon: Users },
-        { label: 'Templates', path: '/admin/configuration/templates', icon: FileBox },
-        { label: 'Pricing', path: '/admin/configuration/pricing', icon: DollarSign },
-        { label: 'Statistics', path: '/admin/analytics', icon: BarChart3 },
-        { label: 'Gallery', path: '/admin/configuration/gallery', icon: Image },
-        { label: 'Styles', path: '/admin/configuration/styles', icon: Palette },
+        { label: t('ADMIN_MENU_USERS'), path: '/admin/users', icon: Users },
+        { label: t('ADMIN_MENU_TEMPLATES'), path: '/admin/configuration/templates', icon: FileBox },
+        { label: t('ADMIN_MENU_PRICING'), path: '/admin/configuration/pricing', icon: DollarSign },
+        { label: t('ADMIN_MENU_STATISTICS'), path: '/admin/analytics', icon: BarChart3 },
+        { label: t('ADMIN_MENU_GALLERY'), path: '/admin/configuration/gallery', icon: Image },
+        { label: t('ADMIN_MENU_STYLES'), path: '/admin/configuration/styles', icon: Palette },
       ],
     },
   ]
 
   return (
     <div className="relative flex h-full w-full overflow-hidden bg-gray-950 text-amber-50">
-      {/* Background Gradient/Pattern (Optional context) */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-900/20 via-gray-950 to-gray-950" />
+      {/* ... bg ... */}
 
       {/* Sidebar */}
       <aside className="relative z-20 mt-4 mb-4 ml-4 flex h-[calc(100%-2rem)] w-64 flex-shrink-0 flex-col">
         <div className="flex flex-1 flex-col overflow-hidden rounded-2xl border border-amber-900/30 bg-gray-900/40 shadow-2xl shadow-black/50 backdrop-blur-md">
-          {/* Logo Header - Replaces Global Header for Admin */}
+          {/* Logo Header */}
           <div className="flex h-20 items-center justify-center border-amber-900/30 border-b bg-gray-900/50 px-6">
             <Link to="/" className="flex items-center gap-2 transition-opacity hover:opacity-80">
               <img src="/logos/logo-transparent.png" alt="Dance United" className="h-8 w-auto" />
@@ -71,7 +76,7 @@ export default function AdminLayout() {
                 variant="title"
                 className="glow-sm font-bold text-amber-500 text-lg uppercase tracking-widest"
               >
-                Dance United
+                {t('BRAND_NAME')}
               </ShinyText>
             </Link>
           </div>
@@ -96,7 +101,7 @@ export default function AdminLayout() {
                             ? 'border border-amber-500/30 bg-amber-500/10 text-amber-400 shadow-[0_0_15px_-3px_rgba(245,158,11,0.15)]'
                             : 'border border-transparent text-gray-400 hover:border-amber-500/10 hover:bg-white/5 hover:text-amber-200'
                         }
-                                                `}
+                                                    `}
                       >
                         <Icon
                           className={`h-4 w-4 transition-transform duration-300 ${isActive ? 'scale-110 text-amber-400' : 'text-gray-500 group-hover:scale-105 group-hover:text-amber-300'}`}
@@ -127,7 +132,7 @@ export default function AdminLayout() {
               className="flex items-center gap-3 rounded-lg border border-transparent px-3 py-2 font-medium text-gray-400 text-sm transition-colors hover:border-amber-500/10 hover:bg-white/5 hover:text-amber-100"
             >
               <Settings className="h-4 w-4 text-gray-500 group-hover:text-amber-300" />
-              Profile Settings
+              {t('NAV_SETTINGS')}
             </Link>
             <Form method="post" action="/api/auth/logout">
               <button
@@ -135,7 +140,7 @@ export default function AdminLayout() {
                 className="flex w-full items-center gap-3 rounded-lg border border-transparent px-3 py-2 font-medium text-gray-400 text-sm transition-colors hover:border-red-500/10 hover:bg-red-500/5 hover:text-red-200"
               >
                 <LogOut className="h-4 w-4 text-gray-500 group-hover:text-red-300" />
-                Logout
+                {t('NAV_LOGOUT')}
               </button>
             </Form>
           </div>

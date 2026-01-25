@@ -173,10 +173,17 @@ export const action = async ({ request }: Route.ActionArgs) => {
   return { success: true }
 }
 
+// ... imports ...
+import { useTranslation } from '../contexts/LanguageContext'
+
+// ... existing code ...
+
 export default function PricingConfiguration() {
   const { packages, classTemplates, search } = useLoaderData<typeof loader>()
   const submit = useSubmit()
+  const { t } = useTranslation()
 
+  // ... state ...
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedPackage, setSelectedPackage] = useState<any | null>(null)
   const [deletingPackageId, setDeletingPackageId] = useState<string | null>(null)
@@ -201,20 +208,20 @@ export default function PricingConfiguration() {
     <div className="space-y-6">
       <div>
         <ShinyText as="h1" variant="title" className="mb-2 font-bold text-3xl text-white">
-          Pricing Configuration
+          {t('ADMIN_PRICING_TITLE')}
         </ShinyText>
-        <p className="text-gray-400">Manage packages and pricing options.</p>
+        <p className="text-gray-400">{t('ADMIN_PRICING_SUBTITLE')}</p>
       </div>
 
       <div className="rounded-xl border border-white/10 bg-black/20 p-6">
         <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center">
           <div className="flex flex-1 items-center gap-4">
-            <h3 className="whitespace-nowrap font-bold text-gold text-xl">Current Packages</h3>
+            <h3 className="whitespace-nowrap font-bold text-gold text-xl">{t('ADMIN_PRICING_PACKAGES_TITLE')}</h3>
             <Form className="w-full max-w-xs">
               <input
                 type="text"
                 name="q"
-                placeholder="Search packages..."
+                placeholder={t('ADMIN_PRICING_SEARCH_PLACEHOLDER')}
                 className="w-full rounded border border-amber-900/50 bg-gray-950 px-4 py-2 text-amber-100 text-sm placeholder-gray-600 focus:border-amber-500/50 focus:outline-none"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
@@ -225,7 +232,7 @@ export default function PricingConfiguration() {
             <Checkbox
               checked={showInactive}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setShowInactive(e.target.checked)}
-              label="Show Inactive"
+              label={t('ADMIN_PRICING_SHOW_INACTIVE')}
             />
             <MetallicButton
               onClick={() => {
@@ -234,7 +241,7 @@ export default function PricingConfiguration() {
               }}
               className="rounded-md border-2 border-gold/50 px-4 py-2"
             >
-              + Create Package
+              {t('ADMIN_PRICING_BTN_CREATE')}
             </MetallicButton>
           </div>
         </div>
@@ -243,20 +250,20 @@ export default function PricingConfiguration() {
           <table className="w-full border-collapse text-left">
             <thead>
               <tr className="border-white/10 border-b text-gray-500 text-xs uppercase">
-                <th className="px-4 py-3">Name</th>
-                <th className="px-4 py-3">Category</th>
-                <th className="px-4 py-3">Classes</th>
-                <th className="px-4 py-3">Validity</th>
-                <th className="px-4 py-3">Price</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3 text-right">Actions</th>
+                <th className="px-4 py-3">{t('ADMIN_TABLE_NAME')}</th>
+                <th className="px-4 py-3">{t('ADMIN_TABLE_CATEGORY')}</th>
+                <th className="px-4 py-3">{t('ADMIN_TABLE_CLASSES')}</th>
+                <th className="px-4 py-3">{t('ADMIN_TABLE_VALIDITY')}</th>
+                <th className="px-4 py-3">{t('ADMIN_TABLE_PRICE')}</th>
+                <th className="px-4 py-3">{t('ADMIN_TABLE_STATUS')}</th>
+                <th className="px-4 py-3 text-right">{t('ADMIN_TABLE_ACTIONS')}</th>
               </tr>
             </thead>
             <tbody>
               {filteredPackages.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="py-8 text-center text-gray-500 italic">
-                    No packages found.
+                    {t('ADMIN_PRICING_NO_PACKAGES')}
                   </td>
                 </tr>
               ) : (
@@ -346,9 +353,9 @@ export default function PricingConfiguration() {
             setDeletingPackageId(null)
           }
         }}
-        title="Delete Package"
-        description="Are you sure you want to delete this package? This will archive it."
-        confirmLabel="Delete"
+        title={t('ADMIN_PRICING_DELETE_TITLE')}
+        description={t('ADMIN_PRICING_DELETE_DESC')}
+        confirmLabel={t('CONFIRM_DELETE')}
         isDestructive
       />
     </div>

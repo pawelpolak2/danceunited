@@ -1,4 +1,5 @@
 import { Link } from 'react-router'
+import { useTranslation } from '../../contexts/LanguageContext'
 import { Checkbox } from '../ui/Checkbox'
 
 interface LegalConsentsProps {
@@ -19,6 +20,8 @@ export function LegalConsents({
   onPrivacyChange,
   errors,
 }: LegalConsentsProps) {
+  const { t } = useTranslation()
+
   return (
     <div className="space-y-4">
       <div className="space-y-2">
@@ -29,9 +32,9 @@ export function LegalConsents({
           required
           label={
             <span className="text-gray-300 text-sm">
-              I accept the{' '}
+              {t('LEGAL_CONSENT_PREFIX')}
               <Link to="/terms" target="_blank" className="text-amber-400 underline hover:text-amber-300">
-                Terms of Service
+                {t('LEGAL_TERMS_LINK')}
               </Link>
             </span>
           }
@@ -47,9 +50,9 @@ export function LegalConsents({
           required
           label={
             <span className="text-gray-300 text-sm">
-              I accept the{' '}
+              {t('LEGAL_CONSENT_PREFIX')}
               <Link to="/privacy" target="_blank" className="text-amber-400 underline hover:text-amber-300">
-                Privacy Policy (RODO)
+                {t('LEGAL_PRIVACY_LINK')}
               </Link>
             </span>
           }

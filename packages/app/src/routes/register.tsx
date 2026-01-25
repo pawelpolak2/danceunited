@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Form, redirect, useActionData, useNavigation } from 'react-router'
 import { LegalConsents } from '../components/auth/LegalConsents'
 import { FormError, FormField, MetallicButton, ShinyText } from '../components/ui'
+import { useTranslation } from '../contexts/LanguageContext'
 import { createSessionCookie, getCurrentUser, hashPassword } from '../lib/auth.server'
 import { validateRegistration } from '../lib/validation'
 import type { Route } from './+types/register'
@@ -114,6 +115,7 @@ type ActionData =
 export default function RegisterPage() {
   const actionData = useActionData<ActionData>()
   const navigation = useNavigation()
+  const { t } = useTranslation()
   const isSubmitting = navigation.state === 'submitting'
 
   // State for consents to allow modal interaction to update checkbox
@@ -127,13 +129,13 @@ export default function RegisterPage() {
       <div className="form-container">
         <div>
           <ShinyText as="h2" variant="title" className="text-center text-3xl">
-            create your account
+            {t('REGISTER_TITLE')}
           </ShinyText>
           <p className="mt-2 text-center text-sm">
             <ShinyText variant="body" className="text-sm">
-              Or{' '}
+              {t('LOGIN_OR')}{' '}
               <a href="/login" className="shiny-text font-medium hover:opacity-80">
-                sign in to your existing account
+                {t('LOGIN_SIGN_IN_EXISTING')}
               </a>
             </ShinyText>
           </p>
@@ -142,41 +144,41 @@ export default function RegisterPage() {
           {actionData && !actionData.success && <FormError message={actionData.message} errors={actionData.errors} />}
           <div className="form-field">
             <FormField
-              label="First name"
+              label={t('REGISTER_FIRST_NAME_LABEL')}
               name="firstName"
               type="text"
               autoComplete="given-name"
               required
-              placeholder="John"
+              placeholder={t('REGISTER_FIRST_NAME_PLACEHOLDER')}
               error={actionData?.errors?.firstName}
             />
             <FormField
-              label="Last name"
+              label={t('REGISTER_LAST_NAME_LABEL')}
               name="lastName"
               type="text"
               autoComplete="family-name"
               required
-              placeholder="Doe"
+              placeholder={t('REGISTER_LAST_NAME_PLACEHOLDER')}
               error={actionData?.errors?.lastName}
             />
             <FormField
-              label="Email address"
+              label={t('LOGIN_EMAIL_LABEL')}
               name="email"
               type="email"
               autoComplete="email"
               required
-              placeholder="you@example.com"
+              placeholder={t('LOGIN_EMAIL_PLACEHOLDER')}
               error={actionData?.errors?.email}
             />
             <FormField
-              label="Password"
+              label={t('LOGIN_PASSWORD_LABEL')}
               name="password"
               type="password"
               autoComplete="new-password"
               required
-              placeholder="••••••••"
+              placeholder={t('LOGIN_PASSWORD_PLACEHOLDER')}
               error={actionData?.errors?.password}
-              hint="Must be at least 8 characters with uppercase, lowercase, and a number"
+              hint={t('REGISTER_PASSWORD_HINT')}
             />
           </div>
 
@@ -199,7 +201,7 @@ export default function RegisterPage() {
               disabled={isSubmitting}
               className="w-full rounded-md border-2 px-4 py-2 text-sm"
             >
-              {isSubmitting ? 'Creating account...' : 'Create account'}
+              {isSubmitting ? t('REGISTER_SUBMIT_LOADING') : t('REGISTER_SUBMIT_INITIAL')}
             </MetallicButton>
           </div>
         </Form>

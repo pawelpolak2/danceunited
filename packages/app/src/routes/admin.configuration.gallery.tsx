@@ -95,6 +95,11 @@ export const action = async ({ request }: Route.ActionArgs) => {
   return { success: true }
 }
 
+// ... imports ...
+import { useTranslation } from '../contexts/LanguageContext'
+
+// ... existing code ...
+
 export default function GalleryConfiguration() {
   const { galleryImages: images } = useLoaderData<typeof loader>()
   const actionData = useActionData<typeof action>()
@@ -102,6 +107,7 @@ export default function GalleryConfiguration() {
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null)
   const navigation = useNavigation()
   const isUploading = navigation.formData?.get('intent') === 'upload_image'
+  const { t } = useTranslation()
 
   // Reset file name on success
   useEffect(() => {
@@ -116,17 +122,19 @@ export default function GalleryConfiguration() {
     <div className="space-y-6">
       <div>
         <ShinyText as="h1" variant="title" className="mb-2 font-bold text-3xl text-white">
-          Gallery Management
+          {t('ADMIN_GALLERY_TITLE')}
         </ShinyText>
-        <p className="text-gray-400">Manage images for your gallery.</p>
+        <p className="text-gray-400">{t('ADMIN_GALLERY_SUBTITLE')}</p>
       </div>
 
       <div className="rounded-xl border border-white/10 bg-black/20 p-6">
-        <h3 className="mb-6 font-bold text-gold text-xl">Gallery Images</h3>
+        <h3 className="mb-6 font-bold text-gold text-xl">{t('ADMIN_GALLERY_IMAGES_TITLE')}</h3>
 
         {/* Upload Form */}
         <div className="mb-8 rounded-lg border border-white/10 bg-white/5 p-4">
-          <h4 className="mb-4 font-bold text-sm text-white uppercase tracking-wider">Upload New Image</h4>
+          <h4 className="mb-4 font-bold text-sm text-white uppercase tracking-wider">
+            {t('ADMIN_GALLERY_UPLOAD_TITLE')}
+          </h4>
 
           {actionData?.error && (
             <div className="mb-4 flex items-center gap-2 rounded-md border border-red-500/50 bg-red-900/20 p-3 text-red-200 text-sm">
@@ -139,7 +147,7 @@ export default function GalleryConfiguration() {
             <input type="hidden" name="intent" value="upload_image" />
 
             <div className="w-full flex-1 space-y-1">
-              <label className="text-gray-400 text-xs">Category</label>
+              <label className="text-gray-400 text-xs">{t('ADMIN_GALLERY_CATEGORY_LABEL')}</label>
               <select
                 name="category"
                 value={selectedCategory}
@@ -155,7 +163,7 @@ export default function GalleryConfiguration() {
             </div>
 
             <div className="w-full flex-[2] space-y-1">
-              <label className="text-gray-400 text-xs">Image File (Auto-converted to WebP)</label>
+              <label className="text-gray-400 text-xs">{t('ADMIN_GALLERY_FILE_LABEL')}</label>
               <div className="relative">
                 <input
                   type="file"
@@ -174,7 +182,7 @@ export default function GalleryConfiguration() {
                   className="flex w-full cursor-pointer items-center justify-between rounded border border-white/10 bg-black/40 px-3 py-2 text-white transition-colors hover:border-gold hover:bg-white/5"
                 >
                   <span className={`text-sm ${selectedFileName ? 'text-white' : 'text-gray-500'}`}>
-                    {selectedFileName || 'Choose file...'}
+                    {selectedFileName || t('ADMIN_GALLERY_CHOOSE_FILE')}
                   </span>
                   <Upload size={16} className="text-gold" />
                 </label>
@@ -186,7 +194,7 @@ export default function GalleryConfiguration() {
               disabled={isUploading}
               className="w-full transform rounded-md border-none bg-amber-500 px-6 py-2 font-bold text-black shadow-[0_0_15px_rgba(245,158,11,0.5)] transition-all hover:scale-105 hover:bg-amber-400 md:w-auto"
             >
-              {isUploading ? 'Uploading...' : 'Upload Image'}
+              {isUploading ? t('ADMIN_GALLERY_BTN_UPLOADING') : t('ADMIN_GALLERY_BTN_UPLOAD')}
             </MetallicButton>
           </Form>
         </div>
@@ -213,7 +221,7 @@ export default function GalleryConfiguration() {
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-5">
           {currentImages.length === 0 ? (
             <div className="col-span-full rounded-lg border border-white/10 border-dashed py-8 text-center text-gray-500">
-              No images in this category.
+              {t('ADMIN_GALLERY_NO_IMAGES')}
             </div>
           ) : (
             currentImages.map((img) => (
@@ -227,7 +235,10 @@ export default function GalleryConfiguration() {
                   className="h-full w-full object-cover transition-opacity group-hover:opacity-70"
                 />
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100">
-                  <Form method="post" onSubmit={(e) => !confirm('Delete this image?') && e.preventDefault()}>
+                  <Form
+                    method="post"
+                    onSubmit={(e) => !confirm(t('ADMIN_GALLERY_DELETE_CONFIRM')) && e.preventDefault()}
+                  >
                     <input type="hidden" name="intent" value="delete_image" />
                     <input type="hidden" name="category" value={selectedCategory} />
                     <input type="hidden" name="filename" value={img} />

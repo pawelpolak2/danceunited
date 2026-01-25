@@ -128,24 +128,31 @@ export async function loader({ request }: Route.LoaderArgs) {
   return { user, revenueData, retentionData, trainerRanking, dailyOccupancy }
 }
 
+// ... imports ...
+import { useTranslation } from '../contexts/LanguageContext'
+
+// ... meta/loader ...
+
 export default function AdminAnalyticsPage() {
   const { revenueData, retentionData, trainerRanking, dailyOccupancy } = useLoaderData<typeof loader>()
+  const { t } = useTranslation()
 
   return (
     <div className="text-amber-50">
       <div className="mb-8">
         <ShinyText as="h1" variant="title" className="mb-1 font-serif text-3xl text-amber-400 tracking-wide">
-          Analytics & Reports
+          {t('ADMIN_ANALYTICS_TITLE')}
         </ShinyText>
-        <p className="text-gray-400 text-sm">Deep dive into studio performance</p>
+        <p className="text-gray-400 text-sm">{t('ADMIN_ANALYTICS_SUBTITLE')}</p>
       </div>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* Revenue */}
         <div className="h-[400px] rounded-lg border border-amber-900/30 bg-gray-900/40 p-6 backdrop-blur-sm">
-          <h2 className="mb-6 font-serif text-amber-400 text-xl">Revenue Stream (6 Months)</h2>
+          <h2 className="mb-6 font-serif text-amber-400 text-xl">{t('ADMIN_CHART_REVENUE')}</h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={revenueData}>
+              {/* ... chart details ... */}
               <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
               <XAxis dataKey="name" stroke="#666" tick={{ fill: '#888' }} />
               <YAxis stroke="#666" tick={{ fill: '#888' }} tickFormatter={(val) => `${val / 1000}k`} />
@@ -161,9 +168,10 @@ export default function AdminAnalyticsPage() {
 
         {/* Trainer Ranking */}
         <div className="h-[400px] rounded-lg border border-amber-900/30 bg-gray-900/40 p-6 backdrop-blur-sm">
-          <h2 className="mb-6 font-serif text-amber-400 text-xl">Top Trainers (Last 30 Days)</h2>
+          <h2 className="mb-6 font-serif text-amber-400 text-xl">{t('ADMIN_CHART_TOP_TRAINERS')}</h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart layout="vertical" data={trainerRanking} margin={{ left: 20 }}>
+              {/* ... chart details ... */}
               <CartesianGrid strokeDasharray="3 3" stroke="#333" horizontal={false} />
               <XAxis type="number" stroke="#666" hide />
               <YAxis type="category" dataKey="name" stroke="#666" width={120} tick={{ fill: '#ccc' }} />
@@ -179,9 +187,10 @@ export default function AdminAnalyticsPage() {
 
         {/* Occupancy by Day */}
         <div className="h-[400px] rounded-lg border border-amber-900/30 bg-gray-900/40 p-6 backdrop-blur-sm">
-          <h2 className="mb-6 font-serif text-amber-400 text-xl">Weekly Occupancy</h2>
+          <h2 className="mb-6 font-serif text-amber-400 text-xl">{t('ADMIN_CHART_OCCUPANCY')}</h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={dailyOccupancy}>
+              {/* ... chart details ... */}
               <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
               <XAxis dataKey="name" stroke="#666" tick={{ fill: '#888' }} />
               <YAxis stroke="#666" tick={{ fill: '#888' }} />
@@ -197,7 +206,8 @@ export default function AdminAnalyticsPage() {
 
         {/* Retention Trend */}
         <div className="h-[400px] rounded-lg border border-amber-900/30 bg-gray-900/40 p-6 backdrop-blur-sm">
-          <h2 className="mb-6 font-serif text-amber-400 text-xl">New User Growth (Daily)</h2>
+          <h2 className="mb-6 font-serif text-amber-400 text-xl">{t('ADMIN_CHART_RETENTION')}</h2>
+          {/* ... rest ... */}
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={retentionData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />

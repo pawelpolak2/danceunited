@@ -14,7 +14,9 @@ import {
 
 import type { Route } from './+types/root'
 import { Footer } from './components/Footer'
+import { LanguageSwitcher } from './components/LanguageSwitcher'
 import { MetallicLink, ShinyText } from './components/ui'
+import { LanguageProvider, useTranslation } from './contexts/LanguageContext'
 import { getCurrentUser } from './lib/auth.server'
 import './app.css'
 
@@ -56,6 +58,15 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 export default function App() {
   const { user } = useLoaderData<typeof loader>()
+  return (
+    <LanguageProvider>
+      <AppContent user={user} />
+    </LanguageProvider>
+  )
+}
+
+function AppContent({ user }: { user: any }) {
+  const { t } = useTranslation()
   // useLocation logic to handle global overflow
   const location = useLocation()
 
@@ -78,7 +89,7 @@ export default function App() {
               <Link to="/" className="flex items-center gap-3">
                 <img src="/logos/logo-transparent.png" alt="Dance United" className="h-16 w-auto" />
                 <ShinyText as="span" variant="title" className="text-3xl">
-                  dance united
+                  {t('BRAND_NAME')}
                 </ShinyText>
               </Link>
 
@@ -89,7 +100,7 @@ export default function App() {
                     variant="body"
                     className="text-xl uppercase tracking-wider transition-colors hover:text-gold"
                   >
-                    About Us
+                    {t('NAV_ABOUT_US')}
                   </ShinyText>
                 </Link>
                 <Link to="/team">
@@ -97,7 +108,7 @@ export default function App() {
                     variant="body"
                     className="text-xl uppercase tracking-wider transition-colors hover:text-gold"
                   >
-                    Team
+                    {t('NAV_TEAM')}
                   </ShinyText>
                 </Link>
                 <Link to="/pricing">
@@ -105,7 +116,7 @@ export default function App() {
                     variant="body"
                     className="text-xl uppercase tracking-wider transition-colors hover:text-gold"
                   >
-                    Pricing
+                    {t('NAV_PRICING')}
                   </ShinyText>
                 </Link>
                 <Link to="/schedule">
@@ -113,7 +124,7 @@ export default function App() {
                     variant="body"
                     className="text-xl uppercase tracking-wider transition-colors hover:text-gold"
                   >
-                    Schedule
+                    {t('NAV_SCHEDULE')}
                   </ShinyText>
                 </Link>
                 <Link to="/contact">
@@ -121,7 +132,7 @@ export default function App() {
                     variant="body"
                     className="text-xl uppercase tracking-wider transition-colors hover:text-gold"
                   >
-                    Contact
+                    {t('NAV_CONTACT')}
                   </ShinyText>
                 </Link>
                 <Link to="/gallery">
@@ -129,12 +140,14 @@ export default function App() {
                     variant="body"
                     className="text-xl uppercase tracking-wider transition-colors hover:text-gold"
                   >
-                    Gallery
+                    {t('NAV_GALLERY')}
                   </ShinyText>
                 </Link>
               </div>
             </div>
             <div className="flex items-center gap-4">
+              <LanguageSwitcher />
+
               {user ? (
                 <details className="group relative">
                   <summary className="flex cursor-pointer list-none items-center gap-2 transition-colors hover:text-amber-400 [&::webkit-details-marker]:hidden">
@@ -159,7 +172,7 @@ export default function App() {
                         className="flex items-center gap-3 px-4 py-2 text-amber-50/80 text-sm transition-colors hover:bg-amber-900/20 hover:text-amber-100"
                       >
                         <LayoutDashboard className="h-4 w-4" />
-                        Dashboard
+                        {t('NAV_DASHBOARD')}
                       </Link>
                     )}
 
@@ -169,7 +182,7 @@ export default function App() {
                       className="flex items-center gap-3 px-4 py-2 text-amber-50/80 text-sm transition-colors hover:bg-amber-900/20 hover:text-amber-100"
                     >
                       <Settings className="h-4 w-4" />
-                      Settings
+                      {t('NAV_SETTINGS')}
                     </Link>
 
                     <div className="my-1 border-amber-900/20 border-t" />
@@ -181,7 +194,7 @@ export default function App() {
                         className="flex w-full items-center gap-3 px-4 py-2 text-left text-red-300 text-sm transition-colors hover:bg-red-900/20 hover:text-red-200"
                       >
                         <LogOut className="h-4 w-4" />
-                        Logout
+                        {t('NAV_LOGOUT')}
                       </button>
                     </Form>
                   </div>
@@ -198,10 +211,10 @@ export default function App() {
               ) : (
                 <>
                   <MetallicLink to="/login" className="rounded-md border-2 px-4 py-2 text-sm">
-                    Login
+                    {t('NAV_LOGIN')}
                   </MetallicLink>
                   <MetallicLink to="/register" className="rounded-md border-2 px-4 py-2 text-sm">
-                    Register
+                    {t('NAV_REGISTER')}
                   </MetallicLink>
                 </>
               )}
