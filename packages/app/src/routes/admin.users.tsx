@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { Form, Link, redirect, useActionData, useLoaderData, useSubmit } from 'react-router'
 import { MetallicButton, Modal, ShinyText } from '../components/ui'
 import { Checkbox } from '../components/ui/Checkbox'
+import { ClientDate } from '../components/ui/ClientDate'
 import { MetallicTooltip } from '../components/ui/MetallicTooltip'
 import { getCurrentUser, hashPassword } from '../lib/auth.server'
 import type { Route } from './+types/admin.users'
@@ -359,7 +360,9 @@ export default function AdminUsersPage() {
                     )}
                   </td>
                   <td className="px-6 py-4 text-gray-400 text-sm">
-                    <div>{new Date(user.createdAt).toLocaleDateString()}</div>
+                    <div>
+                      <ClientDate date={user.createdAt} />
+                    </div>
                     {/* Placeholder for last active */}
                     <div className="mt-0.5 text-gray-600 text-xs">Last active: Recently</div>
                   </td>

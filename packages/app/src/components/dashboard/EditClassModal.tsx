@@ -71,12 +71,6 @@ export function EditClassModal({ isOpen, onClose, classInstance, trainers }: Edi
     }
   }, [startDate, classInstance])
 
-  // Helper to format Date to datetime-local string for hidden input
-  const toLocalISO = (date: Date) => {
-    const pad = (n: number) => n.toString().padStart(2, '0')
-    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
-  }
-
   if (!classInstance) return null
 
   return (
@@ -110,7 +104,7 @@ export function EditClassModal({ isOpen, onClose, classInstance, trainers }: Edi
             <input
               type="hidden"
               name="startTime"
-              value={startDate && !Number.isNaN(startDate.getTime()) ? toLocalISO(startDate) : ''}
+              value={startDate && !Number.isNaN(startDate.getTime()) ? startDate.toISOString() : ''}
             />
             {/* Hidden submit button for delete confirmation */}
             <button type="submit" name="intent" value="deleteClass" id="hidden-delete-btn" className="hidden" />

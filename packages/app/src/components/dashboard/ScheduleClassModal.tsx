@@ -56,12 +56,6 @@ export function ScheduleClassModal({ isOpen, onClose, templates, defaultDate }: 
     }
   }, [startDate, selectedTemplateId, templates])
 
-  // Helper to format Date to datetime-local string for hidden input
-  const toLocalISO = (date: Date) => {
-    const pad = (n: number) => n.toString().padStart(2, '0')
-    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
-  }
-
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Schedule Class">
       <Form method="post" className="space-y-4" onSubmit={() => setTimeout(onClose, 100)}>
@@ -86,7 +80,11 @@ export function ScheduleClassModal({ isOpen, onClose, templates, defaultDate }: 
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1">
-            <input type="hidden" name="startTime" value={startDate ? toLocalISO(startDate) : ''} />
+            <input
+              type="hidden"
+              name="startTime"
+              value={startDate && !Number.isNaN(startDate.getTime()) ? startDate.toISOString() : ''}
+            />
             <MetallicDatePicker
               selected={startDate}
               onChange={(d: Date | null) => setStartDate(d || undefined)}
@@ -163,7 +161,11 @@ export function ScheduleClassModal({ isOpen, onClose, templates, defaultDate }: 
                   <input
                     type="hidden"
                     name="recurrenceEndDate"
-                    value={recurrenceEndDate ? toLocalISO(recurrenceEndDate).split('T')[0] : ''}
+                    value={
+                      recurrenceEndDate && !Number.isNaN(recurrenceEndDate.getTime())
+                        ? recurrenceEndDate.toISOString().split('T')[0]
+                        : ''
+                    }
                   />
                   <MetallicDatePicker
                     selected={recurrenceEndDate}
