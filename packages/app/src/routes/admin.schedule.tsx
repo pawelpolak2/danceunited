@@ -261,6 +261,57 @@ export async function action({ request }: Route.ActionArgs) {
           ...(actualTrainerId && { actualTrainerId }),
         },
       })
+
+      // Send Update Email if toggled
+      const notifyUsers = formData.get('notifyUsers') === 'on'
+      if (notifyUsers) {
+        const updatedInstance = await prisma.classInstance.findUnique({
+          where: { id: classInstanceId },
+          include: {
+            classTemplate: true,
+            attendances: { include: { user: true } },
+          },
+        })
+
+        if (updatedInstance && updatedInstance.attendances.length > 0) {
+          const { sendClassUpdateEmail } = await import('../lib/email.server')
+
+          const oldDate = new Date(instance.startTime).toLocaleString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+          })
+          const newDate = newStartTime.toLocaleString('en-US', {
+            weekday: 'long',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+          })
+
+          const changes = []
+          if (instance.startTime.getTime() !== newStartTime.getTime()) changes.push('Time changed')
+          if (hall && instance.actualHall !== hall) changes.push(`Moved to ${hall}`)
+          if (actualTrainerId && instance.actualTrainerId !== actualTrainerId) changes.push('Trainer changed')
+
+          const changesStr = changes.join(', ')
+
+          Promise.allSettled(
+            updatedInstance.attendances.map((attendance) =>
+              sendClassUpdateEmail(
+                attendance.user.email,
+                attendance.user.firstName,
+                updatedInstance.classTemplate.name,
+                oldDate,
+                newDate,
+                changesStr
+              )
+            )
+          ).then((_results) => {})
+        }
+      }
+
       return { success: true, intent }
     } catch (error) {
       console.error('Update failed:', error)
@@ -291,12 +342,56 @@ export async function action({ request }: Route.ActionArgs) {
     if (!classInstanceId) return { error: 'Missing required fields' }
 
     try {
+      // 1. Fetch class details AND attendees before cancelling
+      // (or after, but we need the list)
+      const instance = await prisma.classInstance.findUnique({
+        where: { id: classInstanceId },
+        include: {
+          classTemplate: true,
+          attendances: {
+            include: { user: true },
+          },
+        },
+      })
+
+      if (!instance) return { error: 'Class not found' }
+
+      // 2. Mark as Cancelled
       await prisma.classInstance.update({
         where: { id: classInstanceId },
         data: { status: 'CANCELLED' },
       })
+
+      // 3. Send Emails to all attendees (if toggle is on)
+      const notifyUsers = formData.get('notifyUsers') === 'on'
+
+      if (notifyUsers) {
+        const { sendClassCancellationEmail } = await import('../lib/email.server')
+        const dateStr = new Date(instance.startTime).toLocaleString('en-US', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+        })
+
+        // Fire and forget
+        Promise.allSettled(
+          instance.attendances.map((attendance) =>
+            sendClassCancellationEmail(
+              attendance.user.email,
+              attendance.user.firstName,
+              instance.classTemplate.name,
+              dateStr
+            )
+          )
+        ).then((_results) => {})
+      }
+
       return { success: true, intent: 'cancelClass' }
     } catch (_error) {
+      console.error(_error)
       return { error: 'Cancel failed' }
     }
   }
