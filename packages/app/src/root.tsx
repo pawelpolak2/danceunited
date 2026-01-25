@@ -196,16 +196,16 @@ export default function App() {
                   />
                 </details>
               ) : (
-                <>
+                <div className="hidden gap-4 md:flex">
                   <MetallicLink to="/login" className="rounded-md border-2 px-4 py-2 text-sm">
                     Login
                   </MetallicLink>
                   <MetallicLink to="/register" className="rounded-md border-2 px-4 py-2 text-sm">
                     Register
                   </MetallicLink>
-                </>
+                </div>
               )}
-              <MobileNav />
+              <MobileNav user={user} />
             </div>
           </nav>
         </header>

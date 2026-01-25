@@ -268,10 +268,10 @@ export default function TemplatesConfiguration() {
             <thead>
               <tr className="border-white/10 border-b text-gray-500 text-xs uppercase">
                 <th className="px-4 py-3">Name</th>
-                <th className="px-4 py-3">Style</th>
-                <th className="px-4 py-3 text-center">Whitelist</th>
-                <th className="px-4 py-3">Defaults</th>
-                <th className="px-4 py-3 text-center">In Use</th>
+                <th className="hidden px-4 py-3 md:table-cell">Style</th>
+                <th className="hidden px-4 py-3 text-center md:table-cell">Whitelist</th>
+                <th className="hidden px-4 py-3 md:table-cell">Defaults</th>
+                <th className="hidden px-4 py-3 text-center md:table-cell">In Use</th>
                 <th className="px-4 py-3 text-center">Status</th>
                 <th className="px-4 py-3 text-right">Actions</th>
               </tr>
@@ -297,8 +297,8 @@ export default function TemplatesConfiguration() {
                       <div className="font-medium text-white">{tpl.name}</div>
                       {tpl.description && <div className="text-gray-500 text-xs">{tpl.description}</div>}
                     </td>
-                    <td className="px-4 py-3 text-gray-300 text-sm">{tpl.style.name}</td>
-                    <td className="px-4 py-3 text-center">
+                    <td className="hidden px-4 py-3 text-gray-300 text-sm md:table-cell">{tpl.style.name}</td>
+                    <td className="hidden px-4 py-3 text-center md:table-cell">
                       {tpl.isWhitelistEnabled ? (
                         <span className="rounded border border-gold/30 bg-gold/10 px-1.5 py-0.5 font-medium text-[10px] text-gold uppercase">
                           Enabled
@@ -309,7 +309,7 @@ export default function TemplatesConfiguration() {
                         </span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-gray-400 text-xs">
+                    <td className="hidden px-4 py-3 text-gray-400 text-xs md:table-cell">
                       <div>
                         <span className="text-gray-500">Hall:</span> {tpl.hallId}
                       </div>
@@ -327,7 +327,9 @@ export default function TemplatesConfiguration() {
                         </div>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-center text-gray-400 text-sm">{tpl._count.classInstances}</td>
+                    <td className="hidden px-4 py-3 text-center text-gray-400 text-sm md:table-cell">
+                      {tpl._count.classInstances}
+                    </td>
                     <td className="px-4 py-3 text-center">
                       <StatusBadge isActive={tpl.isActive} />
                     </td>
