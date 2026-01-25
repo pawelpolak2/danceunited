@@ -244,11 +244,11 @@ export default function PricingConfiguration() {
             <thead>
               <tr className="border-white/10 border-b text-gray-500 text-xs uppercase">
                 <th className="px-4 py-3">Name</th>
-                <th className="px-4 py-3">Category</th>
-                <th className="px-4 py-3">Classes</th>
-                <th className="px-4 py-3">Validity</th>
-                <th className="px-4 py-3">Price</th>
-                <th className="px-4 py-3">Status</th>
+                <th className="hidden px-4 py-3 md:table-cell">Category</th>
+                <th className="hidden px-4 py-3 md:table-cell">Classes</th>
+                <th className="hidden px-4 py-3 md:table-cell">Validity</th>
+                <th className="px-4 py-3 font-semibold">Price</th>
+                <th className="hidden px-4 py-3 text-center md:table-cell">Status</th>
                 <th className="px-4 py-3 text-right">Actions</th>
               </tr>
             </thead>
@@ -273,11 +273,11 @@ export default function PricingConfiguration() {
                       <div className="font-medium text-white">{pkg.name}</div>
                       {pkg.description && <div className="text-gray-500 text-xs">{pkg.description}</div>}
                     </td>
-                    <td className="px-4 py-3 text-gray-300 text-xs">{pkg.category}</td>
-                    <td className="px-4 py-3 text-gray-300 text-sm">{pkg.classCount}</td>
-                    <td className="px-4 py-3 text-gray-300 text-sm">{pkg.validityDays} days</td>
+                    <td className="hidden px-4 py-3 text-gray-300 text-xs md:table-cell">{pkg.category}</td>
+                    <td className="hidden px-4 py-3 text-gray-300 text-sm md:table-cell">{pkg.classCount}</td>
+                    <td className="hidden px-4 py-3 text-gray-300 text-sm md:table-cell">{pkg.validityDays} days</td>
                     <td className="px-4 py-3 font-bold text-gold">{Number(pkg.price).toFixed(2)} zł</td>
-                    <td className="px-4 py-3">
+                    <td className="hidden px-4 py-3 md:table-cell">
                       <StatusBadge isActive={pkg.isActive} />
                     </td>
                     <td className="px-4 py-3 text-right">

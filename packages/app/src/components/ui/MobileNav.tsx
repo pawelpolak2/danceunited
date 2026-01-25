@@ -1,9 +1,16 @@
 import { Menu, X } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router'
-import { ShinyText } from './ShinyText'
+import { MetallicLink, ShinyText } from './index'
 
-export function MobileNav() {
+interface MobileNavProps {
+  user?: {
+    firstName: string
+    role: string
+  } | null
+}
+
+export function MobileNav({ user }: MobileNavProps) {
   const [isOpen, setIsOpen] = useState(false)
 
   const toggle = () => setIsOpen(!isOpen)
@@ -38,21 +45,53 @@ export function MobileNav() {
 
       {/* Drawer */}
       <div
-        className={`fixed top-0 right-0 z-40 h-full w-64 transform border-amber-900/30 border-l bg-gray-950 px-6 py-20 shadow-2xl transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 right-0 z-40 h-full w-64 transform border-amber-900/30 border-l bg-gray-950 px-6 py-12 shadow-2xl transition-transform duration-300 ease-in-out ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        <div className="flex flex-col gap-6">
-          {menuItems.map((item) => (
-            <Link key={item.href} to={item.href} onClick={toggle}>
-              <ShinyText
-                variant="body"
-                className="block text-xl uppercase tracking-wider transition-colors hover:text-gold"
-              >
-                {item.label}
-              </ShinyText>
-            </Link>
-          ))}
+        <div className="flex flex-col gap-8">
+          {/* Main Menu Links */}
+          <div className="flex flex-col gap-6">
+            {menuItems.map((item) => (
+              <Link key={item.href} to={item.href} onClick={toggle}>
+                <ShinyText
+                  variant="body"
+                  className="block text-xl uppercase tracking-wider transition-colors hover:text-gold"
+                >
+                  {item.label}
+                </ShinyText>
+              </Link>
+            ))}
+          </div>
+
+          <div className="mt-4 border-amber-900/20 border-t pt-8">
+            {!user ? (
+              <div className="flex flex-col gap-4">
+                <MetallicLink
+                  to="/login"
+                  className="w-full rounded-md border-2 py-3 text-center text-lg"
+                  onClick={toggle}
+                >
+                  Login
+                </MetallicLink>
+                <MetallicLink
+                  to="/register"
+                  className="w-full rounded-md border-2 py-3 text-center text-lg"
+                  onClick={toggle}
+                >
+                  Register
+                </MetallicLink>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-4">
+                <Link to="/profile" onClick={toggle}>
+                  <ShinyText variant="body" className="text-sm">
+                    Logged in as {user.firstName}
+                  </ShinyText>
+                </Link>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

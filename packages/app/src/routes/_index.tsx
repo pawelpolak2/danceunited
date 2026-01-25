@@ -43,7 +43,7 @@ export default function HomePage() {
           <ShinyText
             as="h1"
             variant="title"
-            className="mb-6 whitespace-nowrap text-3xl tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl"
+            className="mb-6 text-2xl tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl"
           >
             welcome to dance united
           </ShinyText>
@@ -58,27 +58,27 @@ export default function HomePage() {
               <MetallicLink
                 to={user.role === 'MANAGER' ? '/admin/dashboard' : '/schedule'}
                 variant="primary"
-                className="w-full rounded-lg border-2 px-8 py-3 text-lg sm:w-auto"
+                className="w-full max-w-[280px] rounded-lg border-2 px-8 py-3 text-lg sm:w-auto"
               >
                 Go to Dashboard
               </MetallicLink>
             ) : (
-              <>
+              <div className="flex w-full flex-col items-center gap-4 sm:flex-row sm:justify-center">
                 <MetallicLink
                   to="/login"
                   variant="primary"
-                  className="w-full rounded-lg border-2 px-8 py-3 text-lg sm:w-auto"
+                  className="w-full max-w-[280px] rounded-lg border-2 px-8 py-3 text-lg sm:w-auto"
                 >
                   Login
                 </MetallicLink>
                 <MetallicLink
                   to="/register"
                   variant="primary"
-                  className="w-full rounded-lg border-2 px-8 py-3 text-lg sm:w-auto"
+                  className="w-full max-w-[280px] rounded-lg border-2 px-8 py-3 text-lg sm:w-auto"
                 >
                   Register
                 </MetallicLink>
-              </>
+              </div>
             )}
           </div>
         </div>
