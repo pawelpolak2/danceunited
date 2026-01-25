@@ -95,7 +95,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     title: `${c.classTemplate.name} (${c.actualTrainer.firstName})`,
     start: c.startTime.toISOString(),
     end: c.endTime.toISOString(),
-    backgroundColor: c.status === 'CANCELLED' ? '#ef4444' : (c.actualHall === 'HALL1' ? '#d97706' : '#92400e'),
+    backgroundColor: c.status === 'CANCELLED' ? '#ef4444' : c.actualHall === 'HALL1' ? '#d97706' : '#92400e',
     borderColor: c.status === 'CANCELLED' ? '#b91c1c' : '#b45309',
     editable: c.status !== 'CANCELLED', // Prevent dragging cancelled classes
   }))

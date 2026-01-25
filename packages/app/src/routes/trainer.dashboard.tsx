@@ -46,13 +46,13 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   const nextClass = nextClassRaw
     ? {
-      id: nextClassRaw.id,
-      name: nextClassRaw.classTemplate.name,
-      startTime: nextClassRaw.startTime.toISOString(),
-      endTime: nextClassRaw.endTime.toISOString(),
-      hall: nextClassRaw.actualHall,
-      // Trainer doesn't need to see trainer name (it's them)
-    }
+        id: nextClassRaw.id,
+        name: nextClassRaw.classTemplate.name,
+        startTime: nextClassRaw.startTime.toISOString(),
+        endTime: nextClassRaw.endTime.toISOString(),
+        hall: nextClassRaw.actualHall,
+        // Trainer doesn't need to see trainer name (it's them)
+      }
     : null
 
   // Fetch upcoming classes count (next 7 days)

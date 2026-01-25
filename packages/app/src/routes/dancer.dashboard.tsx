@@ -59,14 +59,14 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   const nextClass = nextClassRaw
     ? {
-      id: nextClassRaw.id,
-      name: nextClassRaw.classTemplate.name,
-      startTime: nextClassRaw.startTime.toISOString(),
-      endTime: nextClassRaw.endTime.toISOString(),
-      hall: nextClassRaw.actualHall,
-      trainerName: `${nextClassRaw.actualTrainer.firstName} ${nextClassRaw.actualTrainer.lastName}`,
-      isAttending: nextClassRaw.attendances.length > 0,
-    }
+        id: nextClassRaw.id,
+        name: nextClassRaw.classTemplate.name,
+        startTime: nextClassRaw.startTime.toISOString(),
+        endTime: nextClassRaw.endTime.toISOString(),
+        hall: nextClassRaw.actualHall,
+        trainerName: `${nextClassRaw.actualTrainer.firstName} ${nextClassRaw.actualTrainer.lastName}`,
+        isAttending: nextClassRaw.attendances.length > 0,
+      }
     : null
 
   // Fetch Active Packages
@@ -307,10 +307,11 @@ export default function DancerDashboard() {
                               type="button"
                               onClick={() => !isTooLate && setIsConfirmModalOpen(true)}
                               disabled={fetcher.state !== 'idle' || isTooLate}
-                              className={`w-full rounded-md border px-4 py-2 transition-colors ${isTooLate
+                              className={`w-full rounded-md border px-4 py-2 transition-colors ${
+                                isTooLate
                                   ? 'cursor-not-allowed border-gray-700 bg-gray-800 text-gray-500'
                                   : 'border-red-500/30 bg-red-500/10 text-red-400 hover:bg-red-500/20 disabled:opacity-50'
-                                }`}
+                              }`}
                             >
                               {fetcher.state !== 'idle' ? 'Processing...' : 'Cancel Reservation'}
                             </button>
