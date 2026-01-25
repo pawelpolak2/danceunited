@@ -12,9 +12,10 @@ interface NextClassProps {
     trainerName?: string // For dancers to see who is teaching
   } | null
   userRole: 'TRAINER' | 'DANCER'
+  children?: React.ReactNode // Slot for actions (Sign Up / Cancel buttons)
 }
 
-export function NextClassWidget({ nextClass, userRole }: NextClassProps) {
+export function NextClassWidget({ nextClass, userRole, children }: NextClassProps) {
   if (!nextClass) {
     return (
       <div className="relative overflow-hidden rounded-xl border border-amber-500/20 bg-gray-900/40 p-6 backdrop-blur-sm">
@@ -90,7 +91,9 @@ export function NextClassWidget({ nextClass, userRole }: NextClassProps) {
         </div>
 
         <div className="mt-6">
-          {userRole === 'TRAINER' ? (
+          {children ? (
+            children
+          ) : userRole === 'TRAINER' ? (
             <MetallicButton className="w-full justify-center">Start Class Details</MetallicButton>
           ) : (
             <div className="h-2 w-full overflow-hidden rounded-full bg-gray-800">

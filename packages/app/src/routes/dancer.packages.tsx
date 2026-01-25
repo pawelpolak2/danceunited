@@ -1,12 +1,48 @@
 import { prisma } from 'db'
 import { Check, Package as PackageIcon, ShieldCheck } from 'lucide-react'
-import { redirect, useLoaderData } from 'react-router'
+import { Form, redirect, useLoaderData } from 'react-router'
 import { MetallicButton, ShinyText } from '../components/ui'
 import { getCurrentUser } from '../lib/auth.server'
 import type { Route } from './+types/dancer.packages'
 
 export function meta(_args: Route.MetaArgs) {
   return [{ title: 'Packages - Dance United' }, { name: 'description', content: 'Purchase class packages' }]
+}
+
+// ... imports ...
+
+export async function action({ request }: Route.ActionArgs) {
+  const user = await getCurrentUser(request)
+  if (!user || user.role !== 'DANCER') return redirect('/')
+
+  const formData = await request.formData()
+  const intent = formData.get('intent')
+
+  if (intent === 'purchase') {
+    const packageId = formData.get('packageId') as string
+    if (!packageId) return { error: 'Package ID is required' }
+
+    const pkg = await prisma.package.findUnique({ where: { id: packageId } })
+    if (!pkg) return { error: 'Package not found' }
+
+    const expiryDate = new Date()
+    expiryDate.setDate(expiryDate.getDate() + pkg.validityDays)
+
+    await prisma.userPurchase.create({
+      data: {
+        userId: user.userId,
+        packageId: pkg.id,
+        classesRemaining: pkg.classCount,
+        expiryDate: expiryDate,
+        status: 'ACTIVE',
+        classesUsed: 0,
+      },
+    })
+
+    return redirect('/dancer/my-packages')
+  }
+
+  return null
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
@@ -147,7 +183,13 @@ function PackageCard({ pkg }: { pkg: any }) {
           </li>
         </ul>
 
-        <MetallicButton className="w-full justify-center py-4 text-lg">Purchase Package</MetallicButton>
+        <Form method="post">
+          <input type="hidden" name="packageId" value={pkg.id} />
+          <input type="hidden" name="intent" value="purchase" />
+          <MetallicButton type="submit" className="w-full justify-center py-4 text-lg">
+            Purchase Package
+          </MetallicButton>
+        </Form>
       </div>
     </div>
   )

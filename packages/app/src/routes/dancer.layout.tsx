@@ -27,7 +27,8 @@ export default function DancerLayout() {
       items: [
         { label: 'Dashboard', path: '/dancer/dashboard', icon: LayoutDashboard },
         { label: 'Schedule', path: '/dancer/schedule', icon: Calendar },
-        { label: 'Packages', path: '/dancer/packages', icon: Package },
+        { label: 'My packages', path: '/dancer/my-packages', icon: Package },
+        { label: 'Buy packages', path: '/dancer/packages', icon: Package },
       ],
     },
   ]

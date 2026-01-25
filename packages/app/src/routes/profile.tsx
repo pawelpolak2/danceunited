@@ -1,8 +1,8 @@
 import bcrypt from 'bcryptjs'
 import { prisma } from 'db'
-import { Check, Lock, Package, User, X } from 'lucide-react'
+import { Check, Lock, User, X } from 'lucide-react'
 import { useState } from 'react'
-import { Form, Link, redirect, useActionData, useLoaderData } from 'react-router'
+import { Form, redirect, useActionData, useLoaderData } from 'react-router'
 import { MetallicButton } from '../components/ui'
 import { getCurrentUser } from '../lib/auth.server'
 import type { Route } from './+types/profile'
@@ -15,13 +15,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   const user = await getCurrentUser(request)
   if (!user) return redirect('/login')
 
-  const purchases = await prisma.userPurchase.findMany({
-    where: { userId: user.userId },
-    include: { package: true },
-    orderBy: { purchaseDate: 'desc' },
-  })
-
-  return { user, purchases }
+  return { user }
 }
 
 export async function action({ request }: Route.ActionArgs) {
@@ -72,9 +66,9 @@ export async function action({ request }: Route.ActionArgs) {
 }
 
 export default function ProfilePage() {
-  const { user, purchases } = useLoaderData<typeof loader>()
+  const { user } = useLoaderData<typeof loader>()
   const actionData = useActionData<{ error?: string; success?: string }>()
-  const [activeTab, setActiveTab] = useState<'details' | 'security' | 'packages'>('details')
+  const [activeTab, setActiveTab] = useState<'details' | 'security'>('details')
 
   return (
     <div className="flex min-h-screen flex-col bg-gray-950/95 font-sans text-amber-50 selection:bg-amber-500/30">
@@ -120,20 +114,6 @@ export default function ProfilePage() {
               className={`h-4 w-4 ${activeTab === 'security' ? 'drop-shadow-[0_0_3px_rgba(253,224,71,0.6)]' : ''}`}
             />{' '}
             Security
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('packages')}
-            className={`flex items-center gap-2 rounded-t-lg px-4 py-2 font-medium transition-all duration-300 ${
-              activeTab === 'packages'
-                ? 'border-amber-500 border-b-2 bg-gradient-to-t from-amber-500/20 via-amber-900/10 to-transparent text-amber-300 shadow-[0_4px_12px_-2px_rgba(245,158,11,0.3)]'
-                : 'text-amber-50/70 hover:bg-amber-900/10 hover:text-amber-100 hover:shadow-[0_2px_8px_-2px_rgba(245,158,11,0.1)]'
-            }`}
-          >
-            <Package
-              className={`h-4 w-4 ${activeTab === 'packages' ? 'drop-shadow-[0_0_3px_rgba(253,224,71,0.6)]' : ''}`}
-            />{' '}
-            My Packages
           </button>
         </div>
 
@@ -222,54 +202,6 @@ export default function ProfilePage() {
                 </MetallicButton>
               </div>
             </Form>
-          )}
-
-          {activeTab === 'packages' && (
-            <div className="space-y-4">
-              {purchases.length === 0 ? (
-                <p className="text-amber-50/50 italic">No packages purchased yet.</p>
-              ) : (
-                <div className="space-y-3">
-                  {purchases.map((purchase) => (
-                    <div
-                      key={purchase.id}
-                      className="group flex items-center justify-between rounded-lg border border-amber-900/20 bg-black/20 p-4 transition-colors hover:border-amber-500/30"
-                    >
-                      <div>
-                        <h3 className="font-semibold text-amber-200 text-lg">{purchase.package.name}</h3>
-                        <p className="text-amber-50/60 text-sm">
-                          Purchased: {new Date(purchase.purchaseDate).toLocaleDateString()}
-                        </p>
-                        {purchase.expiryDate && (
-                          <p className="text-amber-50/40 text-xs">
-                            Expires: {new Date(purchase.expiryDate).toLocaleDateString()}
-                          </p>
-                        )}
-                      </div>
-                      <div className="text-right">
-                        <span
-                          className={`rounded-full border px-3 py-1 font-bold text-xs ${
-                            purchase.status === 'ACTIVE'
-                              ? 'border-green-500/30 bg-green-900/20 text-green-400'
-                              : 'border-gray-600/30 bg-gray-800/50 text-gray-400'
-                          }`}
-                        >
-                          {purchase.status}
-                        </span>
-                        <p className="mt-2 text-amber-50/80 text-sm">
-                          Sessions: {purchase.classesRemaining} / {purchase.package.classCount}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-              <div className="mt-6 border-amber-900/20 border-t pt-4">
-                <Link to="/pricing">
-                  <MetallicButton className="w-full sm:w-auto">Browse Packages</MetallicButton>
-                </Link>
-              </div>
-            </div>
           )}
         </div>
       </div>

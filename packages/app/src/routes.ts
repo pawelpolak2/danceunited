@@ -32,6 +32,7 @@ export default [
     route('dancer/dashboard', 'routes/dancer.dashboard.tsx'),
     route('dancer/schedule', 'routes/dancer.schedule.tsx'),
     route('dancer/packages', 'routes/dancer.packages.tsx'),
+    route('dancer/my-packages', 'routes/dancer.my-packages.tsx'),
   ]),
 
   // Resource Routes
