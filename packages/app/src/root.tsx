@@ -14,9 +14,13 @@ import {
 
 import type { Route } from './+types/root'
 import { Footer } from './components/Footer'
+<<<<<<< HEAD
 import { LanguageSwitcher } from './components/LanguageSwitcher'
 import { MetallicLink, ShinyText } from './components/ui'
 import { LanguageProvider, useTranslation } from './contexts/LanguageContext'
+=======
+import { MetallicLink, MobileNav, ShinyText } from './components/ui'
+>>>>>>> origin/main
 import { getCurrentUser } from './lib/auth.server'
 import './app.css'
 
@@ -209,15 +213,16 @@ function AppContent({ user }: { user: any }) {
                   />
                 </details>
               ) : (
-                <>
+                <div className="hidden gap-4 md:flex">
                   <MetallicLink to="/login" className="rounded-md border-2 px-4 py-2 text-sm">
                     {t('NAV_LOGIN')}
                   </MetallicLink>
                   <MetallicLink to="/register" className="rounded-md border-2 px-4 py-2 text-sm">
                     {t('NAV_REGISTER')}
                   </MetallicLink>
-                </>
+                </div>
               )}
+              <MobileNav user={user} />
             </div>
           </nav>
         </header>

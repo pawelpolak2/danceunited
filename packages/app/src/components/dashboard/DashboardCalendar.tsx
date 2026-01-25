@@ -1,6 +1,7 @@
 import type { DateSelectArg, EventClickArg, EventDropArg, EventInput } from '@fullcalendar/core'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
+import listPlugin from '@fullcalendar/list'
 import FullCalendar from '@fullcalendar/react'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -16,11 +17,17 @@ interface DashboardCalendarProps {
   height?: string | number | 'auto'
 }
 
-// Move static config outside component to prevent re-creation
-const headerToolbarConfig = {
+// Full config including listWeek
+const desktopHeaderConfig = {
   left: 'prev,next today',
   center: 'title',
-  right: 'dayGridMonth,timeGridWeek,timeGridDay',
+  right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
+} as const
+
+const mobileHeaderConfig = {
+  left: 'prev,next',
+  center: 'title',
+  right: '',
 } as const
 
 const buttonTextConfig = {
@@ -28,11 +35,12 @@ const buttonTextConfig = {
   month: 'month',
   week: 'week',
   day: 'day',
+  list: 'list',
 } as const
 
-const calendarPlugins = [dayGridPlugin, timeGridPlugin, interactionPlugin]
+const calendarPlugins = [dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]
 
-const eventTimeFormatConfig = {
+const _eventTimeFormatConfig = {
   hour: '2-digit',
   minute: '2-digit',
   meridiem: false,
@@ -56,14 +64,22 @@ function DashboardCalendarComponent({
   height = 600,
 }: DashboardCalendarProps) {
   const [isClient, setIsClient] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const calendarRef = useRef<FullCalendar>(null)
 
-  // Only render on client to avoid SSR hydration issues
+  // Mobile detection and SSR hydration safety
   useEffect(() => {
     setIsClient(true)
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  // Memoize default events to prevent recreation on every render
+  // Memoize default events
   const defaultEvents = useMemo<EventInput[]>(() => {
     const today = new Date()
     const todayStr = today.toISOString().split('T')[0]
@@ -79,40 +95,25 @@ function DashboardCalendarComponent({
     ]
   }, [])
 
-  // Memoize handlers to prevent recreation
   const handleDateSelect = useCallback(
     (selectInfo: DateSelectArg) => {
       if (readOnly) return
-
-      if (onDateSelect) {
-        onDateSelect(selectInfo)
-      } else {
-        // Default: show alert (will be replaced with booking modal)
-        alert(`Selected: ${selectInfo.startStr} to ${selectInfo.endStr}`)
-      }
+      onDateSelect?.(selectInfo)
     },
     [onDateSelect, readOnly]
   )
 
   const handleEventClick = useCallback(
     (clickInfo: EventClickArg) => {
-      // Allow click in readOnly mode for details view, but don't show default alert if readOnly
-      if (onEventClick) {
-        onEventClick(clickInfo)
-      } else if (!readOnly) {
-        // Default: show event details only if not readOnly (unless handled by parent)
-        alert(`Event: ${clickInfo.event.title}`)
-      }
+      onEventClick?.(clickInfo)
     },
-    [onEventClick, readOnly]
+    [onEventClick]
   )
 
-  // Memoize events array
   const calendarEvents = useMemo(() => {
     return events.length > 0 ? events : defaultEvents
   }, [events, defaultEvents])
 
-  // Show placeholder during SSR
   if (!isClient) {
     return (
       <div className="dashboard-calendar" style={{ minHeight: '600px' }}>
@@ -124,12 +125,12 @@ function DashboardCalendarComponent({
   }
 
   return (
-    <div className="dashboard-calendar">
+    <div className="dashboard-calendar overflow-hidden rounded-xl border border-amber-900/20 bg-gray-900/30 p-2 sm:p-4">
       <FullCalendar
         ref={calendarRef}
         plugins={calendarPlugins}
-        initialView="dayGridMonth"
-        headerToolbar={headerToolbarConfig}
+        initialView={isMobile ? 'listWeek' : 'dayGridMonth'}
+        headerToolbar={isMobile ? mobileHeaderConfig : desktopHeaderConfig}
         events={calendarEvents}
         selectable={!readOnly}
         selectMirror={!readOnly}
@@ -137,15 +138,29 @@ function DashboardCalendarComponent({
         weekends={true}
         select={handleDateSelect}
         eventClick={handleEventClick}
-        editable={editable}
+        editable={editable && !readOnly}
         eventDrop={onEventDrop}
-        height={height}
-        aspectRatio={1.8}
+        displayEventEnd={!isMobile}
+        height={isMobile ? 'auto' : height}
+        aspectRatio={isMobile ? 0.7 : 1.8}
+        handleWindowResize={true}
+        stickyHeaderDates={true}
         eventClassNames="calendar-event"
         dayHeaderClassNames="calendar-day-header"
         buttonText={buttonTextConfig}
-        eventTimeFormat={eventTimeFormatConfig}
+        eventTimeFormat={{
+          hour: 'numeric',
+          minute: '2-digit',
+          meridiem: false,
+          hour12: false,
+        }}
         slotLabelFormat={slotLabelFormatConfig}
+        dayHeaderFormat={isMobile ? { weekday: 'narrow' } : { weekday: 'short' }}
+        titleFormat={isMobile ? { month: 'short', year: 'numeric' } : { month: 'long', year: 'numeric' }}
+        listDayFormat={
+          isMobile ? { weekday: 'short', day: 'numeric' } : { weekday: 'long', month: 'long', day: 'numeric' }
+        }
+        listDaySideFormat={isMobile ? false : { year: 'numeric' }}
       />
     </div>
   )

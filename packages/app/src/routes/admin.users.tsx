@@ -315,11 +315,19 @@ export default function AdminUsersPage() {
         <table className="w-full border-collapse text-left">
           <thead>
             <tr className="border-amber-900/30 border-b bg-gray-900/80 text-amber-500/60 text-xs uppercase tracking-wider">
+<<<<<<< HEAD
               <th className="px-6 py-4 font-semibold">{t('ADMIN_TABLE_USER_INFO')}</th>
               <th className="px-6 py-4 font-semibold">{t('ADMIN_TABLE_ROLE')}</th>
               <th className="px-6 py-4 font-semibold">{t('ADMIN_TABLE_PASS_STATUS')}</th>
               <th className="px-6 py-4 font-semibold">{t('ADMIN_TABLE_JOINED')}</th>
               <th className="px-6 py-4 text-right font-semibold">{t('ADMIN_TABLE_ACTIONS')}</th>
+=======
+              <th className="px-6 py-4 font-semibold">User Info</th>
+              <th className="hidden px-6 py-4 font-semibold md:table-cell">Role</th>
+              <th className="hidden px-6 py-4 font-semibold md:table-cell">Pass Status</th>
+              <th className="hidden px-6 py-4 font-semibold md:table-cell">Joined / Active</th>
+              <th className="px-6 py-4 text-right font-semibold">Actions</th>
+>>>>>>> origin/main
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5">
@@ -350,10 +358,10 @@ export default function AdminUsersPage() {
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="hidden px-6 py-4 md:table-cell">
                     <RoleBadge role={user.role} />
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="hidden px-6 py-4 md:table-cell">
                     {user.role === 'DANCER' ? (
                       user.purchases.length > 0 ? (
                         <div className="flex flex-col gap-1">
@@ -373,7 +381,7 @@ export default function AdminUsersPage() {
                       <span className="text-gray-700 text-xs">-</span>
                     )}
                   </td>
-                  <td className="px-6 py-4 text-gray-400 text-sm">
+                  <td className="hidden px-6 py-4 text-gray-400 text-sm md:table-cell">
                     <div>
                       <ClientDate date={user.createdAt} />
                     </div>

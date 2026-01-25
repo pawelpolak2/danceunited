@@ -1,8 +1,13 @@
-import { Calendar, LayoutDashboard, LogOut, Package, Settings } from 'lucide-react'
-import { Form, Link, Outlet, redirect, useLocation } from 'react-router'
+import { Calendar, LayoutDashboard, Package } from 'lucide-react'
+import { Outlet, redirect } from 'react-router'
 import { Footer } from '../components/Footer'
+<<<<<<< HEAD
 import { ShinyText } from '../components/ui'
 import { useTranslation } from '../contexts/LanguageContext'
+=======
+import { DashboardMobileNav } from '../components/dashboard/DashboardMobileNav'
+import { DashboardSidebar } from '../components/dashboard/DashboardSidebar'
+>>>>>>> origin/main
 import { getCurrentUser } from '../lib/auth.server'
 import type { Route } from './+types/dancer.layout'
 
@@ -20,7 +25,20 @@ export async function loader({ request }: Route.LoaderArgs) {
   return { user }
 }
 
+const DANCER_MENU = [
+  {
+    title: 'MAIN',
+    items: [
+      { label: 'Dashboard', path: '/dancer/dashboard', icon: LayoutDashboard },
+      { label: 'Schedule', path: '/dancer/schedule', icon: Calendar },
+      { label: 'My packages', path: '/dancer/my-packages', icon: Package },
+      { label: 'Buy packages', path: '/dancer/packages', icon: Package },
+    ],
+  },
+]
+
 export default function DancerLayout() {
+<<<<<<< HEAD
   const location = useLocation()
   const { t } = useTranslation()
 
@@ -36,11 +54,14 @@ export default function DancerLayout() {
     },
   ]
 
+=======
+>>>>>>> origin/main
   return (
-    <div className="relative flex h-full w-full overflow-hidden bg-gray-950 text-amber-50">
+    <div className="relative flex h-full w-full flex-col overflow-hidden bg-gray-950 text-amber-50 md:flex-row">
       {/* Background Gradient */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-900/20 via-gray-950 to-gray-950" />
 
+<<<<<<< HEAD
       {/* Sidebar */}
       <aside className="relative z-20 mt-4 mb-4 ml-4 flex h-[calc(100%-2rem)] w-64 flex-shrink-0 flex-col">
         <div className="flex flex-1 flex-col overflow-hidden rounded-2xl border border-amber-900/30 bg-gray-900/40 shadow-2xl shadow-black/50 backdrop-blur-md">
@@ -123,12 +144,23 @@ export default function DancerLayout() {
             </Form>
           </div>
         </div>
+=======
+      {/* Mobile Top Nav */}
+      <DashboardMobileNav
+        title="DU Dancer"
+        renderSidebar={(onNavigate) => <DashboardSidebar groups={DANCER_MENU} onNavigate={onNavigate} />}
+      />
+
+      {/* Desktop Sidebar */}
+      <aside className="relative z-20 mt-4 mb-4 ml-4 hidden h-[calc(100%-2rem)] w-64 flex-shrink-0 flex-col md:flex">
+        <DashboardSidebar groups={DANCER_MENU} />
+>>>>>>> origin/main
       </aside>
 
       {/* Main Content Area */}
       <main className="relative z-10 flex min-w-0 flex-1 flex-col overflow-hidden">
         <div className="scrollbar-metallic flex-1 overflow-y-auto scroll-smooth">
-          <div className="p-4 pt-24 md:p-8">
+          <div className="p-4 pt-4 md:p-8 md:pt-8">
             <Outlet />
           </div>
           <Footer />
