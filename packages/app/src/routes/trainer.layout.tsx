@@ -41,14 +41,18 @@ export default function TrainerLayout() {
       <aside className="relative z-20 mt-4 mb-4 ml-4 flex h-[calc(100%-2rem)] w-64 flex-shrink-0 flex-col">
         <div className="flex flex-1 flex-col overflow-hidden rounded-2xl border border-amber-900/30 bg-gray-900/40 shadow-2xl shadow-black/50 backdrop-blur-md">
           {/* Sidebar Header */}
+          {/* Logo Header */}
           <div className="flex h-20 items-center justify-center border-amber-900/30 border-b bg-gray-900/50 px-6">
-            <ShinyText
-              as="span"
-              variant="title"
-              className="glow-sm font-bold text-amber-500 text-xl uppercase tracking-[0.2em]"
-            >
-              Trainer
-            </ShinyText>
+            <Link to="/" className="flex items-center gap-2 transition-opacity hover:opacity-80">
+              <img src="/logos/logo-transparent.png" alt="Dance United" className="h-8 w-auto" />
+              <ShinyText
+                as="span"
+                variant="title"
+                className="glow-sm font-bold text-amber-500 text-lg uppercase tracking-widest"
+              >
+                Dance United
+              </ShinyText>
+            </Link>
           </div>
 
           {/* Sidebar Navigation */}

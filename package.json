@@ -7,7 +7,8 @@
 		"typegen": "turbo typegen"
 	},
 	"dependencies": {
-		"@biomejs/biome": "^2.3.5"
+		"@biomejs/biome": "^2.3.5",
+		"framer-motion": "^12.29.0"
 	},
 	"devDependencies": {
 		"baseline-browser-mapping": "^2.9.14",
