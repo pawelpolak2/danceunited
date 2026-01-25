@@ -14,7 +14,7 @@ import {
 
 import type { Route } from './+types/root'
 import { Footer } from './components/Footer'
-import { MetallicLink, ShinyText } from './components/ui'
+import { MetallicLink, MobileNav, ShinyText } from './components/ui'
 import { getCurrentUser } from './lib/auth.server'
 import './app.css'
 
@@ -205,6 +205,7 @@ export default function App() {
                   </MetallicLink>
                 </>
               )}
+              <MobileNav />
             </div>
           </nav>
         </header>

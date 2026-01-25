@@ -12,11 +12,18 @@
   font-family: "EB Garamond", Georgia, serif;
   width: 100%;
   max-width: 100%;
+
+  /* FullCalendar Variable Overrides */
+  --fc-page-bg-color: rgb(3, 7, 18);
+  --fc-list-day-cushion-bg-color: rgb(3, 7, 18);
+  --fc-list-day-side-text-color: rgba(255, 215, 0, 0.6);
+  --fc-list-event-hover-bg-color: rgba(255, 215, 0, 0.05);
+  --fc-border-color: rgba(255, 215, 0, 0.3);
 }
 
 /* Make all calendar text shiny */
 .dashboard-calendar .fc-button,
-.dashboard-calendar .fc-button-group > .fc-button {
+.dashboard-calendar .fc-button-group>.fc-button {
   position: relative;
 }
 
@@ -117,26 +124,24 @@
 /* Style the icon buttons (prev/next arrows) */
 .dashboard-calendar .fc-button .fc-icon {
   color: transparent;
-  background: linear-gradient(
-    135deg,
-    #ffffff 0%,
-    #fff9e6 3%,
-    #ffed4e 8%,
-    #ffd700 15%,
-    #ffc125 22%,
-    #daa520 28%,
-    #b8860b 35%,
-    #daa520 42%,
-    #ffc125 50%,
-    #ffd700 58%,
-    #ffc125 65%,
-    #daa520 72%,
-    #ffd700 78%,
-    #ffed4e 85%,
-    #fff9e6 92%,
-    #ffffff 97%,
-    #ffd700 100%
-  );
+  background: linear-gradient(135deg,
+      #ffffff 0%,
+      #fff9e6 3%,
+      #ffed4e 8%,
+      #ffd700 15%,
+      #ffc125 22%,
+      #daa520 28%,
+      #b8860b 35%,
+      #daa520 42%,
+      #ffc125 50%,
+      #ffd700 58%,
+      #ffc125 65%,
+      #daa520 72%,
+      #ffd700 78%,
+      #ffed4e 85%,
+      #fff9e6 92%,
+      #ffffff 97%,
+      #ffd700 100%);
   background-size: 500% 500%;
   background-clip: text;
   -webkit-background-clip: text;
@@ -197,26 +202,24 @@
   font-weight: 500;
   position: relative;
   z-index: 1;
-  background: linear-gradient(
-    135deg,
-    #ffffff 0%,
-    #fff9e6 3%,
-    #ffed4e 8%,
-    #ffd700 15%,
-    #ffc125 22%,
-    #daa520 28%,
-    #b8860b 35%,
-    #daa520 42%,
-    #ffc125 50%,
-    #ffd700 58%,
-    #ffc125 65%,
-    #daa520 72%,
-    #ffd700 78%,
-    #ffed4e 85%,
-    #fff9e6 92%,
-    #ffffff 97%,
-    #ffd700 100%
-  );
+  background: linear-gradient(135deg,
+      #ffffff 0%,
+      #fff9e6 3%,
+      #ffed4e 8%,
+      #ffd700 15%,
+      #ffc125 22%,
+      #daa520 28%,
+      #b8860b 35%,
+      #daa520 42%,
+      #ffc125 50%,
+      #ffd700 58%,
+      #ffc125 65%,
+      #daa520 72%,
+      #ffd700 78%,
+      #ffed4e 85%,
+      #fff9e6 92%,
+      #ffffff 97%,
+      #ffd700 100%);
   background-size: 500% 500%;
   background-clip: text;
   -webkit-background-clip: text;
@@ -232,18 +235,16 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    transparent 25%,
-    rgba(255, 255, 255, 0.3) 35%,
-    rgba(255, 255, 255, 0.8) 45%,
-    rgba(255, 255, 255, 1) 50%,
-    rgba(255, 255, 255, 0.8) 55%,
-    rgba(255, 255, 255, 0.3) 65%,
-    transparent 75%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg,
+      transparent 0%,
+      transparent 25%,
+      rgba(255, 255, 255, 0.3) 35%,
+      rgba(255, 255, 255, 0.8) 45%,
+      rgba(255, 255, 255, 1) 50%,
+      rgba(255, 255, 255, 0.8) 55%,
+      rgba(255, 255, 255, 0.3) 65%,
+      transparent 75%,
+      transparent 100%);
   background-size: 500% 100%;
   background-clip: text;
   -webkit-background-clip: text;
@@ -285,26 +286,24 @@
 .dashboard-calendar .fc-timegrid-axis-cushion {
   position: relative;
   z-index: 1;
-  background: linear-gradient(
-    135deg,
-    #ffffff 0%,
-    #fff9e6 3%,
-    #ffed4e 8%,
-    #ffd700 15%,
-    #ffc125 22%,
-    #daa520 28%,
-    #b8860b 35%,
-    #daa520 42%,
-    #ffc125 50%,
-    #ffd700 58%,
-    #ffc125 65%,
-    #daa520 72%,
-    #ffd700 78%,
-    #ffed4e 85%,
-    #fff9e6 92%,
-    #ffffff 97%,
-    #ffd700 100%
-  );
+  background: linear-gradient(135deg,
+      #ffffff 0%,
+      #fff9e6 3%,
+      #ffed4e 8%,
+      #ffd700 15%,
+      #ffc125 22%,
+      #daa520 28%,
+      #b8860b 35%,
+      #daa520 42%,
+      #ffc125 50%,
+      #ffd700 58%,
+      #ffc125 65%,
+      #daa520 72%,
+      #ffd700 78%,
+      #ffed4e 85%,
+      #fff9e6 92%,
+      #ffffff 97%,
+      #ffd700 100%);
   background-size: 500% 500%;
   background-clip: text;
   -webkit-background-clip: text;
@@ -320,18 +319,16 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    transparent 25%,
-    rgba(255, 255, 255, 0.3) 35%,
-    rgba(255, 255, 255, 0.8) 45%,
-    rgba(255, 255, 255, 1) 50%,
-    rgba(255, 255, 255, 0.8) 55%,
-    rgba(255, 255, 255, 0.3) 65%,
-    transparent 75%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg,
+      transparent 0%,
+      transparent 25%,
+      rgba(255, 255, 255, 0.3) 35%,
+      rgba(255, 255, 255, 0.8) 45%,
+      rgba(255, 255, 255, 1) 50%,
+      rgba(255, 255, 255, 0.8) 55%,
+      rgba(255, 255, 255, 0.3) 65%,
+      transparent 75%,
+      transparent 100%);
   background-size: 500% 100%;
   background-clip: text;
   -webkit-background-clip: text;
@@ -344,26 +341,24 @@
 .dashboard-calendar .fc-toolbar-title {
   position: relative;
   z-index: 1;
-  background: linear-gradient(
-    135deg,
-    #ffffff 0%,
-    #fff9e6 3%,
-    #ffed4e 8%,
-    #ffd700 15%,
-    #ffc125 22%,
-    #daa520 28%,
-    #b8860b 35%,
-    #daa520 42%,
-    #ffc125 50%,
-    #ffd700 58%,
-    #ffc125 65%,
-    #daa520 72%,
-    #ffd700 78%,
-    #ffed4e 85%,
-    #fff9e6 92%,
-    #ffffff 97%,
-    #ffd700 100%
-  );
+  background: linear-gradient(135deg,
+      #ffffff 0%,
+      #fff9e6 3%,
+      #ffed4e 8%,
+      #ffd700 15%,
+      #ffc125 22%,
+      #daa520 28%,
+      #b8860b 35%,
+      #daa520 42%,
+      #ffc125 50%,
+      #ffd700 58%,
+      #ffc125 65%,
+      #daa520 72%,
+      #ffd700 78%,
+      #ffed4e 85%,
+      #fff9e6 92%,
+      #ffffff 97%,
+      #ffd700 100%);
   background-size: 500% 500%;
   background-clip: text;
   -webkit-background-clip: text;
@@ -380,18 +375,16 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    transparent 25%,
-    rgba(255, 255, 255, 0.3) 35%,
-    rgba(255, 255, 255, 0.8) 45%,
-    rgba(255, 255, 255, 1) 50%,
-    rgba(255, 255, 255, 0.8) 55%,
-    rgba(255, 255, 255, 0.3) 65%,
-    transparent 75%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg,
+      transparent 0%,
+      transparent 25%,
+      rgba(255, 255, 255, 0.3) 35%,
+      rgba(255, 255, 255, 0.8) 45%,
+      rgba(255, 255, 255, 1) 50%,
+      rgba(255, 255, 255, 0.8) 55%,
+      rgba(255, 255, 255, 0.3) 65%,
+      transparent 75%,
+      transparent 100%);
   background-size: 500% 100%;
   background-clip: text;
   -webkit-background-clip: text;
@@ -403,7 +396,7 @@
 
 /* Consistent Golden Borders */
 .dashboard-calendar .fc-scrollgrid,
-.dashboard-calendar .fc-scrollgrid-section-header > td,
+.dashboard-calendar .fc-scrollgrid-section-header>td,
 .dashboard-calendar .fc-scrollgrid td,
 .dashboard-calendar .fc-scrollgrid th,
 .dashboard-calendar .fc-col-header-cell,
@@ -424,4 +417,145 @@
 
 .dashboard-calendar .fc-timegrid-slot-minor {
   border-top-color: rgba(255, 215, 0, 0.15) !important;
+}
+
+/* List View Enhancements */
+.dashboard-calendar .fc-list {
+  border: none !important;
+  background-color: transparent !important;
+}
+
+.dashboard-calendar .fc-list-day,
+.dashboard-calendar .fc-list-day td,
+.dashboard-calendar .fc-list-day th,
+.dashboard-calendar .fc-list-day-cushion,
+.dashboard-calendar .fc-list-heading,
+.dashboard-calendar .fc-list-heading td,
+.dashboard-calendar .fc-list-heading th,
+.dashboard-calendar .fc .fc-list-sticky .fc-list-day>* {
+  background-color: rgb(3, 7, 18) !important;
+  background: rgb(3, 7, 18) !important;
+  color: #ffd700 !important;
+}
+
+.dashboard-calendar .fc-list-table {
+  background-color: transparent !important;
+}
+
+.dashboard-calendar .fc-list-empty {
+  background-color: transparent !important;
+  background: transparent !important;
+  color: #888 !important;
+  font-style: italic;
+  padding: 2rem !important;
+}
+
+.dashboard-calendar .fc-list-day-cushion {
+  background-color: rgba(255, 215, 0, 0.05) !important;
+  color: #ffd700 !important;
+  font-family: "Cinzel", serif;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 10px 16px !important;
+  border-bottom: 1px solid rgba(255, 215, 0, 0.2) !important;
+}
+
+.dashboard-calendar .fc-list-event {
+  background-color: rgba(17, 24, 39, 0.3) !important;
+  transition: all 0.2s ease;
+}
+
+.dashboard-calendar .fc-list-event:hover td {
+  background-color: rgba(255, 215, 0, 0.05) !important;
+}
+
+.dashboard-calendar .fc-list-event-title a {
+  color: #ffd700 !important;
+  text-decoration: none !important;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.dashboard-calendar .fc-list-event-time {
+  color: #fbbf24 !important;
+  font-family: monospace;
+  font-size: 0.8rem;
+  white-space: normal !important;
+  max-width: 60px;
+  line-height: 1.2;
+}
+
+.dashboard-calendar .fc-list-event-title {
+  padding-left: 8px !important;
+}
+
+.dashboard-calendar .fc-list-event-title a {
+  color: #ffd700 !important;
+  text-decoration: none !important;
+  font-weight: 500;
+  font-size: 0.9rem;
+  display: block;
+}
+
+.dashboard-calendar .fc-list-event-graphic {
+  padding-right: 8px !important;
+  width: 10px !important;
+}
+
+.dashboard-calendar .fc-list-day-side-text {
+  color: rgba(255, 215, 0, 0.6) !important;
+  font-size: 0.75rem;
+}
+
+/* Day Names Clipping Fix */
+.dashboard-calendar .fc-col-header-cell-cushion {
+  padding: 4px 2px !important;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 767px) {
+  .dashboard-calendar {
+    padding: 0.5rem;
+  }
+
+  .dashboard-calendar .fc-col-header-cell-cushion {
+    font-size: 0.7rem;
+    letter-spacing: 0;
+  }
+
+  /* Compact grid time */
+  .dashboard-calendar .fc-timegrid-slot-label-cushion,
+  .dashboard-calendar .fc-timegrid-axis-cushion {
+    font-size: 0.7rem !important;
+  }
+
+  .dashboard-calendar .fc-toolbar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .dashboard-calendar .fc-toolbar-title {
+    font-size: 1rem !important;
+    text-align: center;
+    margin: 0 !important;
+  }
+
+  .dashboard-calendar .fc-button {
+    padding: 0.3rem 0.6rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  .dashboard-calendar .fc-header-toolbar {
+    margin-bottom: 0.75rem !important;
+  }
+
+  /* Event text wrap in grid */
+  .dashboard-calendar .calendar-event {
+    font-size: 0.7rem !important;
+    padding: 1px 3px !important;
+    white-space: normal !important;
+    line-height: 1.1;
+  }
 }
