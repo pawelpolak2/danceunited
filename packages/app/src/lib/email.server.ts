@@ -23,6 +23,10 @@ interface SendEmailOptions {
 }
 
 export async function sendEmail({ to, subject, html }: SendEmailOptions) {
+  if (process.env.MOCK_EMAIL === 'true') {
+    return { messageId: 'mock-id' }
+  }
+
   if (!SMTP_USER || !SMTP_PASS) {
     console.warn('⚠️ SMTP credentials missing. Email skipped:', { to, subject })
     return null

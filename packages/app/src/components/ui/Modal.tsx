@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { useEffect, useRef } from 'react'
+import { useEffect, useId, useRef } from 'react'
 import { createPortal } from 'react-dom'
 
 interface ModalProps {
@@ -11,6 +11,7 @@ interface ModalProps {
 
 export function Modal({ isOpen, onClose, title, children }: ModalProps) {
   const dialogRef = useRef<HTMLDialogElement>(null)
+  const titleId = useId()
 
   useEffect(() => {
     const dialog = dialogRef.current
@@ -67,11 +68,15 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
 
   return createPortal(
     <dialog
+      aria-labelledby={titleId}
       ref={dialogRef}
       className="-translate-x-1/2 -translate-y-1/2 backdrop:fade-in zoom-in-95 pointer-events-auto fixed top-1/2 left-1/2 w-full max-w-lg rounded-xl border border-amber-900/40 bg-gray-950 p-0 text-gray-100 shadow-2xl shadow-black ring-1 ring-amber-500/20 backdrop:animate-in backdrop:bg-black/80 backdrop:backdrop-blur-sm"
     >
       <div className="flex items-center justify-between border-amber-900/30 border-b bg-gray-900/50 px-6 py-4">
-        <h2 className="bg-gradient-to-r from-amber-200 to-amber-500 bg-clip-text font-bold font-cinzel text-transparent text-xl">
+        <h2
+          id={titleId}
+          className="bg-gradient-to-r from-amber-200 to-amber-500 bg-clip-text font-bold font-cinzel text-transparent text-xl"
+        >
           {title}
         </h2>
         <button
