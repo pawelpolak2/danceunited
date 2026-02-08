@@ -185,9 +185,15 @@ export const action = async ({ request }: Route.ActionArgs) => {
   return { success: true }
 }
 
+// ... imports ...
+import { useTranslation } from '../contexts/LanguageContext'
+
+// ... existing code ...
+
 export default function TemplatesConfiguration() {
   const { templates, danceStyles: styles, trainers, users, search } = useLoaderData<typeof loader>()
   const submit = useSubmit()
+  const { t } = useTranslation()
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState<any | null>(null)
@@ -224,20 +230,20 @@ export default function TemplatesConfiguration() {
     <div className="space-y-6">
       <div>
         <ShinyText as="h1" variant="title" className="mb-2 font-bold text-3xl text-white">
-          Class Templates
+          {t('ADMIN_TEMPLATES_TITLE')}
         </ShinyText>
-        <p className="text-gray-400">Manage templates for classes.</p>
+        <p className="text-gray-400">{t('ADMIN_TEMPLATES_SUBTITLE')}</p>
       </div>
 
       <div className="rounded-xl border border-white/10 bg-black/20 p-6">
         <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center">
           <div className="flex flex-1 items-center gap-4">
-            <h3 className="whitespace-nowrap font-bold text-gold text-xl">Templates List</h3>
+            <h3 className="whitespace-nowrap font-bold text-gold text-xl">{t('ADMIN_TEMPLATES_LIST_TITLE')}</h3>
             <Form className="w-full max-w-xs">
               <input
                 type="text"
                 name="q"
-                placeholder="Search templates..."
+                placeholder={t('ADMIN_TEMPLATES_SEARCH_PLACEHOLDER')}
                 className="w-full rounded border border-amber-900/50 bg-gray-950 px-4 py-2 text-amber-100 text-sm placeholder-gray-600 focus:border-amber-500/50 focus:outline-none"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
@@ -248,7 +254,7 @@ export default function TemplatesConfiguration() {
             <Checkbox
               checked={showInactive}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setShowInactive(e.target.checked)}
-              label="Show Inactive"
+              label={t('ADMIN_TEMPLATES_SHOW_INACTIVE')}
             />
             <MetallicButton
               type="button"
@@ -258,7 +264,7 @@ export default function TemplatesConfiguration() {
               }}
               className="rounded-md border-2 border-gold/50 px-4 py-2"
             >
-              + Create Template
+              {t('ADMIN_TEMPLATES_BTN_CREATE')}
             </MetallicButton>
           </div>
         </div>
@@ -267,19 +273,20 @@ export default function TemplatesConfiguration() {
           <table className="w-full border-collapse text-left">
             <thead>
               <tr className="border-white/10 border-b text-gray-500 text-xs uppercase">
-                <th className="px-4 py-3">Name</th>
-                <th className="hidden px-4 py-3 md:table-cell">Style</th>
-                <th className="hidden px-4 py-3 text-center md:table-cell">Whitelist</th>
-                <th className="hidden px-4 py-3 md:table-cell">Defaults</th>
-                <th className="hidden px-4 py-3 text-center md:table-cell">In Use</th>
-                <th className="px-4 py-3 text-center">Status</th>
-                <th className="px-4 py-3 text-right">Actions</th>
+                <th className="px-4 py-3">{t('ADMIN_TABLE_NAME')}</th>
+                <th className="px-4 py-3">{t('ADMIN_TABLE_STYLE')}</th>
+                <th className="px-4 py-3 text-center">{t('ADMIN_TABLE_WHITELIST')}</th>
+                <th className="px-4 py-3">{t('ADMIN_TABLE_DEFAULTS')}</th>
+                <th className="px-4 py-3 text-center">{t('ADMIN_TABLE_IN_USE')}</th>
+                <th className="px-4 py-3 text-center">{t('ADMIN_TABLE_STATUS')}</th>
+                <th className="px-4 py-3 text-right">{t('ADMIN_TABLE_ACTIONS')}</th>
               </tr>
             </thead>
             <tbody>
               {filteredTemplates.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-gray-500 italic">
+                  <td colSpan={7} className="py-8 text-center text-gray-500 italic">
+                    {/* No templates found message - could add a key if stricter, but using generic empty behavior is ok or add key */}
                     No templates found.
                   </td>
                 </tr>
@@ -301,28 +308,29 @@ export default function TemplatesConfiguration() {
                     <td className="hidden px-4 py-3 text-center md:table-cell">
                       {tpl.isWhitelistEnabled ? (
                         <span className="rounded border border-gold/30 bg-gold/10 px-1.5 py-0.5 font-medium text-[10px] text-gold uppercase">
-                          Enabled
+                          {t('STATUS_ENABLED')}
                         </span>
                       ) : (
                         <span className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5 font-medium text-[10px] text-gray-400 uppercase">
-                          Disabled
+                          {t('STATUS_DISABLED')}
                         </span>
                       )}
                     </td>
                     <td className="hidden px-4 py-3 text-gray-400 text-xs md:table-cell">
                       <div>
-                        <span className="text-gray-500">Hall:</span> {tpl.hallId}
+                        <span className="text-gray-500">{t('LABEL_HALL')}</span> {tpl.hallId}
                       </div>
                       <div>
-                        <span className="text-gray-500">Trainer:</span> {tpl.trainer.firstName} {tpl.trainer.lastName}
+                        <span className="text-gray-500">{t('LABEL_TRAINER')}</span> {tpl.trainer.firstName}{' '}
+                        {tpl.trainer.lastName}
                       </div>
                       <div>
-                        <span className="text-gray-500">Duration:</span> {Math.round(tpl.duration / 60)}m
+                        <span className="text-gray-500">{t('LABEL_DURATION')}</span> {Math.round(tpl.duration / 60)}m
                       </div>
                       {tpl.isIndividual && (
                         <div className="mt-1">
                           <span className="rounded border border-gold/30 bg-gold/10 px-1.5 py-0.5 text-[10px] text-gold uppercase">
-                            Individual
+                            {t('LABEL_INDIVIDUAL')}
                           </span>
                         </div>
                       )}
@@ -364,7 +372,7 @@ export default function TemplatesConfiguration() {
                         </Form>
 
                         <MetallicTooltip
-                          content="Cannot delete template that is in use. Deactivate it instead."
+                          content={t('ADMIN_TEMPLATES_DELETE_BLOCKED')}
                           shouldShow={tpl._count.classInstances > 0}
                           align="end"
                         >
@@ -417,9 +425,9 @@ export default function TemplatesConfiguration() {
             setDeletingTemplateId(null)
           }
         }}
-        title="Delete Template"
-        description="Are you sure you want to delete this template? This cannot be undone."
-        confirmLabel="Delete"
+        title={t('ADMIN_TEMPLATES_DELETE_TITLE')}
+        description={t('ADMIN_TEMPLATES_DELETE_DESC')}
+        confirmLabel={t('CONFIRM_DELETE')}
         isDestructive
       />
     </div>

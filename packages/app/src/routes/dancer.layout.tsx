@@ -1,8 +1,9 @@
 import { Calendar, LayoutDashboard, Package } from 'lucide-react'
-import { Outlet, redirect } from 'react-router'
+import { Outlet, redirect, useLocation } from 'react-router'
 import { Footer } from '../components/Footer'
 import { DashboardMobileNav } from '../components/dashboard/DashboardMobileNav'
 import { DashboardSidebar } from '../components/dashboard/DashboardSidebar'
+import { useTranslation } from '../contexts/LanguageContext'
 import { getCurrentUser } from '../lib/auth.server'
 import type { Route } from './+types/dancer.layout'
 
@@ -20,19 +21,22 @@ export async function loader({ request }: Route.LoaderArgs) {
   return { user }
 }
 
-const DANCER_MENU = [
-  {
-    title: 'MAIN',
-    items: [
-      { label: 'Dashboard', path: '/dancer/dashboard', icon: LayoutDashboard },
-      { label: 'Schedule', path: '/dancer/schedule', icon: Calendar },
-      { label: 'My packages', path: '/dancer/my-packages', icon: Package },
-      { label: 'Buy packages', path: '/dancer/packages', icon: Package },
-    ],
-  },
-]
-
 export default function DancerLayout() {
+  const _location = useLocation()
+  const { t } = useTranslation()
+
+  const menuGroups = [
+    {
+      title: t('DANCER_MENU_MAIN'),
+      items: [
+        { label: t('DANCER_MENU_DASHBOARD'), path: '/dancer/dashboard', icon: LayoutDashboard },
+        { label: t('DANCER_MENU_SCHEDULE'), path: '/dancer/schedule', icon: Calendar },
+        { label: t('DANCER_MENU_MY_PACKAGES'), path: '/dancer/my-packages', icon: Package },
+        { label: t('DANCER_MENU_BUY_PACKAGES'), path: '/dancer/packages', icon: Package },
+      ],
+    },
+  ]
+
   return (
     <div className="relative flex h-full w-full flex-col overflow-hidden bg-gray-950 text-amber-50 md:flex-row">
       {/* Background Gradient */}
@@ -41,12 +45,12 @@ export default function DancerLayout() {
       {/* Mobile Top Nav */}
       <DashboardMobileNav
         title="DU Dancer"
-        renderSidebar={(onNavigate) => <DashboardSidebar groups={DANCER_MENU} onNavigate={onNavigate} />}
+        renderSidebar={(onNavigate) => <DashboardSidebar groups={menuGroups} onNavigate={onNavigate} />}
       />
 
       {/* Desktop Sidebar */}
       <aside className="relative z-20 mt-4 mb-4 ml-4 hidden h-[calc(100%-2rem)] w-64 flex-shrink-0 flex-col md:flex">
-        <DashboardSidebar groups={DANCER_MENU} />
+        <DashboardSidebar groups={menuGroups} />
       </aside>
 
       {/* Main Content Area */}

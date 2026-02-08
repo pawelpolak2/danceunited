@@ -22,18 +22,22 @@ export async function loader({ request }: Route.LoaderArgs) {
   return { purchases }
 }
 
+// ... imports ...
+import { useTranslation } from '../contexts/LanguageContext'
+
 export default function DancerMyPackagesPage() {
   const { purchases } = useLoaderData<typeof loader>()
+  const { t } = useTranslation()
 
   return (
     <div className="min-h-screen text-amber-50">
       <div className="mx-auto max-w-5xl">
         <div className="mb-8 flex flex-col gap-1">
           <ShinyText as="h1" variant="title" className="font-serif text-4xl text-amber-400">
-            My Packages
+            {t('MY_PACKAGES_TITLE')}
           </ShinyText>
           <ShinyText variant="body" className="text-lg opacity-80">
-            Manage your active and past packages
+            {t('MY_PACKAGES_SUBTITLE')}
           </ShinyText>
         </div>
 
@@ -41,9 +45,9 @@ export default function DancerMyPackagesPage() {
           {purchases.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center opacity-70">
               <Package className="mb-4 h-16 w-16 text-amber-500/30" />
-              <p className="mb-6 text-amber-50/70 text-xl">You haven't purchased any packages yet.</p>
+              <p className="mb-6 text-amber-50/70 text-xl">{t('MY_PACKAGES_EMPTY')}</p>
               <Link to="/dancer/packages">
-                <MetallicButton>Browse Packages</MetallicButton>
+                <MetallicButton>{t('MY_PACKAGES_BROWSE_BTN')}</MetallicButton>
               </Link>
             </div>
           ) : (
@@ -69,24 +73,32 @@ export default function DancerMyPackagesPage() {
 
                     <div className="grid grid-cols-2 gap-x-8 gap-y-1 text-sm md:flex md:gap-6">
                       <div className="flex flex-col">
-                        <span className="text-amber-50/40 text-xs uppercase tracking-wider">Purchased</span>
+                        <span className="text-amber-50/40 text-xs uppercase tracking-wider">
+                          {t('MY_PACKAGES_PURCHASED_LABEL')}
+                        </span>
                         <span className="font-medium text-amber-50/80">
                           {new Date(purchase.purchaseDate).toLocaleDateString()}
                         </span>
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-amber-50/40 text-xs uppercase tracking-wider">Expires</span>
+                        <span className="text-amber-50/40 text-xs uppercase tracking-wider">
+                          {t('MY_PACKAGES_EXPIRES_LABEL')}
+                        </span>
                         <span
                           className={`font-medium ${purchase.expiryDate && new Date(purchase.expiryDate) < new Date() ? 'text-red-400' : 'text-amber-50/80'}`}
                         >
-                          {purchase.expiryDate ? new Date(purchase.expiryDate).toLocaleDateString() : 'N/A'}
+                          {purchase.expiryDate
+                            ? new Date(purchase.expiryDate).toLocaleDateString()
+                            : t('MY_PACKAGES_NA')}
                         </span>
                       </div>
                     </div>
                   </div>
 
                   <div className="flex flex-col items-end md:items-end">
-                    <span className="text-amber-50/40 text-xs uppercase tracking-wider">Classes Remaining</span>
+                    <span className="text-amber-50/40 text-xs uppercase tracking-wider">
+                      {t('MY_PACKAGES_REMAINING_LABEL')}
+                    </span>
                     <div className="flex items-baseline gap-1">
                       <span
                         className={`font-bold text-3xl ${purchase.classesRemaining > 0 ? 'text-amber-400' : 'text-gray-500'}`}

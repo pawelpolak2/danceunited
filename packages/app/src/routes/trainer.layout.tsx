@@ -1,8 +1,9 @@
 import { BarChart3, Calendar, LayoutDashboard } from 'lucide-react'
-import { Outlet, redirect } from 'react-router'
+import { Outlet, redirect, useLocation } from 'react-router'
 import { Footer } from '../components/Footer'
 import { DashboardMobileNav } from '../components/dashboard/DashboardMobileNav'
 import { DashboardSidebar } from '../components/dashboard/DashboardSidebar'
+import { useTranslation } from '../contexts/LanguageContext'
 import { getCurrentUser } from '../lib/auth.server'
 import type { Route } from './+types/trainer.layout'
 
@@ -20,18 +21,21 @@ export async function loader({ request }: Route.LoaderArgs) {
   return { user }
 }
 
-const TRAINER_MENU = [
-  {
-    title: 'MAIN',
-    items: [
-      { label: 'Dashboard', path: '/trainer/dashboard', icon: LayoutDashboard },
-      { label: 'Schedule', path: '/trainer/schedule', icon: Calendar },
-      { label: 'Statistics', path: '/trainer/statistics', icon: BarChart3 },
-    ],
-  },
-]
-
 export default function TrainerLayout() {
+  const _location = useLocation()
+  const { t } = useTranslation()
+
+  const menuGroups = [
+    {
+      title: t('TRAINER_MENU_MAIN'),
+      items: [
+        { label: t('TRAINER_MENU_DASHBOARD'), path: '/trainer/dashboard', icon: LayoutDashboard },
+        { label: t('TRAINER_MENU_SCHEDULE'), path: '/trainer/schedule', icon: Calendar },
+        { label: t('TRAINER_MENU_STATISTICS'), path: '/trainer/statistics', icon: BarChart3 },
+      ],
+    },
+  ]
+
   return (
     <div className="relative flex h-full w-full flex-col overflow-hidden bg-gray-950 text-amber-50 md:flex-row">
       {/* Background Gradient */}
@@ -40,12 +44,12 @@ export default function TrainerLayout() {
       {/* Mobile Top Nav */}
       <DashboardMobileNav
         title="DU Trainer"
-        renderSidebar={(onNavigate) => <DashboardSidebar groups={TRAINER_MENU} onNavigate={onNavigate} />}
+        renderSidebar={(onNavigate) => <DashboardSidebar groups={menuGroups} onNavigate={onNavigate} />}
       />
 
       {/* Desktop Sidebar */}
       <aside className="relative z-20 mt-4 mb-4 ml-4 hidden h-[calc(100%-2rem)] w-64 flex-shrink-0 flex-col md:flex">
-        <DashboardSidebar groups={TRAINER_MENU} />
+        <DashboardSidebar groups={menuGroups} />
       </aside>
 
       {/* Main Content Area */}

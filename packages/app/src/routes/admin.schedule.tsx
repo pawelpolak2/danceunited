@@ -402,10 +402,17 @@ export async function action({ request }: Route.ActionArgs) {
   return null
 }
 
+// ... imports ...
+import { useTranslation } from '../contexts/LanguageContext'
+
+// ... meta/loader/action ...
+
 export default function AdminSchedulePage() {
   const { danceStyles, classTemplates, events, classes, trainers, users } = useLoaderData<typeof loader>()
   const fetcher = useFetcher()
+  const { t } = useTranslation()
 
+  // ... state ...
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false)
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
@@ -413,7 +420,7 @@ export default function AdminSchedulePage() {
   const [selectedClass, setSelectedClass] = useState<(typeof classes)[0] | null>(null)
   const [moveConfirmation, setMoveConfirmation] = useState<EventDropArg | null>(null)
 
-  // Close modals on success
+  // ... useEffects (fetcher) ...
   if (fetcher.data?.success) {
     if (fetcher.data.intent === 'create_template' && isTemplateModalOpen) setIsTemplateModalOpen(false)
     if (fetcher.data.intent === 'scheduleClass' && isScheduleModalOpen) setIsScheduleModalOpen(false)
@@ -428,14 +435,8 @@ export default function AdminSchedulePage() {
 
   const handleEventClick = useCallback(
     (clickInfo: EventClickArg) => {
+      // ... Same logic ...
       const classId = clickInfo.event.id
-      // This looks up in `classes` array. If classes array is new every render (from loaderData),
-      // we need `classes` in dependency array.
-      // However, if we want `handleEventClick` to be stable, we should likely rely on `clickInfo` data
-      // OR ensure `classes` in `loaderData` is memoized? `useLoaderData` returns new object on nav?
-
-      // Actually, `clickInfo` has `event`. We can store `event.id` and let `EditClassModal` fetch details?
-      // Or just pass `classes` dependency.
       const foundClass = classes.find((c) => c.id === classId)
       if (foundClass) {
         setSelectedClass(foundClass)
@@ -443,20 +444,12 @@ export default function AdminSchedulePage() {
       }
     },
     [classes]
-  ) // `classes` might change, so this callback changes.
+  )
 
   const handleEventDrop = useCallback((dropInfo: EventDropArg) => {
     setMoveConfirmation(dropInfo)
   }, [])
 
-  // Memoize events array for the calendar
-  // Use `useMemo` on `events` from loaderData if it's passed directly?
-  // No, `events` from loaderData is already an array. If `loaderData` changes, `events` changes.
-  // BUT `DashboardCalendar` checks `prevProps`.
-  // Ideally, we shouldn't pass `events` from loader directly if we want to avoid re-renders when other loader data changes?
-  // But loader data likely changes together.
-
-  // Actually, let's just memoize the array passed to component to be safe
   const calendarEvents = useMemo(() => events, [events])
 
   return (
@@ -464,9 +457,9 @@ export default function AdminSchedulePage() {
       <div className="mb-6 flex flex-col items-start justify-between gap-4 md:flex-row md:items-end">
         <div className="flex flex-col gap-1">
           <ShinyText as="h1" variant="title" className="font-serif text-3xl text-amber-400 tracking-wide">
-            Master Schedule
+            {t('ADMIN_SCHEDULE_TITLE')}
           </ShinyText>
-          <p className="text-gray-400 text-sm">Manage all classes (Drag & Drop to reschedule)</p>
+          <p className="text-gray-400 text-sm">{t('ADMIN_SCHEDULE_SUBTITLE')}</p>
         </div>
         <div className="flex w-full gap-3 md:w-auto">
           <MetallicButton
@@ -476,16 +469,17 @@ export default function AdminSchedulePage() {
             }}
             className="flex-1 rounded-md border-2 px-4 py-2 text-sm md:flex-none"
           >
-            + Schedule Class
+            {t('TRAINER_BTN_SCHEDULE')}
           </MetallicButton>
           <MetallicButton
             onClick={() => setIsTemplateModalOpen(true)}
             className="flex-1 rounded-md border-2 px-4 py-2 text-sm md:flex-none"
           >
-            + New Template
+            {t('TRAINER_BTN_NEW_TEMPLATE')}
           </MetallicButton>
         </div>
       </div>
+      {/* ... */}
 
       <div className="flex-1 rounded-lg border border-amber-900/20 bg-gray-900/20 p-4">
         <DashboardCalendar

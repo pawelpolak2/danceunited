@@ -103,8 +103,14 @@ export async function loader({ request }: Route.LoaderArgs) {
   return { user, kpi, nextClass, agenda }
 }
 
+// ... imports ...
+import { useTranslation } from '../contexts/LanguageContext'
+
+// ... loader ...
+
 export default function TrainerDashboard() {
   const { user, kpi, nextClass, agenda } = useLoaderData<typeof loader>()
+  const { t } = useTranslation()
 
   const formatDate = (isoString: string) => {
     return new Date(isoString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -117,39 +123,32 @@ export default function TrainerDashboard() {
         <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
           <div className="flex flex-col gap-1">
             <ShinyText as="h1" variant="title" className="mb-0 font-serif text-4xl text-amber-400 tracking-wide">
-              HELLO, {user?.firstName}
+              {t('TRAINER_DASH_HELLO')}
+              {user?.firstName}
             </ShinyText>
             <ShinyText variant="body" className="font-light text-lg opacity-80">
-              Here is your overview for today
+              {t('TRAINER_DASH_SUBTITLE')}
             </ShinyText>
           </div>
         </div>
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-          {/* Left Column: KPIs & Next Class (Takes 2 cols space ideally or stack?) 
-                        Actually, let's put Next Class on top or side? 
-                        Let's put Next Class in a prominent spot. 
-                        Grid layout: 
-                        [ Next Class Widget ] [ KPI 1 ] 
-                        [ Agenda .......... ] [ KPI 2 ]
-                                              [ KPI 3 ]
-                        Maybe simpler: Top row KPIs, then columns.
-                    */}
-
           {/* Main Content (2/3) */}
           <div className="space-y-8 lg:col-span-2">
             {/* Next Class Widget */}
             <section>
-              <h2 className="mb-4 font-serif text-amber-400 text-xl tracking-wide">Next Class</h2>
+              <h2 className="mb-4 font-serif text-amber-400 text-xl tracking-wide">{t('TRAINER_NEXT_CLASS_TITLE')}</h2>
               <NextClassWidget nextClass={nextClass} userRole="TRAINER" />
             </section>
 
             {/* Agenda */}
             <section className="rounded-lg border border-amber-900/30 bg-gray-900/40 p-6 backdrop-blur-sm">
-              <h2 className="mb-6 font-serif text-amber-400 text-xl tracking-wide">Today's Classes</h2>
+              <h2 className="mb-6 font-serif text-amber-400 text-xl tracking-wide">
+                {t('TRAINER_TODAYS_CLASSES_TITLE')}
+              </h2>
 
               {agenda.length === 0 ? (
-                <p className="text-gray-500 italic">No classes scheduled for today.</p>
+                <p className="text-gray-500 italic">{t('TRAINER_NO_CLASSES_TODAY')}</p>
               ) : (
                 <div className="space-y-4">
                   {agenda.map((cls) => (
@@ -169,7 +168,9 @@ export default function TrainerDashboard() {
                       </div>
                       <div className="text-right">
                         <div className="font-serif text-2xl text-amber-100">{cls.occupancy}</div>
-                        <div className="text-gray-500 text-xs uppercase tracking-wider">Students</div>
+                        <div className="text-gray-500 text-xs uppercase tracking-wider">
+                          {t('TRAINER_CLASS_STUDENTS')}
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -180,10 +181,10 @@ export default function TrainerDashboard() {
 
           {/* Right Column: KPIs (1/3) */}
           <div className="space-y-4">
-            <h2 className="mb-4 font-serif text-amber-400 text-xl tracking-wide">Stats</h2>
-            <KpiCard title="Classes Today" value={kpi.classesToday} />
-            <KpiCard title="Hours Month" value={kpi.hoursWorkedMonth} />
-            <KpiCard title="Upcoming (7 days)" value={kpi.upcomingClasses} />
+            <h2 className="mb-4 font-serif text-amber-400 text-xl tracking-wide">{t('TRAINER_STATS_TITLE')}</h2>
+            <KpiCard title={t('TRAINER_STAT_TODAY')} value={kpi.classesToday} />
+            <KpiCard title={t('TRAINER_STAT_HOURS')} value={kpi.hoursWorkedMonth} />
+            <KpiCard title={t('TRAINER_STAT_UPCOMING')} value={kpi.upcomingClasses} />
           </div>
         </div>
       </div>

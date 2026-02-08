@@ -218,13 +218,21 @@ export async function action({ request }: Route.ActionArgs) {
   return null
 }
 
+// ... imports ...
+import { useTranslation } from '../contexts/LanguageContext'
+
+// ... meta/loader/action ...
+
 export default function DancerSchedulePage() {
   const { events } = useLoaderData<typeof loader>()
   const fetcher = useFetcher()
+  const { t } = useTranslation() // Hook
 
   const [isMyClassesOnly, setIsMyClassesOnly] = useState(false)
   const [selectedEvent, setSelectedEvent] = useState<any>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+
+  // ... (existing logic)
 
   // Close modal on successful fetcher completion
   const isSubmittingRef = useRef(false)
@@ -242,26 +250,10 @@ export default function DancerSchedulePage() {
     }
   }, [fetcher.state, fetcher.data])
 
-  const filteredEvents = useMemo(() => {
-    if (!isMyClassesOnly) return events
-    return events.filter((e) => e.extendedProps.isAttending)
-  }, [events, isMyClassesOnly])
-
-  const handleEventClick = useCallback(
-    (clickInfo: EventClickArg) => {
-      const event = events.find((e) => e.id === clickInfo.event.id)
-      if (event) {
-        setSelectedEvent(event)
-        setIsModalOpen(true)
-      }
-    },
-    [events]
-  )
+  // ... (filteredEvents, handleEventClick, state)
 
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
   const [classToCancel, setClassToCancel] = useState<string | null>(null)
-
-  // ... (previous handles)
 
   const handleSignUp = (classId: string) => {
     const formData = new FormData()
@@ -286,16 +278,34 @@ export default function DancerSchedulePage() {
     setClassToCancel(null)
   }
 
+  // Memoize filtered events
+  const filteredEvents = useMemo(() => {
+    if (!isMyClassesOnly) return events
+    return events.filter((e) => e.extendedProps.isAttending)
+  }, [events, isMyClassesOnly])
+
+  // Callback for event click
+  const handleEventClickCallback = useCallback(
+    (clickInfo: EventClickArg) => {
+      const event = events.find((e) => e.id === clickInfo.event.id)
+      if (event) {
+        setSelectedEvent(event)
+        setIsModalOpen(true)
+      }
+    },
+    [events]
+  )
+
   return (
     <div className="min-h-screen">
       <div className="mx-auto max-w-7xl">
         <div className="mb-8 flex flex-col items-start justify-between gap-4 md:flex-row md:items-end">
           <div className="flex flex-col gap-1">
             <ShinyText as="h1" variant="title" className="font-serif text-4xl text-amber-400">
-              Class Schedule
+              {t('SCHEDULE_PAGE_TITLE')}
             </ShinyText>
             <ShinyText variant="body" className="text-lg opacity-80">
-              Browse classes and manage your bookings
+              {t('SCHEDULE_PAGE_SUBTITLE')}
             </ShinyText>
           </div>
 
@@ -307,7 +317,7 @@ export default function DancerSchedulePage() {
                 onChange={(e) => setIsMyClassesOnly(e.target.checked)}
                 className="h-4 w-4 rounded border-amber-500/50 bg-gray-900 text-amber-500 focus:ring-amber-500 focus:ring-offset-gray-900"
               />
-              <span className="font-medium text-amber-100 text-sm">Show My Classes Only</span>
+              <span className="font-medium text-amber-100 text-sm">{t('SCHEDULE_SHOW_MY_CLASSES')}</span>
             </label>
           </div>
         </div>
@@ -324,7 +334,7 @@ export default function DancerSchedulePage() {
         )}
 
         <div className="rounded-lg border border-amber-900/20 bg-gray-900/30 p-1">
-          <DashboardCalendar events={filteredEvents} onEventClick={handleEventClick} height="auto" />
+          <DashboardCalendar events={filteredEvents} onEventClick={handleEventClickCallback} height="auto" />
         </div>
       </div>
 
@@ -342,10 +352,10 @@ export default function DancerSchedulePage() {
         isOpen={isConfirmModalOpen}
         onClose={() => setIsConfirmModalOpen(false)}
         onConfirm={handleConfirmCancel}
-        title="Cancel Reservation"
-        description="Are you sure you want to cancel this reservation? The class will be credited back to your package."
-        confirmLabel="Yes, Cancel"
-        cancelLabel="No, Keep it"
+        title={t('MODAL_CANCEL_RESERVATION_TITLE')}
+        description={t('MODAL_CANCEL_RESERVATION_DESC')}
+        confirmLabel={t('MODAL_CANCEL_CONFIRM')}
+        cancelLabel={t('MODAL_CANCEL_DENY')}
         isDestructive
         isLoading={fetcher.state !== 'idle'}
       />

@@ -233,10 +233,16 @@ export async function action({ request }: Route.ActionArgs) {
   return null
 }
 
+// ... imports ...
+import { useTranslation } from '../contexts/LanguageContext'
+
+// ... meta/loader/action ...
+
 export default function DancerDashboard() {
   const { user, kpi, nextClass, agenda, activePackages } = useLoaderData<typeof loader>()
   // We use fetcher for interacting with the widget without full page reload feels
   const fetcher = useFetcher()
+  const { t } = useTranslation()
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
 
   const formatDate = (isoString: string) => {
@@ -265,10 +271,11 @@ export default function DancerDashboard() {
         <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
           <div className="flex flex-col gap-1">
             <ShinyText as="h1" variant="title" className="mb-0 font-serif text-4xl text-amber-400 tracking-wide">
-              HELLO, {user?.firstName}
+              {t('DANCER_DASH_HELLO')}
+              {user?.firstName}
             </ShinyText>
             <ShinyText variant="body" className="font-light text-lg opacity-80">
-              Your dance journey overview
+              {t('DANCER_DASH_SUBTITLE')}
             </ShinyText>
           </div>
         </div>
@@ -290,7 +297,7 @@ export default function DancerDashboard() {
           <div className="space-y-8 lg:col-span-2">
             {/* Next Class Widget */}
             <section>
-              <h2 className="mb-4 font-serif text-amber-400 text-xl tracking-wide">Next Class</h2>
+              <h2 className="mb-4 font-serif text-amber-400 text-xl tracking-wide">{t('DANCER_NEXT_CLASS_TITLE')}</h2>
               <NextClassWidget nextClass={nextClass} userRole="DANCER">
                 {nextClass && (
                   <div className="flex gap-4">
@@ -360,10 +367,12 @@ export default function DancerDashboard() {
 
             {/* Agenda */}
             <section className="rounded-lg border border-amber-900/30 bg-gray-900/40 p-6 backdrop-blur-sm">
-              <h2 className="mb-6 font-serif text-amber-400 text-xl tracking-wide">Today's Schedule</h2>
+              <h2 className="mb-6 font-serif text-amber-400 text-xl tracking-wide">
+                {t('DANCER_SCHEDULE_TODAY_TITLE')}
+              </h2>
 
               {agenda.length === 0 ? (
-                <p className="text-gray-500 italic">You haven't signed up for any classes today.</p>
+                <p className="text-gray-500 italic">{t('DANCER_SCHEDULE_NO_CLASSES')}</p>
               ) : (
                 <div className="space-y-4">
                   {agenda.map((cls) => (
@@ -383,7 +392,9 @@ export default function DancerDashboard() {
                       </div>
                       <div className="text-right">
                         <div className="font-serif text-amber-100 text-xl">{cls.trainerName}</div>
-                        <div className="text-gray-500 text-xs uppercase tracking-wider">Trainer</div>
+                        <div className="text-gray-500 text-xs uppercase tracking-wider">
+                          {t('DANCER_TRAINER_LABEL')}
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -393,7 +404,9 @@ export default function DancerDashboard() {
 
             {/* Packages Summary */}
             <section>
-              <h2 className="mb-4 font-serif text-amber-400 text-xl tracking-wide">My Active Packages</h2>
+              <h2 className="mb-4 font-serif text-amber-400 text-xl tracking-wide">
+                {t('DANCER_ACTIVE_PACKAGES_TITLE')}
+              </h2>
 
               <div className="group relative overflow-hidden rounded-xl border border-amber-500/30 bg-gradient-to-br from-gray-900/80 to-gray-950/80 p-6 shadow-lg backdrop-blur-md transition-all hover:border-amber-500/50">
                 {/* Background Glow */}
@@ -412,9 +425,9 @@ export default function DancerDashboard() {
                   {activePackages.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-8 text-center text-gray-500">
                       <Package className="mb-2 h-8 w-8 opacity-20" />
-                      <p className="italic">You don't have any active packages.</p>
+                      <p className="italic">{t('DANCER_NO_ACTIVE_PACKAGES')}</p>
                       <Link to="/dancer/packages" className="mt-4 text-amber-400 text-sm hover:underline">
-                        Purchase a package
+                        {t('DANCER_PURCHASE_LINK')}
                       </Link>
                     </div>
                   ) : (
@@ -430,11 +443,12 @@ export default function DancerDashboard() {
                           <div className="relative z-10">
                             <div className="truncate font-bold text-amber-100">{p.package.name}</div>
                             <div className="mb-2 text-amber-400/80 text-xs">
-                              Expires: {p.expiryDate ? new Date(p.expiryDate).toLocaleDateString() : 'Never'}
+                              {t('DANCER_EXPIRES')}{' '}
+                              {p.expiryDate ? new Date(p.expiryDate).toLocaleDateString() : t('DANCER_EXPIRES_NEVER')}
                             </div>
                             <div className="flex items-end gap-1">
                               <span className="font-bold text-2xl text-amber-400">{p.classesRemaining}</span>
-                              <span className="mb-1 text-gray-400 text-sm">classes left</span>
+                              <span className="mb-1 text-gray-400 text-sm">{t('DANCER_CLASSES_LEFT')}</span>
                             </div>
                           </div>
                         </div>
@@ -448,10 +462,10 @@ export default function DancerDashboard() {
 
           {/* Right Column: KPIs (1/3) */}
           <div className="space-y-4">
-            <h2 className="mb-4 font-serif text-amber-400 text-xl tracking-wide">My Stats</h2>
-            <KpiCard title="Classes Today" value={kpi.classesToday} />
-            <KpiCard title="Month Activity" value={kpi.classesMonth} />
-            <KpiCard title="Upcoming (7 days)" value={kpi.upcomingClasses} />
+            <h2 className="mb-4 font-serif text-amber-400 text-xl tracking-wide">{t('DANCER_STATS_TITLE')}</h2>
+            <KpiCard title={t('DANCER_STAT_TODAY')} value={kpi.classesToday} />
+            <KpiCard title={t('DANCER_STAT_MONTH')} value={kpi.classesMonth} />
+            <KpiCard title={t('DANCER_STAT_UPCOMING')} value={kpi.upcomingClasses} />
           </div>
         </div>
       </div>
