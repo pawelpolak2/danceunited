@@ -193,14 +193,12 @@ export async function loader({ request }: Route.LoaderArgs) {
   thirtyDaysAgo.setDate(now.getDate() - 30)
   thirtyDaysAgo.setHours(0, 0, 0, 0)
 
-  const paymentsLast30Days = await prisma.payment.findMany({
-    where: {
-      paymentDate: { gte: thirtyDaysAgo },
-      paymentStatus: 'COMPLETED',
-    },
-    select: { paymentDate: true, amount: true },
-    orderBy: { paymentDate: 'asc' },
-  })
+  const aggregatedPayments = (await prisma.$queryRaw`
+    SELECT DATE(payment_date) as date, SUM(amount) as total
+    FROM payment
+    WHERE payment_date >= ${thirtyDaysAgo} AND payment_status = 'COMPLETED'::"PaymentStatus"
+    GROUP BY DATE(payment_date)
+  `) as { date: Date | string; total: unknown }[]
 
   const revenueMap = new Map<string, number>()
   // Initialize map with 0s
@@ -211,10 +209,11 @@ export async function loader({ request }: Route.LoaderArgs) {
     revenueMap.set(key, 0)
   }
 
-  for (const p of paymentsLast30Days) {
-    const dateKey = p.paymentDate.toISOString().split('T')[0]
+  for (const row of aggregatedPayments) {
+    const d = new Date(row.date)
+    const dateKey = d.toISOString().split('T')[0]
     if (revenueMap.has(dateKey)) {
-      revenueMap.set(dateKey, (revenueMap.get(dateKey) || 0) + Number(p.amount))
+      revenueMap.set(dateKey, Number(row.total))
     }
   }
 
