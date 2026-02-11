@@ -12,21 +12,22 @@ export const loader = async () => {
   const fs = await import('fs')
   const path = await import('path')
 
-  const galleryImages: Record<string, string[]> = {}
-
-  for (const category of GALLERY_CATEGORIES) {
-    const dir = path.join(process.cwd(), 'public', 'gallery', category)
-    try {
-      if (fs.existsSync(dir)) {
-        galleryImages[category] = fs.readdirSync(dir).filter((file) => /\.(png|jpg|jpeg|webp)$/i.test(file))
-      } else {
-        galleryImages[category] = []
+  const entries = await Promise.all(
+    GALLERY_CATEGORIES.map(async (category) => {
+      const dir = path.join(process.cwd(), 'public', 'gallery', category)
+      try {
+        const files = await fs.promises.readdir(dir)
+        return [category, files.filter((file) => /\.(png|jpg|jpeg|webp)$/i.test(file))]
+      } catch (e) {
+        if ((e as any).code !== 'ENOENT') {
+          console.error(`Error reading gallery ${category}`, e)
+        }
+        return [category, []]
       }
-    } catch (e) {
-      console.error(`Error reading gallery ${category}`, e)
-      galleryImages[category] = []
-    }
-  }
+    })
+  )
+
+  const galleryImages = Object.fromEntries(entries)
   return { galleryImages }
 }
 
