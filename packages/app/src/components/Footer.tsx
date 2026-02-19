@@ -8,7 +8,7 @@ export function Footer() {
       <div className="mx-auto grid max-w-7xl gap-8 px-4 text-gray-400 text-sm md:grid-cols-4">
         <div className="space-y-4">
           <div className="flex items-center gap-2">
-            <img src="/logos/logo-transparent.png" alt="Dance United" className="h-8 w-auto opacity-80" />
+            <img src="/logos/logo-transparent.webp" alt="Dance United" className="h-8 w-auto opacity-80" />
             <span className="font-bold font-serif text-amber-500 uppercase tracking-wider">{t('BRAND_NAME')}</span>
           </div>
           <p className="opacity-70">{t('FOOTER_DESCRIPTION')}</p>

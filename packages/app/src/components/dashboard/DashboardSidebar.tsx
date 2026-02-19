@@ -27,7 +27,7 @@ export function DashboardSidebar({ groups, onNavigate }: DashboardSidebarProps) 
       {/* Logo Header */}
       <div className="flex h-20 items-center justify-center border-amber-900/30 border-b bg-gray-900/50 px-6">
         <Link to="/" className="flex items-center gap-2 transition-opacity hover:opacity-80">
-          <img src="/logos/logo-transparent.png" alt="Dance United" className="h-8 w-auto" />
+          <img src="/logos/logo-transparent.webp" alt="Dance United" className="h-8 w-auto" />
           <ShinyText
             as="span"
             variant="title"
