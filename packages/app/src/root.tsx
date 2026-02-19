@@ -87,7 +87,7 @@ function AppContent({ user }: { user: any }) {
           <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
             <div className="flex items-center gap-8">
               <Link to="/" className="flex items-center gap-3">
-                <img src="/logos/logo-transparent.png" alt="Dance United" className="h-16 w-auto" />
+                <img src="/logos/logo-transparent.webp" alt="Dance United" className="h-16 w-auto" />
                 <ShinyText as="span" variant="title" className="text-3xl">
                   {t('BRAND_NAME')}
                 </ShinyText>

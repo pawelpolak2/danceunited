@@ -40,7 +40,7 @@ export function DashboardMobileNav({ title, renderSidebar }: DashboardMobileNavP
         >
           {title}
         </ShinyText>
-        <img src="/logos/logo-transparent.png" alt="Dance United" className="h-8 w-auto" />
+        <img src="/logos/logo-transparent.webp" alt="Dance United" className="h-8 w-auto" />
       </Link>
 
       {/* Drawer via Portal */}
